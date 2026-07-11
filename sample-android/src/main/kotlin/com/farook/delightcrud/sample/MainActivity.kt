@@ -49,8 +49,8 @@ class MainActivity : AppCompatActivity() {
         fun addTodo() {
             val title = etInput.text.toString().trim()
             if (title.isEmpty()) { Toast.makeText(this, "Title is empty", Toast.LENGTH_SHORT).show(); return }
-            val urgency = if (rgPriority.checkedRadioButtonId == R.id.rbHigh) 1 else 0
-            lifecycleScope.launch { repo.insert(Todo(title = title, urgency = urgency)) }
+            val priority = if (rgPriority.checkedRadioButtonId == R.id.rbHigh) 1 else 0
+            lifecycleScope.launch { repo.insert(Todo(title = title, priority = priority)) }
             etInput.setText("")
         }
 
@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 repo.observeAll().collect { todos ->
                     adapter.submitList(
-                        todos.sortedWith(compareByDescending<Todo> { it.urgency }.thenBy { it.id })
+                        todos.sortedWith(compareByDescending<Todo> { it.priority }.thenBy { it.id })
                     )
                 }
             }

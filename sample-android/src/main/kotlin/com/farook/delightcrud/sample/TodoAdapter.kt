@@ -49,7 +49,7 @@ class TodoAdapter(
         else
             holder.tvTitle.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
 
-        holder.tvPriority.visibility = if (todo.urgency == 1) View.VISIBLE else View.GONE
+        holder.tvPriority.visibility = if (todo.priority == 1) View.VISIBLE else View.GONE
 
         holder.cbDone.setOnClickListener { onToggle(todo) }
         holder.btnDelete.setOnClickListener { onDelete(todo) }
