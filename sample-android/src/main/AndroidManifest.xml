@@ -4,6 +4,7 @@
     <application
         android:name=".SampleApplication"
         android:label="DelightCRUD Sample"
+        android:theme="@style/Theme.DelightCRUDSample"
         android:allowBackup="false"
         android:supportsRtl="true">
 

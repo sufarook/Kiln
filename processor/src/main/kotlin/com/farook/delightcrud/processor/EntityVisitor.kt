@@ -89,7 +89,9 @@ object EntityVisitor {
             isEnum = pkMapping.isEnum,
             enumClassName = if (pkMapping.isEnum) pkType.declaration.qualifiedName?.asString() ?: "" else "",
             isInt = pkMapping.isInt,
-            isFloat = pkMapping.isFloat
+            isFloat = pkMapping.isFloat,
+            sqlDefaultValue = pkMapping.defaultValue,
+            migrateFrom = ""  // primary keys are never renamed via migrateFrom
         )
 
         val nonPkColumns = persistableProps
@@ -103,8 +105,9 @@ object EntityVisitor {
                     return null
                 }
                 val colAnnotation = prop.annotations.firstOrNull { it.shortName.asString() == "Column" }
-                val isUnique = colAnnotation?.arguments?.firstOrNull { it.name?.asString() == "unique" }?.value as? Boolean ?: false
-                val hasIndex = colAnnotation?.arguments?.firstOrNull { it.name?.asString() == "index" }?.value as? Boolean ?: false
+                val isUnique    = colAnnotation?.arguments?.firstOrNull { it.name?.asString() == "unique" }?.value as? Boolean ?: false
+                val hasIndex    = colAnnotation?.arguments?.firstOrNull { it.name?.asString() == "index" }?.value as? Boolean ?: false
+                val migrateFrom = colAnnotation?.arguments?.firstOrNull { it.name?.asString() == "migrateFrom" }?.value as? String ?: ""
 
                 ColumnMetadata(
                     propertyName = prop.simpleName.asString(),
@@ -122,7 +125,9 @@ object EntityVisitor {
                     isEnum = mapping.isEnum,
                     enumClassName = if (mapping.isEnum) resolvedType.declaration.qualifiedName?.asString() ?: "" else "",
                     isInt = mapping.isInt,
-                    isFloat = mapping.isFloat
+                    isFloat = mapping.isFloat,
+                    sqlDefaultValue = mapping.defaultValue,
+                    migrateFrom = migrateFrom
                 )
             }
 

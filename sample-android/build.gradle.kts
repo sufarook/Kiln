@@ -29,6 +29,8 @@ dependencies {
     implementation(project(":runtime"))
     implementation(libs.sqldelight.android.driver)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.lifecycle.runtime.ktx)   // lifecycleScope for suspend CRUD
 
     // KSP runs the processor and auto-adds generated sources to the compilation
     ksp(project(":processor"))

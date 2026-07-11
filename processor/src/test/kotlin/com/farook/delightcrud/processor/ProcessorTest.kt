@@ -60,23 +60,24 @@ class SqlStatementBuilderTest {
         )
     )
 
+    // Identifiers are double-quoted so reserved words like "order" are safe table names
     @Test
     fun createTableContainsTableName() {
         val sql = SqlStatementBuilder.createTable(productMeta())
-        assertTrue(sql.contains("CREATE TABLE IF NOT EXISTS product"))
+        assertTrue(sql.contains("CREATE TABLE IF NOT EXISTS \"product\""))
     }
 
     @Test
     fun createTableContainsPrimaryKey() {
         val sql = SqlStatementBuilder.createTable(productMeta())
-        assertTrue(sql.contains("id TEXT NOT NULL PRIMARY KEY"))
+        assertTrue(sql.contains("\"id\" TEXT NOT NULL PRIMARY KEY"))
     }
 
     @Test
     fun createTableContainsAllColumns() {
         val sql = SqlStatementBuilder.createTable(productMeta())
-        assertTrue(sql.contains("name TEXT NOT NULL"))
-        assertTrue(sql.contains("price REAL NOT NULL"))
+        assertTrue(sql.contains("\"name\" TEXT NOT NULL"))
+        assertTrue(sql.contains("\"price\" REAL NOT NULL"))
     }
 
     @Test
@@ -99,8 +100,8 @@ class SqlStatementBuilderTest {
             )
         )
         val sql = SqlStatementBuilder.createTable(meta)
-        assertFalse("Nullable column must not have NOT NULL", sql.contains("description TEXT NOT NULL"))
-        assertTrue(sql.contains("description TEXT"))
+        assertFalse("Nullable column must not have NOT NULL", sql.contains("\"description\" TEXT NOT NULL"))
+        assertTrue(sql.contains("\"description\" TEXT"))
     }
 
     @Test
@@ -150,7 +151,7 @@ class SqlStatementBuilderTest {
     @Test
     fun insertSqlIncludesAllColumnsWithPlaceholders() {
         val sql = SqlStatementBuilder.insert(productMeta())
-        assertTrue(sql.startsWith("INSERT INTO product"))
+        assertTrue(sql.startsWith("INSERT INTO \"product\""))
         assertEquals(3, sql.count { it == '?' })
     }
 
@@ -167,8 +168,8 @@ class SqlStatementBuilderTest {
     @Test
     fun updateSqlSetsAllNonPkColumns() {
         val sql = SqlStatementBuilder.update(productMeta())
-        assertTrue(sql.startsWith("UPDATE product SET"))
-        assertTrue(sql.contains("WHERE id = ?"))
+        assertTrue(sql.startsWith("UPDATE \"product\" SET"))
+        assertTrue(sql.contains("WHERE \"id\" = ?"))
         // name and price are set, id is the WHERE clause
         assertEquals(3, sql.count { it == '?' })
     }
@@ -176,14 +177,14 @@ class SqlStatementBuilderTest {
     @Test
     fun deleteSqlFiltersById() {
         val sql = SqlStatementBuilder.delete(productMeta())
-        assertEquals("DELETE FROM product WHERE id = ?", sql)
+        assertEquals("DELETE FROM \"product\" WHERE \"id\" = ?", sql)
     }
 
     @Test
     fun findByIdSqlSelectsAllColumns() {
         val sql = SqlStatementBuilder.findById(productMeta())
         assertTrue(sql.contains("SELECT"))
-        assertTrue(sql.contains("WHERE id = ?"))
+        assertTrue(sql.contains("WHERE \"id\" = ?"))
         assertTrue(sql.contains("id"))
         assertTrue(sql.contains("name"))
         assertTrue(sql.contains("price"))
@@ -194,7 +195,7 @@ class SqlStatementBuilderTest {
         val sql = SqlStatementBuilder.findAll(productMeta())
         assertTrue(sql.startsWith("SELECT"))
         assertFalse(sql.contains("WHERE"))
-        assertTrue(sql.contains("FROM product"))
+        assertTrue(sql.contains("FROM \"product\""))
     }
 
     @Test

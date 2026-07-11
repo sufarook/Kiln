@@ -16,7 +16,10 @@ android {
 }
 
 kotlin {
-    androidTarget()
+    applyDefaultHierarchyTemplate()   // creates iosMain umbrella source set
+    androidTarget {
+        publishLibraryVariants("release")
+    }
     jvm()
     iosArm64()
     iosX64()
@@ -26,11 +29,24 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(libs.sqldelight.runtime)           // SqlDriver visible to consumers
+                api(libs.kotlinx.coroutines.core)      // Flow/suspend in CrudRepository
             }
         }
         val androidMain by getting {
             dependencies {
                 api(libs.sqldelight.android.driver)    // AndroidDatabaseDriverFactory visible to consumers
+            }
+        }
+        val iosMain by getting {
+            dependencies {
+                api(libs.sqldelight.native.driver)     // IosDatabaseDriverFactory visible to consumers
+            }
+        }
+        val jvmTest by getting {
+            dependencies {
+                implementation(libs.junit)
+                implementation(kotlin("test"))
+                implementation(libs.sqldelight.sqlite.driver)  // in-memory JDBC driver for migrator tests
             }
         }
     }

@@ -28,5 +28,7 @@ data class ColumnMetadata(
     val isEnum: Boolean = false,
     val enumClassName: String = "",
     val isInt: Boolean = false,
-    val isFloat: Boolean = false
+    val isFloat: Boolean = false,
+    val sqlDefaultValue: String = "",  // SQL literal, e.g. "0", "''" — for ALTER TABLE ADD COLUMN
+    val migrateFrom: String = ""       // old column name when property was renamed
 )
