@@ -5,6 +5,8 @@ repo_name: DelightCRUD
 repo_url: https://github.com/ummerfarook/DelightCRUD
 copyright: Copyright &copy; 2024 Syed Ummer Farook
 
+docs_dir: .
+
 theme:
   name: material
   palette:
