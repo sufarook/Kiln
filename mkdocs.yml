@@ -1,0 +1,86 @@
+site_name: DelightCRUD
+site_description: Compile-time CRUD generation for Kotlin Multiplatform — no SQL, no version numbers, no boilerplate.
+site_author: Syed Ummer Farook
+repo_name: DelightCRUD
+repo_url: https://github.com/ummerfarook/DelightCRUD
+copyright: Copyright &copy; 2024 Syed Ummer Farook
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.footer
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - tables
+  - attr_list
+  - md_in_html
+  - def_list
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Quickstart: getting-started/quickstart.md
+    - Installation: getting-started/installation.md
+    - Requirements: getting-started/requirements.md
+  - Annotations:
+    - Overview: annotations/index.md
+    - "@DbEntity": annotations/db-entity.md
+    - "@PrimaryKey": annotations/primary-key.md
+    - "@Column": annotations/column.md
+    - "@Ignore": annotations/ignore.md
+  - Sample App:
+    - Task Tracker: sample/index.md
+    - Entity Definitions: sample/entities.md
+    - Initialization: sample/initialization.md
+    - CRUD Operations: sample/crud.md
+    - Reactive Queries: sample/reactive.md
+    - Cross-table Loading: sample/cross-table.md
+    - DSL Queries: sample/dsl.md
+  - Auto-migration: migration.md
+  - API Reference:
+    - Generated Methods: reference/api.md
+    - DSL Operators: reference/dsl-operators.md
+    - Supported Types: reference/supported-types.md
+  - FAQ: faq.md
