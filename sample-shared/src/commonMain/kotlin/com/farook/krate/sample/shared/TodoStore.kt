@@ -13,26 +13,26 @@ import kotlinx.coroutines.flow.map
  */
 class TodoStore(driver: SqlDriver) {
 
-    private val repo = TodoRepository(driver)
+    private val repo = TodoSharedRepository(driver)
 
     init {
         repo.createTable()  // creates on first launch, auto-migrates on upgrades
     }
 
     /** Reactive stream — emits on every insert/update/delete, high-priority first. */
-    fun observeAll(): Flow<List<Todo>> = repo.observeAll().map { list ->
-        list.sortedWith(compareByDescending<Todo> { it.priority }.thenBy { it.id })
+    fun observeAll(): Flow<List<TodoShared>> = repo.observeAll().map { list ->
+        list.sortedWith(compareByDescending<TodoShared> { it.priority }.thenBy { it.id })
     }
 
     suspend fun add(title: String, highPriority: Boolean = false) {
-        repo.insert(Todo(title = title, priority = if (highPriority) 1 else 0))
+        repo.insert(TodoShared(title = title, priority = if (highPriority) 1 else 0))
     }
 
-    suspend fun toggle(todo: Todo) {
+    suspend fun toggle(todo: TodoShared) {
         repo.update(todo.copy(isCompleted = !todo.isCompleted))
     }
 
-    suspend fun rename(todo: Todo, newTitle: String) {
+    suspend fun rename(todo: TodoShared, newTitle: String) {
         repo.update(todo.copy(title = newTitle))
     }
 
@@ -40,8 +40,8 @@ class TodoStore(driver: SqlDriver) {
         repo.delete(id)
     }
 
-    suspend fun all(): List<Todo> =
-        repo.findAll().sortedWith(compareByDescending<Todo> { it.priority }.thenBy { it.id })
+    suspend fun all(): List<TodoShared> =
+        repo.findAll().sortedWith(compareByDescending<TodoShared> { it.priority }.thenBy { it.id })
 
     // ── Type-safe query DSL in action — no SQL strings ──────────────────────────
 
@@ -49,11 +49,11 @@ class TodoStore(driver: SqlDriver) {
         repo.deleteWhere { isCompleted eq true }
     }
 
-    suspend fun highPriorityOpen(): List<Todo> =
+    suspend fun highPriorityOpen(): List<TodoShared> =
         repo.findWhere { (priority eq 1) and (isCompleted eq false) }
 
-    suspend fun search(prefix: String): List<Todo> =
+    suspend fun search(prefix: String): List<TodoShared> =
         repo.findWhere { title like "$prefix%" }
 
-    suspend fun pendingCount(): Long = repo.count()
+    suspend fun pendingCount(): Long = repo.count { isCompleted eq false }
 }

@@ -9,7 +9,7 @@ import com.farook.krate.annotations.PrimaryKey
  * so Android and iOS share the exact same type-safe CRUD code.
  */
 @DbEntity(tableName = "todos")
-data class Todo(
+data class TodoShared(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val title: String,
     @Column(name = "is_completed") val isCompleted: Boolean = false,
