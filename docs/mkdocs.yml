@@ -1,8 +1,8 @@
-site_name: DelightCRUD
+site_name: Krate
 site_description: Compile-time CRUD generation for Kotlin Multiplatform — no SQL, no version numbers, no boilerplate.
 site_author: Syed Ummer Farook
-repo_name: DelightCRUD
-repo_url: https://github.com/ummerfarook/DelightCRUD
+repo_name: Krate
+repo_url: https://github.com/ummerfarook/Krate
 copyright: Copyright &copy; 2024 Syed Ummer Farook
 
 docs_dir: src

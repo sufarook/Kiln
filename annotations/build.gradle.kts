@@ -4,11 +4,11 @@ plugins {
     `maven-publish`
 }
 
-group = "com.farook.delightcrud"
+group = "com.farook.krate"
 version = "1.0.0-SNAPSHOT"
 
 android {
-    namespace = "com.farook.delightcrud.annotations"
+    namespace = "com.farook.krate.annotations"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()

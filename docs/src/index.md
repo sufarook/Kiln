@@ -1,4 +1,4 @@
-# DelightCRUD
+# Krate
 
 **Annotate a data class. Rebuild. Get a complete, type-safe SQLite repository.**
 
@@ -18,7 +18,7 @@ No SQL to write. No version numbers to track. No migration files to maintain.
 
     ---
 
-    Add, rename, or remove a property. Just rebuild — DelightCRUD diffs the live schema and migrates automatically.
+    Add, rename, or remove a property. Just rebuild — Krate diffs the live schema and migrates automatically.
 
 -   :material-water-outline:{ .lg .middle } **Reactive by default**
 
@@ -42,7 +42,7 @@ No SQL to write. No version numbers to track. No migration files to maintain.
 
     ---
 
-    The `com.farook.delightcrud` plugin applies KSP and wires all source sets automatically.
+    The `com.farook.krate` plugin applies KSP and wires all source sets automatically.
 
 </div>
 
@@ -59,7 +59,7 @@ data class Task(
 )
 ```
 
-DelightCRUD generates `TaskRepository` at compile time with:
+Krate generates `TaskRepository` at compile time with:
 
 | Method | Description |
 |--------|-------------|
@@ -75,9 +75,9 @@ DelightCRUD generates `TaskRepository` at compile time with:
 | `deleteWhere { … }` | `suspend` — bulk delete by predicate |
 | `count { … }` | `suspend` — returns `Long` |
 
-## Why DelightCRUD
+## Why Krate
 
-| | Room | SQLDelight | DelightCRUD |
+| | Room | SQLDelight | Krate |
 |---|---|---|---|
 | SQL you write | `@Query` annotations | `.sq` files | **None** |
 | Migration | Version numbers + SQL files | Manual SQL | **Automatic** |
@@ -89,7 +89,7 @@ DelightCRUD generates `TaskRepository` at compile time with:
 
 ```kotlin
 // 1. Apply the plugin in build.gradle.kts
-//    id("com.farook.delightcrud") version "1.0.0-alpha01"
+//    id("com.farook.krate") version "1.0.0-alpha01"
 
 // 2. Annotate a data class
 @DbEntity(tableName = "notes")
@@ -113,4 +113,4 @@ lifecycleScope.launch {
 ```
 
 [Get started :material-arrow-right:](getting-started/quickstart.md){ .md-button .md-button--primary }
-[View on GitHub :material-github:](https://github.com/ummerfarook/DelightCRUD){ .md-button }
+[View on GitHub :material-github:](https://github.com/ummerfarook/Krate){ .md-button }

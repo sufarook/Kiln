@@ -14,7 +14,7 @@ annotation class Ignore
 
 - **Computed properties** — values derived from other fields at runtime.
 - **Transient UI state** — selection state, expansion state, etc.
-- **Unsupported types** — when a property holds a type that DelightCRUD cannot map to SQLite (e.g. `List<String>`). Serialize it yourself and store the serialized form in a supported column separately.
+- **Unsupported types** — when a property holds a type that Krate cannot map to SQLite (e.g. `List<String>`). Serialize it yourself and store the serialized form in a supported column separately.
 
 ## Example
 

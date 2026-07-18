@@ -3,7 +3,7 @@ plugins {
     `maven-publish`
 }
 
-group = "com.farook.delightcrud"
+group = "com.farook.krate"
 version = "1.0.0-SNAPSHOT"
 
 dependencies {

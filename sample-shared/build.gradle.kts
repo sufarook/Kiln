@@ -4,11 +4,11 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
-group = "com.farook.delightcrud.sample"
+group = "com.farook.krate.sample"
 version = "1.0.0-SNAPSHOT"
 
 android {
-    namespace = "com.farook.delightcrud.sample.shared"
+    namespace = "com.farook.krate.sample.shared"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
@@ -17,10 +17,10 @@ android {
 
 // KSP runs once on common metadata; its output is copied to a neutral directory
 // because the KSP plugin filters build/generated/ksp/** out of Android compilations.
-val syncGeneratedSources = tasks.register<Sync>("syncDelightCrudGeneratedSources") {
+val syncGeneratedSources = tasks.register<Sync>("syncKrateGeneratedSources") {
     dependsOn("kspCommonMainKotlinMetadata")
     from(layout.buildDirectory.dir("generated/ksp/metadata/commonMain/kotlin"))
-    into(layout.buildDirectory.dir("generated/delightcrud/commonMain/kotlin"))
+    into(layout.buildDirectory.dir("generated/krate/commonMain/kotlin"))
 }
 
 kotlin {
@@ -35,7 +35,7 @@ kotlin {
 
     sourceSets {
         val commonMain by getting {
-            kotlin.srcDir(layout.buildDirectory.dir("generated/delightcrud/commonMain/kotlin"))
+            kotlin.srcDir(layout.buildDirectory.dir("generated/krate/commonMain/kotlin"))
             dependencies {
                 api(project(":annotations"))
                 api(project(":runtime"))

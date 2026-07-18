@@ -20,7 +20,7 @@
 
 ## Runtime dependencies
 
-DelightCRUD's runtime layer sits on top of [SQLDelight](https://cashapp.github.io/sqldelight/) 2.x for the `SqlDriver` abstraction. You choose the driver for your platform — DelightCRUD does not bundle one.
+Krate's runtime layer sits on top of [SQLDelight](https://cashapp.github.io/sqldelight/) 2.x for the `SqlDriver` abstraction. You choose the driver for your platform — Krate does not bundle one.
 
 | Platform | Driver dependency |
 |----------|------------------|
@@ -29,4 +29,4 @@ DelightCRUD's runtime layer sits on top of [SQLDelight](https://cashapp.github.i
 | JVM tests | `app.cash.sqldelight:sqlite-driver:2.3.2` |
 
 !!! note
-    DelightCRUD does not require you to write any SQLDelight `.sq` files or configure a SQLDelight schema. The driver is used purely as a transport layer for raw SQL execution.
+    Krate does not require you to write any SQLDelight `.sq` files or configure a SQLDelight schema. The driver is used purely as a transport layer for raw SQL execution.

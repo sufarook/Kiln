@@ -4,7 +4,7 @@ plugins {
     `maven-publish`
 }
 
-group = "com.farook.delightcrud"
+group = "com.farook.krate"
 version = "1.0.0-SNAPSHOT"
 
 dependencies {
@@ -20,10 +20,10 @@ dependencies {
 
 gradlePlugin {
     plugins {
-        create("delightCrud") {
-            id = "com.farook.delightcrud"
-            implementationClass = "com.farook.delightcrud.gradle.DelightCrudPlugin"
-            displayName = "DelightCRUD"
+        create("krate") {
+            id = "com.farook.krate"
+            implementationClass = "com.farook.krate.gradle.KratePlugin"
+            displayName = "Krate"
             description = "Compile-time CRUD generation for Kotlin Multiplatform SQLite"
         }
     }

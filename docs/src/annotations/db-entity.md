@@ -1,6 +1,6 @@
 # @DbEntity
 
-Marks a `data class` as a database entity. DelightCRUD generates a repository and a columns object for every class annotated with `@DbEntity`.
+Marks a `data class` as a database entity. Krate generates a repository and a columns object for every class annotated with `@DbEntity`.
 
 ## Signature
 
@@ -49,7 +49,7 @@ data class UserProfile(
 !!! warning "Must be a data class"
     `@DbEntity` must be applied to a `data class`. Applying it to an abstract class, sealed class, interface, or regular class produces a compile-time error:
     ```
-    DelightCRUD: @DbEntity must be applied to a data class
+    Krate: @DbEntity must be applied to a data class
     ```
 
 !!! warning "Exactly one @PrimaryKey required"

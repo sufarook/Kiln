@@ -1,6 +1,6 @@
 # Auto-migration
 
-DelightCRUD migrates your SQLite schema automatically whenever `createTable()` is called after an entity change. You never write a migration file or bump a version number.
+Krate migrates your SQLite schema automatically whenever `createTable()` is called after an entity change. You never write a migration file or bump a version number.
 
 ## How it works
 
@@ -72,7 +72,7 @@ data class Task(
 )
 ```
 
-**Without `migrateFrom`**: DelightCRUD sees `priority` as an orphaned column (dropped) and `urgency` as a new column (all rows get the default value `1`). Existing data is lost.
+**Without `migrateFrom`**: Krate sees `priority` as an orphaned column (dropped) and `urgency` as a new column (all rows get the default value `1`). Existing data is lost.
 
 **With `migrateFrom = "priority"`**: The slow path recreates the table and copies `priority` values into `urgency`. No data loss.
 
@@ -124,7 +124,7 @@ data class Task(
 
 ## Combined changes
 
-All migration paths compose correctly. In a single entity update you can add columns (fast path), rename a column (slow path), and remove a column (slow path) — DelightCRUD performs them in the correct order in a single transaction.
+All migration paths compose correctly. In a single entity update you can add columns (fast path), rename a column (slow path), and remove a column (slow path) — Krate performs them in the correct order in a single transaction.
 
 ```kotlin
 // v1 (installed on devices)

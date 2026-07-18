@@ -13,7 +13,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "DelightCRUD"
+rootProject.name = "Krate"
 
 include(":annotations")
 include(":processor")

@@ -1,4 +1,4 @@
-# DelightCRUD
+# Krate
 
 **Compile-time CRUD generation for Kotlin Multiplatform SQLite. No SQL. No mappers. No migrations.**
 
@@ -33,9 +33,9 @@ repo.deleteWhere { isCompleted eq true }
 repo.count()
 ```
 
-## Why DelightCRUD over Room?
+## Why Krate over Room?
 
-| | Room | DelightCRUD |
+| | Room | Krate |
 |---|---|---|
 | Platforms | Android (KMP support partial) | Android + iOS from one `commonMain` entity |
 | Migrations | Manual: bump version, write `Migration(1, 2)` | **Automatic** — no version numbers exist |
@@ -50,7 +50,7 @@ One line with the Gradle plugin:
 ```kotlin
 plugins {
     kotlin("multiplatform")                        // or com.android.application + kotlin-android
-    id("com.farook.delightcrud") version "1.0.0"
+    id("com.farook.krate") version "1.0.0"
 }
 ```
 
@@ -68,20 +68,20 @@ plugins {
 }
 
 kotlin.sourceSets.commonMain {
-    kotlin.srcDir(layout.buildDirectory.dir("generated/delightcrud/commonMain/kotlin"))
+    kotlin.srcDir(layout.buildDirectory.dir("generated/krate/commonMain/kotlin"))
     dependencies {
-        api("com.farook.delightcrud:annotations:1.0.0")
-        api("com.farook.delightcrud:runtime:1.0.0")
+        api("com.farook.krate:annotations:1.0.0")
+        api("com.farook.krate:runtime:1.0.0")
     }
 }
 
-dependencies { add("kspCommonMainMetadata", "com.farook.delightcrud:processor:1.0.0") }
+dependencies { add("kspCommonMainMetadata", "com.farook.krate:processor:1.0.0") }
 
 // KSP filters its own output dirs out of Android compilations — sync to a neutral dir
-val sync = tasks.register<Sync>("syncDelightCrudGeneratedSources") {
+val sync = tasks.register<Sync>("syncKrateGeneratedSources") {
     dependsOn("kspCommonMainKotlinMetadata")
     from(layout.buildDirectory.dir("generated/ksp/metadata/commonMain/kotlin"))
-    into(layout.buildDirectory.dir("generated/delightcrud/commonMain/kotlin"))
+    into(layout.buildDirectory.dir("generated/krate/commonMain/kotlin"))
 }
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask<*>>().configureEach {
     if (name != "kspCommonMainKotlinMetadata") dependsOn(sync)
@@ -152,10 +152,10 @@ Nullable variants of all of the above. Skip a property with `@Ignore`.
 
 | Coordinate | What it is |
 |---|---|
-| `com.farook.delightcrud:annotations` | The four annotations (all KMP targets) |
-| `com.farook.delightcrud:runtime` | `CrudRepository`, `SchemaMigrator`, query DSL, driver factories |
-| `com.farook.delightcrud:processor` | KSP processor (compile-time only) |
-| `com.farook.delightcrud` (plugin) | One-line Gradle setup |
+| `com.farook.krate:annotations` | The four annotations (all KMP targets) |
+| `com.farook.krate:runtime` | `CrudRepository`, `SchemaMigrator`, query DSL, driver factories |
+| `com.farook.krate:processor` | KSP processor (compile-time only) |
+| `com.farook.krate` (plugin) | One-line Gradle setup |
 
 ## Samples
 

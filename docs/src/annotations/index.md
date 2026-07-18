@@ -1,6 +1,6 @@
 # Annotations
 
-DelightCRUD provides four annotations. All have `SOURCE` retention — they are consumed entirely at compile time and produce no runtime overhead.
+Krate provides four annotations. All have `SOURCE` retention — they are consumed entirely at compile time and produce no runtime overhead.
 
 | Annotation | Target | Purpose |
 |-----------|--------|---------|
@@ -30,7 +30,7 @@ data class Product(
 
 ## What gets generated
 
-For `Product` above, DelightCRUD generates:
+For `Product` above, Krate generates:
 
 - `ProductRepository` — all CRUD, reactive, and DSL methods
 - `ProductColumns` — typed `Column<T>` references for use in DSL queries:

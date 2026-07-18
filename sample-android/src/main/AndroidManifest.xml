@@ -3,8 +3,8 @@
 
     <application
         android:name=".SampleApplication"
-        android:label="DelightCRUD Sample"
-        android:theme="@style/Theme.DelightCRUDSample"
+        android:label="Krate Sample"
+        android:theme="@style/Theme.KrateSample"
         android:allowBackup="false"
         android:supportsRtl="true">
 

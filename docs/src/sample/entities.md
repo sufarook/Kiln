@@ -53,7 +53,7 @@ taskRepo.update(task.copy(status = "IN_PROGRESS"))
 
 ## Generated output
 
-After a build, DelightCRUD generates:
+After a build, Krate generates:
 
 - `ProjectRepository` + `ProjectColumns`
 - `TaskRepository` + `TaskColumns`
