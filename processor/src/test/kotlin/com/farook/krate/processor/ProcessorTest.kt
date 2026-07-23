@@ -261,4 +261,61 @@ class TypeMapperSimpleTest {
         assertEquals("id", meta.allColumns[0].columnName)
         assertEquals("name", meta.allColumns[1].columnName)
     }
+
+    @Test
+    fun entityMetadataDefaultRelationsIsEmpty() {
+        val pk = ColumnMetadata(
+            propertyName = "id", columnName = "id",
+            kotlinTypeName = LONG, sqliteType = "INTEGER",
+            bindMethod = "bindLong", cursorMethod = "getLong",
+            isNullable = false, isUnique = false, hasIndex = false,
+            isPrimaryKey = true, autoGenerate = true
+        )
+        val meta = EntityMetadata("com.test", "Task", "tasks", pk, emptyList())
+        assertTrue(meta.relations.isEmpty())
+    }
+
+    @Test
+    fun entityMetadataStoresRelations() {
+        val pk = ColumnMetadata(
+            propertyName = "id", columnName = "id",
+            kotlinTypeName = LONG, sqliteType = "INTEGER",
+            bindMethod = "bindLong", cursorMethod = "getLong",
+            isNullable = false, isUnique = false, hasIndex = false,
+            isPrimaryKey = true, autoGenerate = true
+        )
+        val fkCol = ColumnMetadata(
+            propertyName = "projectId", columnName = "project_id",
+            kotlinTypeName = LONG, sqliteType = "INTEGER",
+            bindMethod = "bindLong", cursorMethod = "getLong",
+            isNullable = false, isUnique = false, hasIndex = false,
+            isPrimaryKey = false, autoGenerate = false
+        )
+        val relation = RelationMetadata(
+            propertyName = "projectId",
+            columnName = "project_id",
+            kotlinTypeName = LONG,
+            parentEntityName = "Project",
+            cascade = true
+        )
+        val meta = EntityMetadata("com.test", "Task", "tasks", pk, listOf(fkCol), listOf(relation))
+        assertEquals(1, meta.relations.size)
+        assertEquals("projectId", meta.relations[0].propertyName)
+        assertEquals("Project", meta.relations[0].parentEntityName)
+        assertTrue(meta.relations[0].cascade)
+    }
+}
+
+class InferParentNameTest {
+
+    private fun inferParentName(propertyName: String): String {
+        val base = if (propertyName.endsWith("Id")) propertyName.dropLast(2) else propertyName
+        return base.replaceFirstChar { it.uppercase() }
+    }
+
+    @Test fun simpleIdSuffix()        { assertEquals("Project",    inferParentName("projectId")) }
+    @Test fun camelCaseIdSuffix()     { assertEquals("Author",     inferParentName("authorId")) }
+    @Test fun compoundIdSuffix()      { assertEquals("ParentTask", inferParentName("parentTaskId")) }
+    @Test fun noIdSuffix()            { assertEquals("Owner",      inferParentName("owner")) }
+    @Test fun singleWordCapitalized() { assertEquals("Category",   inferParentName("categoryId")) }
 }

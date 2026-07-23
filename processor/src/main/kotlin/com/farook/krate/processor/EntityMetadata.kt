@@ -7,10 +7,23 @@ data class EntityMetadata(
     val entityClassName: String,
     val tableName: String,
     val primaryKey: ColumnMetadata,
-    val columns: List<ColumnMetadata>
+    val columns: List<ColumnMetadata>,
+    val relations: List<RelationMetadata> = emptyList()
 ) {
     val allColumns: List<ColumnMetadata> get() = listOf(primaryKey) + columns
 }
+
+/**
+ * Extracted from a `@Relation`-annotated FK property.
+ * [parentEntityName] is inferred by stripping the `Id` suffix from [propertyName].
+ */
+data class RelationMetadata(
+    val propertyName: String,
+    val columnName: String,
+    val kotlinTypeName: TypeName,
+    val parentEntityName: String,
+    val cascade: Boolean
+)
 
 data class ColumnMetadata(
     val propertyName: String,

@@ -22,6 +22,7 @@ object RepositoryGenerator {
     private val BIND_ARG            = MemberName("com.farook.krate.runtime", "bindArg")
     private val ORDER_SPEC          = ClassName("com.farook.krate.runtime", "OrderSpec")
     private val BUILD_ORDER_SUFFIX  = MemberName("com.farook.krate.runtime", "buildOrderSuffix")
+    private val EQ_FUN              = MemberName("com.farook.krate.runtime", "eq", isExtension = true)
 
     fun generate(meta: EntityMetadata, codeGenerator: CodeGenerator) {
         val entityClass = ClassName(meta.packageName, meta.entityClassName)
@@ -137,6 +138,13 @@ object RepositoryGenerator {
             .addFunction(buildQueryById(meta, entityClass))
             .addFunction(buildQueryAll(meta, entityClass))
             .addFunction(buildQueryWhere(meta, entityClass))
+            .also { builder ->
+                meta.relations.forEach { rel ->
+                    builder.addFunction(buildFindByRelation(meta, entityClass, rel))
+                    builder.addFunction(buildObserveByRelation(meta, entityClass, rel))
+                    builder.addFunction(buildDeleteByRelation(meta, rel))
+                }
+            }
             .build()
     }
 
@@ -481,6 +489,65 @@ object RepositoryGenerator {
                     .addStatement("}, 0).value")
                     .build()
             )
+            .build()
+    }
+
+    // ── @Relation helpers ─────────────────────────────────────────────────────────
+
+    /**
+     * Generates `suspend fun findBy<Parent>(propertyName: T): List<Entity>`.
+     * Captures the FK argument as `_fk` before entering the DSL lambda to avoid
+     * name shadowing with the same-named column on the receiver (`<Entity>Columns`).
+     */
+    private fun buildFindByRelation(
+        meta: EntityMetadata,
+        entityClass: ClassName,
+        rel: RelationMetadata
+    ): FunSpec {
+        val listType = List::class.asClassName().parameterizedBy(entityClass)
+        val kdoc = "Returns all ${meta.entityClassName}s belonging to the given ${rel.parentEntityName}."
+        return FunSpec.builder("findBy${rel.parentEntityName}")
+            .addKdoc(kdoc)
+            .addModifiers(KModifier.SUSPEND)
+            .addParameter(rel.propertyName, rel.kotlinTypeName)
+            .returns(listType)
+            // 'this.propertyName' pins to the lambda receiver (Column<T>), avoiding shadowing
+            // by the same-named parameter in the outer function.
+            .addStatement("return findWhere { this.%N.%M(%N) }", rel.propertyName, EQ_FUN, rel.propertyName)
+            .build()
+    }
+
+    /** Generates `fun observeBy<Parent>(propertyName: T): Flow<List<Entity>>`. */
+    private fun buildObserveByRelation(
+        meta: EntityMetadata,
+        entityClass: ClassName,
+        rel: RelationMetadata
+    ): FunSpec {
+        val flowType = FLOW.parameterizedBy(List::class.asClassName().parameterizedBy(entityClass))
+        val cascadeNote = if (rel.cascade)
+            "\n\nThis is the cascade-delete companion — call before deleting the parent ${rel.parentEntityName}."
+        else ""
+        return FunSpec.builder("observeBy${rel.parentEntityName}")
+            .addKdoc("Reactive stream of ${meta.entityClassName}s for the given ${rel.parentEntityName}. Re-emits on every change.$cascadeNote")
+            .addParameter(rel.propertyName, rel.kotlinTypeName)
+            .returns(flowType)
+            .addStatement("return observeWhere { this.%N.%M(%N) }", rel.propertyName, EQ_FUN, rel.propertyName)
+            .build()
+    }
+
+    /** Generates `suspend fun deleteBy<Parent>(propertyName: T)`. */
+    private fun buildDeleteByRelation(
+        meta: EntityMetadata,
+        rel: RelationMetadata
+    ): FunSpec {
+        val cascadeNote = if (rel.cascade)
+            " Call before `delete(parentId)` to cascade."
+        else ""
+        return FunSpec.builder("deleteBy${rel.parentEntityName}")
+            .addKdoc("Deletes all ${meta.entityClassName}s belonging to the given ${rel.parentEntityName}.$cascadeNote")
+            .addModifiers(KModifier.SUSPEND)
+            .addParameter(rel.propertyName, rel.kotlinTypeName)
+            .addStatement("deleteWhere { this.%N.%M(%N) }", rel.propertyName, EQ_FUN, rel.propertyName)
             .build()
     }
 

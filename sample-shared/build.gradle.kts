@@ -15,14 +15,6 @@ android {
     }
 }
 
-// KSP runs once on common metadata; its output is copied to a neutral directory
-// because the KSP plugin filters build/generated/ksp/** out of Android compilations.
-val syncGeneratedSources = tasks.register<Sync>("syncKrateGeneratedSources") {
-    dependsOn("kspCommonMainKotlinMetadata")
-    from(layout.buildDirectory.dir("generated/ksp/metadata/commonMain/kotlin"))
-    into(layout.buildDirectory.dir("generated/krate/commonMain/kotlin"))
-}
-
 kotlin {
     applyDefaultHierarchyTemplate()
     androidTarget()
@@ -35,7 +27,9 @@ kotlin {
 
     sourceSets {
         val commonMain by getting {
-            kotlin.srcDir(layout.buildDirectory.dir("generated/krate/commonMain/kotlin"))
+            // KSP generates once into the metadata output dir; adding it directly here
+            // makes the generated repositories visible to all targets (Android + iOS).
+            kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
             dependencies {
                 api(project(":annotations"))
                 api(project(":runtime"))
@@ -49,9 +43,9 @@ dependencies {
     add("kspCommonMainMetadata", project(":processor"))
 }
 
-// Every compilation waits for the synced generated sources
+// Every compilation that needs the generated sources must wait for KSP to finish.
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask<*>>().configureEach {
     if (name != "kspCommonMainKotlinMetadata") {
-        dependsOn(syncGeneratedSources)
+        dependsOn("kspCommonMainKotlinMetadata")
     }
 }

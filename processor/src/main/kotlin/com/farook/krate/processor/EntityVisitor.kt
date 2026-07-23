@@ -94,45 +94,57 @@ object EntityVisitor {
             migrateFrom = ""  // primary keys are never renamed via migrateFrom
         )
 
-        val nonPkColumns = persistableProps
-            .filter { it.simpleName.asString() != pkProp.simpleName.asString() }
-            .mapNotNull { prop ->
-                val resolvedType = prop.type.resolve()
-                val mapping = try {
-                    TypeMapper.map(resolvedType)
-                } catch (e: IllegalStateException) {
-                    logger.error(e.message ?: "Krate: unsupported type", prop)
-                    return null
-                }
-                val colAnnotation = prop.annotations.firstOrNull { it.shortName.asString() == "Column" }
-                val isUnique    = colAnnotation?.arguments?.firstOrNull { it.name?.asString() == "unique" }?.value as? Boolean ?: false
-                val hasIndex    = colAnnotation?.arguments?.firstOrNull { it.name?.asString() == "index" }?.value as? Boolean ?: false
-                val migrateFrom = colAnnotation?.arguments?.firstOrNull { it.name?.asString() == "migrateFrom" }?.value as? String ?: ""
+        val nonPkColumns = mutableListOf<ColumnMetadata>()
+        val relations    = mutableListOf<RelationMetadata>()
 
-                ColumnMetadata(
-                    propertyName = prop.simpleName.asString(),
-                    columnName = resolveColumnName(prop),
-                    kotlinTypeName = resolvedType.toTypeName(),
-                    sqliteType = mapping.sqliteType,
-                    bindMethod = mapping.bindMethod,
-                    cursorMethod = mapping.cursorMethod,
-                    isNullable = resolvedType.nullability == Nullability.NULLABLE,
-                    isUnique = isUnique,
-                    hasIndex = hasIndex,
-                    isPrimaryKey = false,
-                    autoGenerate = false,
-                    isBoolean = mapping.isBoolean,
-                    isEnum = mapping.isEnum,
-                    enumClassName = if (mapping.isEnum) resolvedType.declaration.qualifiedName?.asString() ?: "" else "",
-                    isInt = mapping.isInt,
-                    isFloat = mapping.isFloat,
-                    sqlDefaultValue = mapping.defaultValue,
-                    migrateFrom = migrateFrom
-                )
+        for (prop in persistableProps.filter { it.simpleName.asString() != pkProp.simpleName.asString() }) {
+            val resolvedType = prop.type.resolve()
+            val mapping = try {
+                TypeMapper.map(resolvedType)
+            } catch (e: IllegalStateException) {
+                logger.error(e.message ?: "Krate: unsupported type", prop)
+                return null
             }
+            val colAnnotation = prop.annotations.firstOrNull { it.shortName.asString() == "Column" }
+            val isUnique    = colAnnotation?.arguments?.firstOrNull { it.name?.asString() == "unique" }?.value as? Boolean ?: false
+            val hasIndex    = colAnnotation?.arguments?.firstOrNull { it.name?.asString() == "index" }?.value as? Boolean ?: false
+            val migrateFrom = colAnnotation?.arguments?.firstOrNull { it.name?.asString() == "migrateFrom" }?.value as? String ?: ""
 
-        if (nonPkColumns.isEmpty() && persistableProps.size == 1) {
-            // Only a primary key — valid (e.g. a tag entity), allow it
+            val col = ColumnMetadata(
+                propertyName = prop.simpleName.asString(),
+                columnName = resolveColumnName(prop),
+                kotlinTypeName = resolvedType.toTypeName(),
+                sqliteType = mapping.sqliteType,
+                bindMethod = mapping.bindMethod,
+                cursorMethod = mapping.cursorMethod,
+                isNullable = resolvedType.nullability == Nullability.NULLABLE,
+                isUnique = isUnique,
+                hasIndex = hasIndex,
+                isPrimaryKey = false,
+                autoGenerate = false,
+                isBoolean = mapping.isBoolean,
+                isEnum = mapping.isEnum,
+                enumClassName = if (mapping.isEnum) resolvedType.declaration.qualifiedName?.asString() ?: "" else "",
+                isInt = mapping.isInt,
+                isFloat = mapping.isFloat,
+                sqlDefaultValue = mapping.defaultValue,
+                migrateFrom = migrateFrom
+            )
+            nonPkColumns.add(col)
+
+            val relationAnnotation = prop.annotations.firstOrNull { it.shortName.asString() == "Relation" }
+            if (relationAnnotation != null) {
+                val cascade = relationAnnotation.arguments
+                    .firstOrNull { it.name?.asString() == "cascade" }?.value as? Boolean ?: false
+                val propName = prop.simpleName.asString()
+                relations.add(RelationMetadata(
+                    propertyName = propName,
+                    columnName = col.columnName,
+                    kotlinTypeName = resolvedType.toTypeName(),
+                    parentEntityName = inferParentName(propName),
+                    cascade = cascade
+                ))
+            }
         }
 
         return EntityMetadata(
@@ -140,7 +152,8 @@ object EntityVisitor {
             entityClassName = entityName,
             tableName = tableName,
             primaryKey = pkMetadata,
-            columns = nonPkColumns
+            columns = nonPkColumns,
+            relations = relations
         )
     }
 
@@ -148,6 +161,16 @@ object EntityVisitor {
         val colAnnotation = prop.annotations.firstOrNull { it.shortName.asString() == "Column" }
         val nameArg = colAnnotation?.arguments?.firstOrNull { it.name?.asString() == "name" }?.value as? String ?: ""
         return if (nameArg.isBlank()) prop.simpleName.asString().toSnakeCase() else nameArg
+    }
+
+    /**
+     * Infers the parent entity name from the FK property name.
+     * `projectId` → `Project`, `authorId` → `Author`, `parentTaskId` → `ParentTask`.
+     * Falls back to capitalising the full property name when no `Id` suffix is found.
+     */
+    private fun inferParentName(propertyName: String): String {
+        val base = if (propertyName.endsWith("Id")) propertyName.dropLast(2) else propertyName
+        return base.replaceFirstChar { it.uppercase() }
     }
 
     private fun String.toSnakeCase(): String = replace(Regex("([a-z])([A-Z])"), "$1_$2").lowercase()
