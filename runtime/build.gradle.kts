@@ -42,11 +42,15 @@ kotlin {
                 api(libs.sqldelight.native.driver)     // IosDatabaseDriverFactory visible to consumers
             }
         }
+        val jvmMain by getting {
+            dependencies {
+                api(libs.sqldelight.sqlite.driver)  // JvmDatabaseDriverFactory
+            }
+        }
         val jvmTest by getting {
             dependencies {
                 implementation(libs.junit)
                 implementation(kotlin("test"))
-                implementation(libs.sqldelight.sqlite.driver)  // in-memory JDBC driver for migrator tests
             }
         }
     }

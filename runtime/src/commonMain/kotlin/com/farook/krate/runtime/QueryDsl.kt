@@ -79,6 +79,34 @@ infix fun <T> Column<T>.inList(values: Collection<T>): Predicate {
     return Predicate("\"$name\" IN ($placeholders)", values.map(toArg))
 }
 
+infix fun <T> Column<T>.notInList(values: Collection<T>): Predicate {
+    require(values.isNotEmpty()) { "notInList requires at least one value" }
+    val placeholders = values.joinToString(", ") { "?" }
+    return Predicate("\"$name\" NOT IN ($placeholders)", values.map(toArg))
+}
+
+fun <T> Column<T>.between(low: T, high: T): Predicate =
+    Predicate("\"$name\" BETWEEN ? AND ?", listOf(toArg(low), toArg(high)))
+
+// ── Ordering & pagination ───────────────────────────────────────────────────────
+
+enum class Order { ASC, DESC }
+
+data class OrderSpec(val columnName: String, val direction: Order)
+
+fun <T> Column<T>.asc(): OrderSpec = OrderSpec(name, Order.ASC)
+fun <T> Column<T>.desc(): OrderSpec = OrderSpec(name, Order.DESC)
+
+/** Builds the ORDER BY / LIMIT / OFFSET suffix appended to WHERE queries. Used by generated code. */
+fun buildOrderSuffix(orderBy: List<OrderSpec>, limit: Long?, offset: Long?): String = buildString {
+    if (orderBy.isNotEmpty()) {
+        append(" ORDER BY ")
+        append(orderBy.joinToString(", ") { "\"${it.columnName}\" ${it.direction.name}" })
+    }
+    limit?.let { append(" LIMIT $it") }
+    offset?.let { append(" OFFSET $it") }
+}
+
 // ── Statement binding (used by generated code) ─────────────────────────────────
 
 fun SqlPreparedStatement.bindArg(index: Int, arg: SqlArg) {

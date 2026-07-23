@@ -16,10 +16,12 @@ object RepositoryGenerator {
     private val FLOW              = ClassName("kotlinx.coroutines.flow", "Flow")
     private val WITH_CONTEXT      = MemberName("kotlinx.coroutines", "withContext")
     private val OBSERVE_QUERY     = MemberName("com.farook.krate.runtime", "observeQuery")
-    private val COLUMN            = ClassName("com.farook.krate.runtime", "Column")
-    private val SQL_ARG           = ClassName("com.farook.krate.runtime", "SqlArg")
-    private val PREDICATE         = ClassName("com.farook.krate.runtime", "Predicate")
-    private val BIND_ARG          = MemberName("com.farook.krate.runtime", "bindArg")
+    private val COLUMN              = ClassName("com.farook.krate.runtime", "Column")
+    private val SQL_ARG             = ClassName("com.farook.krate.runtime", "SqlArg")
+    private val PREDICATE           = ClassName("com.farook.krate.runtime", "Predicate")
+    private val BIND_ARG            = MemberName("com.farook.krate.runtime", "bindArg")
+    private val ORDER_SPEC          = ClassName("com.farook.krate.runtime", "OrderSpec")
+    private val BUILD_ORDER_SUFFIX  = MemberName("com.farook.krate.runtime", "buildOrderSuffix")
 
     fun generate(meta: EntityMetadata, codeGenerator: CodeGenerator) {
         val entityClass = ClassName(meta.packageName, meta.entityClassName)
@@ -131,6 +133,7 @@ object RepositoryGenerator {
             .addFunction(buildObserveWhere(meta, entityClass, tableObjectName))
             .addFunction(buildDeleteWhere(meta, tableObjectName))
             .addFunction(buildCount(meta))
+            .addFunction(buildCountWhere(meta))
             .addFunction(buildQueryById(meta, entityClass))
             .addFunction(buildQueryAll(meta, entityClass))
             .addFunction(buildQueryWhere(meta, entityClass))
@@ -143,26 +146,42 @@ object RepositoryGenerator {
     private fun predicateBlockType(meta: EntityMetadata) =
         LambdaTypeName.get(receiver = columnsClass(meta), returnType = PREDICATE)
 
+    private fun orderByParam() = ParameterSpec.builder(
+        "orderBy", List::class.asClassName().parameterizedBy(ORDER_SPEC)
+    ).defaultValue("emptyList()").build()
+
+    private fun limitParam() = ParameterSpec.builder("limit", Long::class.asTypeName().copy(nullable = true))
+        .defaultValue("null").build()
+
+    private fun offsetParam() = ParameterSpec.builder("offset", Long::class.asTypeName().copy(nullable = true))
+        .defaultValue("null").build()
+
     private fun buildFindWhere(meta: EntityMetadata, entityClass: ClassName): FunSpec {
         val listType = List::class.asClassName().parameterizedBy(entityClass)
         return FunSpec.builder("findWhere")
-            .addKdoc("Type-safe filtered query: `findWhere { (priority eq 1) and (title like \"A%%\") }`")
+            .addKdoc("Type-safe filtered query. Optionally sort and paginate:\n`findWhere(orderBy = listOf(Col.priority.desc()), limit = 20) { status eq \"DONE\" }`")
             .addModifiers(KModifier.SUSPEND)
+            .addParameter(orderByParam())
+            .addParameter(limitParam())
+            .addParameter(offsetParam())
             .addParameter("block", predicateBlockType(meta))
             .returns(listType)
-            .addStatement("return %M(context) { queryWhere(%T.block()) }", WITH_CONTEXT, columnsClass(meta))
+            .addStatement("return %M(context) { queryWhere(%T.block(), orderBy, limit, offset) }", WITH_CONTEXT, columnsClass(meta))
             .build()
     }
 
     private fun buildObserveWhere(meta: EntityMetadata, entityClass: ClassName, tableObjectName: String): FunSpec {
         val flowType = FLOW.parameterizedBy(List::class.asClassName().parameterizedBy(entityClass))
         return FunSpec.builder("observeWhere")
-            .addKdoc("Reactive filtered query — re-emits after every write to this table.")
+            .addKdoc("Reactive filtered query — re-emits after every write to this table. Supports ordering and pagination.")
+            .addParameter(orderByParam())
+            .addParameter(limitParam())
+            .addParameter(offsetParam())
             .addParameter("block", predicateBlockType(meta))
             .returns(flowType)
             .addStatement("val predicate = %T.block()", columnsClass(meta))
             .addStatement(
-                "return %M(driver, %N.TABLE_NAME, context) { queryWhere(predicate) }",
+                "return %M(driver, %N.TABLE_NAME, context) { queryWhere(predicate, orderBy, limit, offset) }",
                 OBSERVE_QUERY, tableObjectName
             )
             .build()
@@ -214,16 +233,49 @@ object RepositoryGenerator {
             .build()
     }
 
+    private fun buildCountWhere(meta: EntityMetadata): FunSpec {
+        val baseSql = "SELECT COUNT(*) FROM \"${meta.tableName}\" WHERE "
+        return FunSpec.builder("count")
+            .addKdoc("Count rows matching the predicate: `count { isCompleted eq false }`")
+            .addModifiers(KModifier.SUSPEND)
+            .addParameter("block", predicateBlockType(meta))
+            .returns(Long::class)
+            .addCode(
+                CodeBlock.builder()
+                    .add("return %M(context) {\n", WITH_CONTEXT)
+                    .indent()
+                    .addStatement("val predicate = %T.block()", columnsClass(meta))
+                    .addStatement("driver.executeQuery(null, %S + predicate.sql, { cursor ->", baseSql)
+                    .indent()
+                    .addStatement("cursor.next()")
+                    .addStatement("%T.Value(cursor.getLong(0)!!)", QUERY_RESULT)
+                    .unindent()
+                    .addStatement("}, predicate.args.size) {")
+                    .indent()
+                    .addStatement("predicate.args.forEachIndexed { index, arg -> %M(index, arg) }", BIND_ARG)
+                    .unindent()
+                    .addStatement("}.value")
+                    .unindent()
+                    .add("}\n")
+                    .build()
+            )
+            .build()
+    }
+
     private fun buildQueryWhere(meta: EntityMetadata, entityClass: ClassName): FunSpec {
         val baseSql = SqlStatementBuilder.findAll(meta) + " WHERE "
         val listType = List::class.asClassName().parameterizedBy(entityClass)
         return FunSpec.builder("queryWhere")
             .addModifiers(KModifier.PRIVATE)
             .addParameter("predicate", PREDICATE)
+            .addParameter(orderByParam())
+            .addParameter(limitParam())
+            .addParameter(offsetParam())
             .returns(listType)
             .addCode(
                 CodeBlock.builder()
-                    .addStatement("return driver.executeQuery(null, %S + predicate.sql, { cursor ->", baseSql)
+                    .addStatement("val sql = %S + predicate.sql + %M(orderBy, limit, offset)", baseSql, BUILD_ORDER_SUFFIX)
+                    .addStatement("return driver.executeQuery(null, sql, { cursor ->")
                     .indent()
                     .add(buildCursorMapper(meta, entityClass, single = false))
                     .unindent()
