@@ -1,11 +1,8 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     `java-gradle-plugin`
-    `maven-publish`
+    alias(libs.plugins.vanniktech.publish)
 }
-
-group = "com.farook.krate"
-version = "1.0.0-SNAPSHOT"
 
 dependencies {
     implementation(gradleApi())
@@ -21,9 +18,9 @@ dependencies {
 gradlePlugin {
     plugins {
         create("krate") {
-            id = "com.farook.krate"
-            implementationClass = "com.farook.krate.gradle.KratePlugin"
-            displayName = "Krate"
+            id = "io.github.sufarook.kiln"
+            implementationClass = "io.github.sufarook.kiln.gradle.KilnPlugin"
+            displayName = "Kiln"
             description = "Compile-time CRUD generation for Kotlin Multiplatform SQLite"
         }
     }
@@ -31,4 +28,35 @@ gradlePlugin {
 
 tasks.test {
     useJUnit()
+}
+
+mavenPublishing {
+    publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL)
+    signAllPublications()
+
+    coordinates(artifactId = "gradle-plugin")
+
+    pom {
+        name.set("Kiln Gradle Plugin")
+        description.set("Gradle plugin for Kiln — one-line setup wires KSP, the processor, and generated sources into any KMP project.")
+        url.set("https://github.com/sufarook/Kiln")
+        licenses {
+            license {
+                name.set("Apache-2.0")
+                url.set("https://www.apache.org/licenses/LICENSE-2.0")
+            }
+        }
+        developers {
+            developer {
+                id.set("sufarook")
+                name.set("Syed Ummer Farook")
+                email.set("syedfarook1798@gmail.com")
+            }
+        }
+        scm {
+            connection.set("scm:git:github.com/sufarook/Kiln.git")
+            developerConnection.set("scm:git:ssh://github.com/sufarook/Kiln.git")
+            url.set("https://github.com/sufarook/Kiln")
+        }
+    }
 }

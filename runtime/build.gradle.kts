@@ -1,14 +1,11 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.library)
-    `maven-publish`
+    alias(libs.plugins.vanniktech.publish)
 }
 
-group = "com.farook.krate"
-version = "1.0.0-SNAPSHOT"
-
 android {
-    namespace = "com.farook.krate.runtime"
+    namespace = "io.github.sufarook.kiln.runtime"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
@@ -52,6 +49,37 @@ kotlin {
                 implementation(libs.junit)
                 implementation(kotlin("test"))
             }
+        }
+    }
+}
+
+mavenPublishing {
+    publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL)
+    signAllPublications()
+
+    coordinates(artifactId = "runtime")
+
+    pom {
+        name.set("Kiln Runtime")
+        description.set("Runtime library for Kiln — base interfaces, DSL predicates, transaction API, and platform driver factories.")
+        url.set("https://github.com/sufarook/Kiln")
+        licenses {
+            license {
+                name.set("Apache-2.0")
+                url.set("https://www.apache.org/licenses/LICENSE-2.0")
+            }
+        }
+        developers {
+            developer {
+                id.set("sufarook")
+                name.set("Syed Ummer Farook")
+                email.set("ummerfarook586@gmail.com")
+            }
+        }
+        scm {
+            connection.set("scm:git:github.com/sufarook/Kiln.git")
+            developerConnection.set("scm:git:ssh://github.com/sufarook/Kiln.git")
+            url.set("https://github.com/sufarook/Kiln")
         }
     }
 }
