@@ -1,1 +1,1 @@
-com.farook.krate.processor.KrateProcessorProvider
+io.github.sufarook.kiln.processor.KilnProcessorProvider
