@@ -50,7 +50,7 @@ One line with the Gradle plugin:
 ```kotlin
 plugins {
     kotlin("multiplatform")                        // or com.android.application + kotlin-android
-    id("io.github.sufarook.kiln") version "1.0.0"
+    id("io.github.sufarook.kiln") version "1.0.0-alpha01"
 }
 ```
 
@@ -70,12 +70,12 @@ plugins {
 kotlin.sourceSets.commonMain {
     kotlin.srcDir(layout.buildDirectory.dir("generated/kiln/commonMain/kotlin"))
     dependencies {
-        api("io.github.sufarook.kiln:annotations:1.0.0")
-        api("io.github.sufarook.kiln:runtime:1.0.0")
+        api("io.github.sufarook.kiln:annotations:1.0.0-alpha01")
+        api("io.github.sufarook.kiln:runtime:1.0.0-alpha01")
     }
 }
 
-dependencies { add("kspCommonMainMetadata", "io.github.sufarook.kiln:processor:1.0.0") }
+dependencies { add("kspCommonMainMetadata", "io.github.sufarook.kiln:processor:1.0.0-alpha01") }
 
 // KSP filters its own output dirs out of Android compilations — sync to a neutral dir
 val sync = tasks.register<Sync>("syncKilnGeneratedSources") {
@@ -146,6 +146,7 @@ Nullable variants of all of the above. Skip a property with `@Ignore`.
 | `@DbEntity(tableName = "")` | Marks a data class as a table (name defaults to snake_case) |
 | `@PrimaryKey(autoGenerate = false)` | Exactly one per entity; `autoGenerate` needs `Long`/`Int` |
 | `@Column(name, unique, index, migrateFrom)` | Column overrides and constraints |
+| `@Relation(foreignKey = "")` | Declares a FK property; generates `findBy<Parent>`, `observeBy<Parent>`, `deleteBy<Parent>` |
 | `@Ignore` | Property is not persisted |
 
 ## Modules
@@ -164,9 +165,9 @@ Nullable variants of all of the above. Skip a property with `@Ignore`.
 
 ## Status
 
-Alpha. CRUD + reactive queries + auto-migration are tested (JVM test suite runs the
-migrator against real SQLite). Not yet supported: relations/foreign keys, compound
-primary keys, pagination, transactions API.
+Alpha. CRUD + reactive queries + auto-migration + `@Relation` FK helpers + transactions
+(`withTransaction`, `insertAll`, `notifyOrDefer`) are fully implemented and tested against
+real SQLite. Not yet supported: compound primary keys, pagination.
 
 ## License
 

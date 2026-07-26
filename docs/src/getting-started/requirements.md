@@ -14,9 +14,9 @@
 
 | Setting | Value |
 |---------|-------|
-| `compileSdk` | 34+ |
-| `minSdk` | **21** (Android 5.0) |
-| `targetSdk` | 34+ |
+| `compileSdk` | **36** |
+| `minSdk` | **24** (Android 7.0) |
+| `targetSdk` | **36** |
 
 ## Runtime dependencies
 

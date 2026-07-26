@@ -2,6 +2,11 @@
 
 Kiln generates one repository per entity — it does not generate SQL JOIN queries. For data that spans multiple tables, create a store or service class that coordinates across repositories.
 
+!!! tip "@Relation shortcut"
+    If your FK property is annotated with `@Relation(foreignKey = "project_id")`, Kiln generates `taskRepo.findByProject(id)`, `taskRepo.observeByProject(id)`, and `taskRepo.deleteByProject(id)` directly on the repository. The manual `findWhere { TaskColumns.projectId eq id }` pattern below is equivalent — use whichever feels cleaner.
+
+    See [the `@Relation` reference](../annotations/relation.md) for details.
+
 ## Data models
 
 Define aggregate types that hold related entities together:
@@ -53,35 +58,41 @@ class TaskStore(
     fun observeChecklist(taskId: Long): Flow<List<ChecklistItem>> =
         checklistRepo.observeWhere { ChecklistItemColumns.taskId eq taskId }
 
+
     // ── Coordinated writes ────────────────────────────────────────────────────
 
-    /** Mark a task done and tick off every unfinished checklist item. */
-    suspend fun completeTask(task: Task) {
-        taskRepo.update(task.copy(isCompleted = true, status = "DONE"))
-        val items = checklistRepo.findWhere { ChecklistItemColumns.taskId eq task.id }
-        items.filter { !it.isDone }.forEach {
-            checklistRepo.update(it.copy(isDone = true))
+    /** Mark a task done and tick off every unfinished checklist item atomically. */
+    suspend fun completeTask(driver: SqlDriver, task: Task) {
+        driver.withTransaction {
+            taskRepo.update(task.copy(isCompleted = true, status = "DONE"))
+            val items = checklistRepo.findWhere { ChecklistItemColumns.taskId eq task.id }
+            items.filter { !it.isDone }.forEach {
+                checklistRepo.update(it.copy(isDone = true))
+            }
         }
     }
 
     /**
-     * Archive a project and delete all its child data.
+     * Archive a project and delete all its child data atomically.
      *
      * Kiln does not enforce foreign key constraints automatically.
-     * This method handles the cascade explicitly.
+     * This method handles the cascade explicitly inside a transaction so either
+     * every deletion succeeds or the database is left unchanged.
      */
-    suspend fun archiveProject(project: Project) {
-        // 1. Find and delete all checklist items for each task
-        val tasks = taskRepo.findWhere { TaskColumns.projectId eq project.id }
-        tasks.forEach { task ->
-            checklistRepo.deleteWhere { ChecklistItemColumns.taskId eq task.id }
+    suspend fun archiveProject(driver: SqlDriver, project: Project) {
+        driver.withTransaction {
+            // 1. Find and delete all checklist items for each task
+            val tasks = taskRepo.findWhere { TaskColumns.projectId eq project.id }
+            tasks.forEach { task ->
+                checklistRepo.deleteWhere { ChecklistItemColumns.taskId eq task.id }
+            }
+
+            // 2. Delete all tasks for this project
+            taskRepo.deleteWhere { TaskColumns.projectId eq project.id }
+
+            // 3. Archive the project
+            projectRepo.update(project.copy(isArchived = true))
         }
-
-        // 2. Delete all tasks for this project
-        taskRepo.deleteWhere { TaskColumns.projectId eq project.id }
-
-        // 3. Archive the project
-        projectRepo.update(project.copy(isArchived = true))
     }
 }
 ```

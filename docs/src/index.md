@@ -44,6 +44,12 @@ No SQL to write. No version numbers to track. No migration files to maintain.
 
     The `io.github.sufarook.kiln` plugin applies KSP and wires all source sets automatically.
 
+-   :material-link-variant:{ .lg .middle } **Relations & transactions**
+
+    ---
+
+    `@Relation` generates typed FK helpers (`findByParent`, `deleteByParent`). `withTransaction` wraps multi-step writes in a single atomic commit.
+
 </div>
 
 ## How it works
@@ -74,6 +80,10 @@ Kiln generates `TaskRepository` at compile time with:
 | `observeWhere { … }` | Reactive + filtered `Flow<List<Task>>` |
 | `deleteWhere { … }` | `suspend` — bulk delete by predicate |
 | `count { … }` | `suspend` — returns `Long` |
+| `insertAll(items)` | `suspend` — bulk insert inside a single transaction |
+| `findBy<Parent>(id)` | `suspend` — returns `List<T>` for a FK parent (requires `@Relation`) |
+| `observeBy<Parent>(id)` | Returns `Flow<List<T>>` filtered by FK parent |
+| `deleteBy<Parent>(id)` | `suspend` — deletes all rows belonging to a FK parent |
 
 ## Why Kiln
 
