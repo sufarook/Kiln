@@ -55,7 +55,7 @@ kotlin {
 
 mavenPublishing {
     publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL)
-    signAllPublications()
+    if (!System.getenv("SIGNING_KEY").isNullOrEmpty()) signAllPublications()
 
     coordinates(artifactId = "runtime")
 
@@ -73,7 +73,7 @@ mavenPublishing {
             developer {
                 id.set("sufarook")
                 name.set("Syed Ummer Farook")
-                email.set("ummerfarook586@gmail.com")
+                email.set("syedfarook1798@gmail.com")
             }
         }
         scm {

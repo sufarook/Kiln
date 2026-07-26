@@ -32,7 +32,7 @@ tasks.test {
 
 mavenPublishing {
     publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL)
-    signAllPublications()
+    if (!System.getenv("SIGNING_KEY").isNullOrEmpty()) signAllPublications()
 
     coordinates(artifactId = "gradle-plugin")
 

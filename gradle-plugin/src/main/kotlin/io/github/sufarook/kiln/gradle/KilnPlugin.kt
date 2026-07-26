@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
  *
  * ```kotlin
  * plugins {
- *     id("io.github.sufarook.kiln") version "1.0.0"
+ *     id("io.github.sufarook.kiln") version "1.0.0-alpha01"
  * }
  * ```
  *
