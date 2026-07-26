@@ -1,7 +1,8 @@
-package com.farook.krate.sample.shared
+package io.github.sufarook.kiln.sample.shared
 
 import app.cash.sqldelight.db.SqlDriver
-import com.farook.krate.runtime.eq
+import io.github.sufarook.kiln.runtime.eq
+import io.github.sufarook.kiln.runtime.withTransaction
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 

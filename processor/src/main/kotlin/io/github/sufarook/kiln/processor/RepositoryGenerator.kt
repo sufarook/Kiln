@@ -1,4 +1,4 @@
-package com.farook.krate.processor
+package io.github.sufarook.kiln.processor
 
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
@@ -9,20 +9,22 @@ object RepositoryGenerator {
 
     private val SQL_DRIVER        = ClassName("app.cash.sqldelight.db", "SqlDriver")
     private val QUERY_RESULT      = ClassName("app.cash.sqldelight.db", "QueryResult")
-    private val SCHEMA_MIGRATOR   = ClassName("com.farook.krate.runtime", "SchemaMigrator")
-    private val COLUMN_DEF        = ClassName("com.farook.krate.runtime", "ColumnDef")
+    private val SCHEMA_MIGRATOR   = ClassName("io.github.sufarook.kiln.runtime", "SchemaMigrator")
+    private val COLUMN_DEF        = ClassName("io.github.sufarook.kiln.runtime", "ColumnDef")
     private val COROUTINE_CONTEXT = ClassName("kotlin.coroutines", "CoroutineContext")
     private val DISPATCHERS       = ClassName("kotlinx.coroutines", "Dispatchers")
     private val FLOW              = ClassName("kotlinx.coroutines.flow", "Flow")
     private val WITH_CONTEXT      = MemberName("kotlinx.coroutines", "withContext")
-    private val OBSERVE_QUERY     = MemberName("com.farook.krate.runtime", "observeQuery")
-    private val COLUMN              = ClassName("com.farook.krate.runtime", "Column")
-    private val SQL_ARG             = ClassName("com.farook.krate.runtime", "SqlArg")
-    private val PREDICATE           = ClassName("com.farook.krate.runtime", "Predicate")
-    private val BIND_ARG            = MemberName("com.farook.krate.runtime", "bindArg")
-    private val ORDER_SPEC          = ClassName("com.farook.krate.runtime", "OrderSpec")
-    private val BUILD_ORDER_SUFFIX  = MemberName("com.farook.krate.runtime", "buildOrderSuffix")
-    private val EQ_FUN              = MemberName("com.farook.krate.runtime", "eq", isExtension = true)
+    private val OBSERVE_QUERY     = MemberName("io.github.sufarook.kiln.runtime", "observeQuery")
+    private val COLUMN              = ClassName("io.github.sufarook.kiln.runtime", "Column")
+    private val SQL_ARG             = ClassName("io.github.sufarook.kiln.runtime", "SqlArg")
+    private val PREDICATE           = ClassName("io.github.sufarook.kiln.runtime", "Predicate")
+    private val BIND_ARG            = MemberName("io.github.sufarook.kiln.runtime", "bindArg")
+    private val ORDER_SPEC          = ClassName("io.github.sufarook.kiln.runtime", "OrderSpec")
+    private val BUILD_ORDER_SUFFIX  = MemberName("io.github.sufarook.kiln.runtime", "buildOrderSuffix")
+    private val EQ_FUN              = MemberName("io.github.sufarook.kiln.runtime", "eq", isExtension = true)
+    private val NOTIFY_OR_DEFER     = MemberName("io.github.sufarook.kiln.runtime", "notifyOrDefer", isExtension = true)
+    private val KRATE_TX            = MemberName("io.github.sufarook.kiln.runtime", "withTransaction", isExtension = true)
 
     fun generate(meta: EntityMetadata, codeGenerator: CodeGenerator) {
         val entityClass = ClassName(meta.packageName, meta.entityClassName)
@@ -98,7 +100,7 @@ object RepositoryGenerator {
         repoClassName: String,
         tableObjectName: String
     ): TypeSpec {
-        val crudInterface = ClassName("com.farook.krate.runtime", "CrudRepository")
+        val crudInterface = ClassName("io.github.sufarook.kiln.runtime", "CrudRepository")
             .parameterizedBy(entityClass, meta.primaryKey.kotlinTypeName)
 
         return TypeSpec.classBuilder(repoClassName)
@@ -135,6 +137,7 @@ object RepositoryGenerator {
             .addFunction(buildDeleteWhere(meta, tableObjectName))
             .addFunction(buildCount(meta))
             .addFunction(buildCountWhere(meta))
+            .addFunction(buildInsertAll(meta, entityClass))
             .addFunction(buildQueryById(meta, entityClass))
             .addFunction(buildQueryAll(meta, entityClass))
             .addFunction(buildQueryWhere(meta, entityClass))
@@ -211,7 +214,7 @@ object RepositoryGenerator {
                     .addStatement("predicate.args.forEachIndexed { index, arg -> %M(index, arg) }", BIND_ARG)
                     .unindent()
                     .addStatement("}")
-                    .addStatement("driver.notifyListeners(%N.TABLE_NAME)", tableObjectName)
+                    .addStatement("driver.%M(%N.TABLE_NAME)", NOTIFY_OR_DEFER, tableObjectName)
                     .unindent()
                     .add("}\n")
                     .build()
@@ -352,7 +355,7 @@ object RepositoryGenerator {
         }
         body.unindent()
             .addStatement("}")
-            .addStatement("driver.notifyListeners(%N.TABLE_NAME)", tableObjectName)
+            .addStatement("driver.%M(%N.TABLE_NAME)", NOTIFY_OR_DEFER, tableObjectName)
             .unindent()
             .add("}\n")
 
@@ -385,7 +388,7 @@ object RepositoryGenerator {
         body.addStatement(bindStatement(meta.primaryKey, "entity.${meta.primaryKey.propertyName}", meta.columns.size))
         body.unindent()
             .addStatement("}")
-            .addStatement("driver.notifyListeners(%N.TABLE_NAME)", tableObjectName)
+            .addStatement("driver.%M(%N.TABLE_NAME)", NOTIFY_OR_DEFER, tableObjectName)
             .unindent()
             .add("}\n")
 
@@ -411,7 +414,7 @@ object RepositoryGenerator {
                     .addStatement(bindStatement(pk, "id", 0))
                     .unindent()
                     .addStatement("}")
-                    .addStatement("driver.notifyListeners(%N.TABLE_NAME)", tableObjectName)
+                    .addStatement("driver.%M(%N.TABLE_NAME)", NOTIFY_OR_DEFER, tableObjectName)
                     .unindent()
                     .add("}\n")
                     .build()
@@ -489,6 +492,23 @@ object RepositoryGenerator {
                     .addStatement("}, 0).value")
                     .build()
             )
+            .build()
+    }
+
+    // ── Batch operations ──────────────────────────────────────────────────────────
+
+    /**
+     * Generates `suspend fun insertAll(entities: List<Entity>)`.
+     * Wraps the loop in a transaction so all rows are inserted atomically and
+     * reactive flows receive exactly one notification after all inserts commit.
+     */
+    private fun buildInsertAll(meta: EntityMetadata, entityClass: ClassName): FunSpec {
+        val listType = List::class.asClassName().parameterizedBy(entityClass)
+        return FunSpec.builder("insertAll")
+            .addKdoc("Inserts all entities in a single transaction. Reactive flows emit once after all rows commit.")
+            .addModifiers(KModifier.SUSPEND)
+            .addParameter("entities", listType)
+            .addStatement("driver.%M(context) { entities.forEach { insert(it) } }", KRATE_TX)
             .build()
     }
 
