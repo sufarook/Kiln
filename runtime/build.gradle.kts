@@ -55,7 +55,7 @@ kotlin {
 
 mavenPublishing {
     publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL)
-    if (!System.getenv("SIGNING_KEY").isNullOrEmpty()) signAllPublications()
+    if (!System.getenv("ORG_GRADLE_PROJECT_signingInMemoryKey").isNullOrEmpty()) signAllPublications()
 
     coordinates(artifactId = "runtime")
 
