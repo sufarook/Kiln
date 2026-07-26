@@ -202,6 +202,98 @@ val openCount: Long = taskRepo.count {
 
 ---
 
+## `insertAll(entities: List<T>)`
+
+```kotlin
+suspend fun insertAll(entities: List<T>)
+```
+
+Batch-inserts a list of entities inside a single transaction. Reactive observers receive one `Flow` emission after all rows are committed rather than one per `insert` call.
+
+```kotlin
+taskRepo.insertAll(importedTasks)
+```
+
+Internally calls `driver.withTransaction { entities.forEach { insert(it) } }`. If any insert fails, the entire batch is rolled back.
+
+---
+
+## `findBy<Parent>(parentId: PK): List<T>`
+
+Generated for each `@Relation`-annotated foreign-key property. Returns all child rows whose FK column equals `parentId`.
+
+```kotlin
+// Task has: @Relation val projectId: Long
+val tasks: List<Task> = taskRepo.findByProject(projectId)
+```
+
+---
+
+## `observeBy<Parent>(parentId: PK): Flow<List<T>>`
+
+Reactive variant of `findBy<Parent>`. Re-emits whenever the child table changes.
+
+```kotlin
+val liveTasksFlow: Flow<List<Task>> = taskRepo.observeByProject(projectId)
+```
+
+---
+
+## `deleteBy<Parent>(parentId: PK)`
+
+Deletes all child rows whose FK column equals `parentId`. Used for cascade deletes.
+
+```kotlin
+// Remove all tasks before deleting the parent project
+taskRepo.deleteByProject(projectId)
+projectRepo.delete(projectId)
+```
+
+For cleaner cascade semantics, wrap both calls in `driver.withTransaction { … }` so both tables are notified in a single `Flow` emission.
+
+---
+
+## Transactions
+
+### `driver.withTransaction { }`
+
+```kotlin
+suspend fun SqlDriver.withTransaction(
+    context: CoroutineContext = Dispatchers.Default,
+    block: suspend () -> Unit
+)
+```
+
+Executes `block` inside a `BEGIN TRANSACTION … COMMIT`. On any exception the transaction is rolled back and the exception re-thrown.
+
+All Kiln repository write methods (`insert`, `update`, `delete`, `deleteWhere`, `insertAll`) defer their `Flow` listener notifications when called inside `withTransaction`. After a successful commit, each affected table is notified **exactly once** — reactive `Flow`s receive one emission for the whole transaction rather than one per operation.
+
+No notifications are sent when a transaction is rolled back.
+
+```kotlin
+// Cascade delete — observers see one emission each, not four
+driver.withTransaction {
+    taskRepo.deleteByProject(projectId)   // deferred
+    projectRepo.delete(projectId)         // deferred
+}
+// notifyListeners fires here, once per table
+
+// Batch import — observers see all rows appear atomically
+driver.withTransaction {
+    taskRepo.insertAll(newTasks)
+}
+```
+
+### `driver.notifyOrDefer(tableName)`
+
+```kotlin
+suspend fun SqlDriver.notifyOrDefer(tableName: String)
+```
+
+Called automatically by generated repository code. Outside a transaction it calls `SqlDriver.notifyListeners` immediately. Inside a `withTransaction` block it adds the table name to the transaction's dirty set, deferring the notification to after commit. Not intended for direct use.
+
+---
+
 ## Companion: `<Entity>Columns`
 
 Each entity also generates a companion `<Entity>Columns` object used inside DSL lambdas:

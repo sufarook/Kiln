@@ -14,7 +14,7 @@ The generated `TaskRepository` class doesn't exist yet, or KSP didn't run.
    ```kotlin
    // build.gradle.kts
    dependencies {
-       add("kspCommonMainMetadata", "com.farook.krate:processor:1.0.0-alpha01")
+       add("kspCommonMainMetadata", "io.github.sufarook.kiln:processor:1.0.0-alpha01")
    }
    ```
 
@@ -33,18 +33,18 @@ The generated `TaskRepository` class doesn't exist yet, or KSP didn't run.
 
 ### "The KSP Gradle plugin should be applied to the project"
 
-You applied the Krate plugin but KSP is missing. The plugin declares KSP as a required dependency — make sure you've added the KSP plugin to the plugins block:
+You applied the Kiln plugin but KSP is missing. The plugin declares KSP as a required dependency — make sure you've added the KSP plugin to the plugins block:
 
 ```kotlin
 plugins {
     id("com.google.devtools.ksp") version "2.3.20-1.0.31"
-    id("com.farook.krate") version "1.0.0-alpha01"
+    id("io.github.sufarook.kiln") version "1.0.0-alpha01"
 }
 ```
 
 ---
 
-### "Krate: @DbEntity must have exactly one @PrimaryKey property"
+### "Kiln: @DbEntity must have exactly one @PrimaryKey property"
 
 Every `@DbEntity` class needs exactly one property annotated with `@PrimaryKey`. Check that:
 
@@ -54,7 +54,7 @@ Every `@DbEntity` class needs exactly one property annotated with `@PrimaryKey`.
 
 ---
 
-### "Krate: type 'X' is not supported"
+### "Kiln: type 'X' is not supported"
 
 The property type isn't in the [supported types list](reference/supported-types.md). Options:
 
@@ -68,7 +68,7 @@ The property type isn't in the [supported types list](reference/supported-types.
 
 ### I renamed a property but existing data is gone
 
-Without `@Column(migrateFrom = "old_name")`, Krate treats the old column as dropped and the new column as added. All data in the old column defaults to the Kotlin default value.
+Without `@Column(migrateFrom = "old_name")`, Kiln treats the old column as dropped and the new column as added. All data in the old column defaults to the Kotlin default value.
 
 **Fix for future renames:** always add `migrateFrom`:
 ```kotlin
@@ -86,7 +86,7 @@ Run this once before calling `createTable()`, then remove it.
 
 ### I added a new non-nullable column but app crashes on launch
 
-SQLite requires a `DEFAULT` value when adding a `NOT NULL` column via `ALTER TABLE`. Krate uses the Kotlin default value for this.
+SQLite requires a `DEFAULT` value when adding a `NOT NULL` column via `ALTER TABLE`. Kiln uses the Kotlin default value for this.
 
 **If the property has no Kotlin default**, the migration throws `SQLiteException`. Add a default:
 ```kotlin
@@ -133,17 +133,17 @@ Or use `stateIn` in a `ViewModel` with `SharingStarted.WhileSubscribed(5_000)`.
 
 ## Using with an existing database
 
-### I have an existing SQLite database — can Krate manage it?
+### I have an existing SQLite database — can Kiln manage it?
 
 Yes. Point the driver at your existing database file and call `createTable()`. The migrator reads `PRAGMA table_info` and only applies changes that differ from the entity definition. Existing columns that match are left untouched.
 
-**Tables Krate doesn't know about** (no corresponding `@DbEntity`) are never touched.
+**Tables Kiln doesn't know about** (no corresponding `@DbEntity`) are never touched.
 
 ---
 
-### Can Krate work alongside raw SQL or Room?
+### Can Kiln work alongside raw SQL or Room?
 
-Yes. Krate uses the `SqlDriver` directly — it's the same driver you'd pass to SQLDelight. You can call raw SQL through `driver.execute(…)` at any point. Just be aware that raw writes won't trigger Krate's `Query.Listener`, so reactive flows won't re-emit for those changes.
+Yes. Kiln uses the `SqlDriver` directly — it's the same driver you'd pass to SQLDelight. You can call raw SQL through `driver.execute(…)` at any point. Just be aware that raw writes won't trigger Kiln's `Query.Listener`, so reactive flows won't re-emit for those changes.
 
 ---
 
@@ -159,7 +159,7 @@ For read-heavy screens that don't need live updates, `findAll()` and `findWhere(
 
 ## General
 
-### Does Krate support transactions?
+### Does Kiln support transactions?
 
 Not via a generated API. Use the `SqlDriver` directly:
 
@@ -179,11 +179,11 @@ try {
 
 ### Does it support foreign keys?
 
-SQLite foreign keys are not enabled by default. Krate does not emit `PRAGMA foreign_keys = ON`. Handle referential integrity manually — see [Cross-table Loading](sample/cross-table.md) for the recommended pattern.
+SQLite foreign keys are not enabled by default. Kiln does not emit `PRAGMA foreign_keys = ON`. Handle referential integrity manually — see [Cross-table Loading](sample/cross-table.md) for the recommended pattern.
 
 ---
 
-### Can I use Krate in a pure JVM project (no Android)?
+### Can I use Kiln in a pure JVM project (no Android)?
 
 Yes. Pass a `JdbcSqliteDriver` from SQLDelight's `sqlite-driver` artifact:
 

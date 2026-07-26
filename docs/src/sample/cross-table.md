@@ -1,6 +1,6 @@
 # Cross-table Loading
 
-Krate generates one repository per entity — it does not generate SQL JOIN queries. For data that spans multiple tables, create a store or service class that coordinates across repositories.
+Kiln generates one repository per entity — it does not generate SQL JOIN queries. For data that spans multiple tables, create a store or service class that coordinates across repositories.
 
 ## Data models
 
@@ -67,7 +67,7 @@ class TaskStore(
     /**
      * Archive a project and delete all its child data.
      *
-     * Krate does not enforce foreign key constraints automatically.
+     * Kiln does not enforce foreign key constraints automatically.
      * This method handles the cascade explicitly.
      */
     suspend fun archiveProject(project: Project) {
@@ -116,4 +116,4 @@ class ProjectDetailViewModel(
 ```
 
 !!! warning "Foreign keys are not auto-enforced"
-    SQLite foreign key constraints are not active by default. Krate does not emit `PRAGMA foreign_keys = ON`. Handle cascades explicitly as shown in `archiveProject` above. This keeps the behaviour visible and avoids silent data loss from unexpected deletions.
+    SQLite foreign key constraints are not active by default. Kiln does not emit `PRAGMA foreign_keys = ON`. Handle cascades explicitly as shown in `archiveProject` above. This keeps the behaviour visible and avoids silent data loss from unexpected deletions.

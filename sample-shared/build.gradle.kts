@@ -4,11 +4,11 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
-group = "com.farook.krate.sample"
+group = "io.github.sufarook.kiln.sample"
 version = "1.0.0-SNAPSHOT"
 
 android {
-    namespace = "com.farook.krate.sample.shared"
+    namespace = "io.github.sufarook.kiln.sample.shared"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()

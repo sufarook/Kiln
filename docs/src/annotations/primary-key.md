@@ -71,7 +71,7 @@ annotation class PrimaryKey(
 !!! warning "autoGenerate requires Long or Int"
     Setting `autoGenerate = true` on a property of any other type produces a compile-time error:
     ```
-    Krate: @PrimaryKey(autoGenerate = true) requires a Long or Int property
+    Kiln: @PrimaryKey(autoGenerate = true) requires a Long or Int property
     ```
 
 !!! warning "Only one @PrimaryKey per entity"

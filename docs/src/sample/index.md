@@ -1,6 +1,6 @@
 # Sample — Task Tracker
 
-This sample demonstrates Krate in a realistic multi-table scenario. It covers entity relationships, reactive observation, cross-table data loading, and DSL queries.
+This sample demonstrates Kiln in a realistic multi-table scenario. It covers entity relationships, reactive observation, cross-table data loading, and DSL queries.
 
 ## Scenario
 

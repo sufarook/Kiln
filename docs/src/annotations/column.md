@@ -80,7 +80,7 @@ data class Task(
 
 ## `migrateFrom` — Column rename hint
 
-When you rename a property, Krate would normally treat it as "old column removed, new column added" — losing all existing data. Set `migrateFrom` to preserve the data across the rename.
+When you rename a property, Kiln would normally treat it as "old column removed, new column added" — losing all existing data. Set `migrateFrom` to preserve the data across the rename.
 
 ```kotlin
 // Before

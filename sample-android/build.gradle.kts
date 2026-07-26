@@ -5,10 +5,10 @@ plugins {
 }
 
 android {
-    namespace = "com.farook.krate.sample"
+    namespace = "io.github.sufarook.kiln.sample"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
-        applicationId = "com.farook.krate.sample"
+        applicationId = "io.github.sufarook.kiln.sample"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1

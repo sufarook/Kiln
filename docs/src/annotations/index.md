@@ -1,6 +1,6 @@
 # Annotations
 
-Krate provides four annotations. All have `SOURCE` retention — they are consumed entirely at compile time and produce no runtime overhead.
+Kiln provides four annotations. All have `SOURCE` retention — they are consumed entirely at compile time and produce no runtime overhead.
 
 | Annotation | Target | Purpose |
 |-----------|--------|---------|
@@ -8,6 +8,7 @@ Krate provides four annotations. All have `SOURCE` retention — they are consum
 | [`@PrimaryKey`](primary-key.md) | Property | Designates the primary key column |
 | [`@Column`](column.md) | Property | Overrides column name, adds constraints, hints migration |
 | [`@Ignore`](ignore.md) | Property | Excludes a property from the schema |
+| [`@Relation`](relation.md) | Property | Marks a FK property; generates `findBy<Parent>`, `observeBy<Parent>`, `deleteBy<Parent>` |
 
 ## Minimal example
 
@@ -30,7 +31,7 @@ data class Product(
 
 ## What gets generated
 
-For `Product` above, Krate generates:
+For `Product` above, Kiln generates:
 
 - `ProductRepository` — all CRUD, reactive, and DSL methods
 - `ProductColumns` — typed `Column<T>` references for use in DSL queries:

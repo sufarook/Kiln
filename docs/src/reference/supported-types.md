@@ -1,6 +1,6 @@
 # Supported Types
 
-The table below shows every Kotlin type Krate can persist, the SQLite column type used, and the bind/read method the generated code uses internally.
+The table below shows every Kotlin type Kiln can persist, the SQLite column type used, and the bind/read method the generated code uses internally.
 
 ## Primitive types
 
@@ -61,7 +61,7 @@ Any of the types above can be made nullable by appending `?`:
 If a property type is not in the tables above and is not annotated with `@Ignore`, the KSP processor emits a build error:
 
 ```
-e: Krate: type 'List<String>' is not supported.
+e: Kiln: type 'List<String>' is not supported.
    Annotate the property with @Ignore or use a supported type.
    File: com/example/MyEntity.kt:12
 ```

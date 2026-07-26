@@ -1,8 +1,8 @@
-site_name: Krate
+site_name: Kiln
 site_description: Compile-time CRUD generation for Kotlin Multiplatform — no SQL, no version numbers, no boilerplate.
 site_author: Syed Ummer Farook
-repo_name: Krate
-repo_url: https://github.com/ummerfarook/Krate
+repo_name: Kiln
+repo_url: https://github.com/sufarook/Kiln
 copyright: Copyright &copy; 2024 Syed Ummer Farook
 
 docs_dir: src
@@ -72,6 +72,7 @@ nav:
     - "@PrimaryKey": annotations/primary-key.md
     - "@Column": annotations/column.md
     - "@Ignore": annotations/ignore.md
+    - "@Relation": annotations/relation.md
   - Sample App:
     - Task Tracker: sample/index.md
     - Entity Definitions: sample/entities.md

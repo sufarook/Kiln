@@ -13,7 +13,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Krate"
+rootProject.name = "Kiln"
 
 include(":annotations")
 include(":processor")

@@ -10,12 +10,12 @@ In your module's `build.gradle.kts`:
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android") version "2.3.20"
-    id("com.farook.krate") version "1.0.0-alpha01" // (1)!
+    id("io.github.sufarook.kiln") version "1.0.0-alpha01" // (1)!
 }
 
 dependencies {
-    implementation("com.farook.krate:annotations:1.0.0-alpha01")
-    implementation("com.farook.krate:runtime:1.0.0-alpha01")
+    implementation("io.github.sufarook.kiln:annotations:1.0.0-alpha01")
+    implementation("io.github.sufarook.kiln:runtime:1.0.0-alpha01")
     implementation("app.cash.sqldelight:android-driver:2.3.2")
 }
 ```
@@ -34,7 +34,7 @@ data class Note(
 )
 ```
 
-**Rebuild the project.** Krate generates `NoteRepository` and `NoteColumns` in `build/generated/`.
+**Rebuild the project.** Kiln generates `NoteRepository` and `NoteColumns` in `build/generated/`.
 
 !!! tip
     If the IDE shows an unresolved reference on `NoteRepository`, run **Build → Make Project** once. The class is generated during compilation — the IDE resolves it after the first successful build.

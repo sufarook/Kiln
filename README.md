@@ -1,4 +1,4 @@
-# Krate
+# Kiln
 
 **Compile-time CRUD generation for Kotlin Multiplatform SQLite. No SQL. No mappers. No migrations.**
 
@@ -33,9 +33,9 @@ repo.deleteWhere { isCompleted eq true }
 repo.count()
 ```
 
-## Why Krate over Room?
+## Why Kiln over Room?
 
-| | Room | Krate |
+| | Room | Kiln |
 |---|---|---|
 | Platforms | Android (KMP support partial) | Android + iOS from one `commonMain` entity |
 | Migrations | Manual: bump version, write `Migration(1, 2)` | **Automatic** — no version numbers exist |
@@ -50,7 +50,7 @@ One line with the Gradle plugin:
 ```kotlin
 plugins {
     kotlin("multiplatform")                        // or com.android.application + kotlin-android
-    id("com.farook.krate") version "1.0.0"
+    id("io.github.sufarook.kiln") version "1.0.0"
 }
 ```
 
@@ -70,12 +70,12 @@ plugins {
 kotlin.sourceSets.commonMain {
     kotlin.srcDir(layout.buildDirectory.dir("generated/krate/commonMain/kotlin"))
     dependencies {
-        api("com.farook.krate:annotations:1.0.0")
-        api("com.farook.krate:runtime:1.0.0")
+        api("io.github.sufarook.kiln:annotations:1.0.0")
+        api("io.github.sufarook.kiln:runtime:1.0.0")
     }
 }
 
-dependencies { add("kspCommonMainMetadata", "com.farook.krate:processor:1.0.0") }
+dependencies { add("kspCommonMainMetadata", "io.github.sufarook.kiln:processor:1.0.0") }
 
 // KSP filters its own output dirs out of Android compilations — sync to a neutral dir
 val sync = tasks.register<Sync>("syncKrateGeneratedSources") {
@@ -152,10 +152,10 @@ Nullable variants of all of the above. Skip a property with `@Ignore`.
 
 | Coordinate | What it is |
 |---|---|
-| `com.farook.krate:annotations` | The four annotations (all KMP targets) |
-| `com.farook.krate:runtime` | `CrudRepository`, `SchemaMigrator`, query DSL, driver factories |
-| `com.farook.krate:processor` | KSP processor (compile-time only) |
-| `com.farook.krate` (plugin) | One-line Gradle setup |
+| `io.github.sufarook.kiln:annotations` | The four annotations (all KMP targets) |
+| `io.github.sufarook.kiln:runtime` | `CrudRepository`, `SchemaMigrator`, query DSL, driver factories |
+| `io.github.sufarook.kiln:processor` | KSP processor (compile-time only) |
+| `io.github.sufarook.kiln` (plugin) | One-line Gradle setup |
 
 ## Samples
 
