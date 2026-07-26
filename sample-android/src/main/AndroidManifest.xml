@@ -3,8 +3,8 @@
 
     <application
         android:name=".SampleApplication"
-        android:label="Krate Sample"
-        android:theme="@style/Theme.KrateSample"
+        android:label="Kiln Sample"
+        android:theme="@style/Theme.KilnSample"
         android:allowBackup="false"
         android:supportsRtl="true">
 

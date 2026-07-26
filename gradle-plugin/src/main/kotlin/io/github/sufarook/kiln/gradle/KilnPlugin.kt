@@ -43,7 +43,7 @@ class KilnPlugin : Plugin<Project> {
     private fun configureMultiplatform(project: Project) {
         project.dependencies.add("kspCommonMainMetadata", "$GROUP:processor:$VERSION")
 
-        val syncTask = project.tasks.register("syncKrateGeneratedSources", Sync::class.java) { task ->
+        val syncTask = project.tasks.register("syncKilnGeneratedSources", Sync::class.java) { task ->
             task.dependsOn("kspCommonMainKotlinMetadata")
             task.from(project.layout.buildDirectory.dir("generated/ksp/metadata/commonMain/kotlin"))
             task.into(project.layout.buildDirectory.dir(GENERATED_DIR))
@@ -75,6 +75,6 @@ class KilnPlugin : Plugin<Project> {
     companion object {
         const val GROUP = "io.github.sufarook.kiln"
         const val VERSION = "1.0.0-SNAPSHOT"
-        const val GENERATED_DIR = "generated/krate/commonMain/kotlin"
+        const val GENERATED_DIR = "generated/kiln/commonMain/kotlin"
     }
 }

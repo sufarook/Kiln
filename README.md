@@ -68,7 +68,7 @@ plugins {
 }
 
 kotlin.sourceSets.commonMain {
-    kotlin.srcDir(layout.buildDirectory.dir("generated/krate/commonMain/kotlin"))
+    kotlin.srcDir(layout.buildDirectory.dir("generated/kiln/commonMain/kotlin"))
     dependencies {
         api("io.github.sufarook.kiln:annotations:1.0.0")
         api("io.github.sufarook.kiln:runtime:1.0.0")
@@ -78,10 +78,10 @@ kotlin.sourceSets.commonMain {
 dependencies { add("kspCommonMainMetadata", "io.github.sufarook.kiln:processor:1.0.0") }
 
 // KSP filters its own output dirs out of Android compilations — sync to a neutral dir
-val sync = tasks.register<Sync>("syncKrateGeneratedSources") {
+val sync = tasks.register<Sync>("syncKilnGeneratedSources") {
     dependsOn("kspCommonMainKotlinMetadata")
     from(layout.buildDirectory.dir("generated/ksp/metadata/commonMain/kotlin"))
-    into(layout.buildDirectory.dir("generated/krate/commonMain/kotlin"))
+    into(layout.buildDirectory.dir("generated/kiln/commonMain/kotlin"))
 }
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask<*>>().configureEach {
     if (name != "kspCommonMainKotlinMetadata") dependsOn(sync)

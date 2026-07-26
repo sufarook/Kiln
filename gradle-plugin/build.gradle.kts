@@ -17,7 +17,7 @@ dependencies {
 
 gradlePlugin {
     plugins {
-        create("krate") {
+        create("kiln") {
             id = "io.github.sufarook.kiln"
             implementationClass = "io.github.sufarook.kiln.gradle.KilnPlugin"
             displayName = "Kiln"

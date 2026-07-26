@@ -24,7 +24,7 @@ object RepositoryGenerator {
     private val BUILD_ORDER_SUFFIX  = MemberName("io.github.sufarook.kiln.runtime", "buildOrderSuffix")
     private val EQ_FUN              = MemberName("io.github.sufarook.kiln.runtime", "eq", isExtension = true)
     private val NOTIFY_OR_DEFER     = MemberName("io.github.sufarook.kiln.runtime", "notifyOrDefer", isExtension = true)
-    private val KRATE_TX            = MemberName("io.github.sufarook.kiln.runtime", "withTransaction", isExtension = true)
+    private val WITH_TX             = MemberName("io.github.sufarook.kiln.runtime", "withTransaction", isExtension = true)
 
     fun generate(meta: EntityMetadata, codeGenerator: CodeGenerator) {
         val entityClass = ClassName(meta.packageName, meta.entityClassName)
@@ -508,7 +508,7 @@ object RepositoryGenerator {
             .addKdoc("Inserts all entities in a single transaction. Reactive flows emit once after all rows commit.")
             .addModifiers(KModifier.SUSPEND)
             .addParameter("entities", listType)
-            .addStatement("driver.%M(context) { entities.forEach { insert(it) } }", KRATE_TX)
+            .addStatement("driver.%M(context) { entities.forEach { insert(it) } }", WITH_TX)
             .build()
     }
 
