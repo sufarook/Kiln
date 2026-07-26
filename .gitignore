@@ -1,8 +1,32 @@
+# Gradle
 .gradle/
 build/
+.kotlin/
+*.hprof
+captures/
+
+# IDE
 .idea/
 *.iml
+
+# Android local config (contains SDK path — machine-specific)
 local.properties
+
+# Signing & secrets — never commit these
 *.keystore
+*.jks
+*.p12
+*.gpg
+*.asc
+gradle.properties.local
+keystore.properties
+
+# macOS
 .DS_Store
-.kotlin/
+**/.DS_Store
+
+# Xcode / KMP iOS builds
+xcuserdata/
+*.xcworkspace/xcuserdata/
+DerivedData/
+.swiftpm/
