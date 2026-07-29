@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.library)
-    alias(libs.plugins.ksp)
+    id("io.github.sufarook.kiln") version "1.0.0-alpha02"
 }
 
 group = "io.github.sufarook.kiln.sample"
@@ -26,22 +26,11 @@ kotlin {
     }
 
     sourceSets {
-        val commonMain by getting {
-            kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
-            dependencies {
-                api(project(":annotations"))
-                api(project(":runtime"))
-            }
+        androidMain.dependencies {
+            implementation(libs.sqldelight.android.driver)
         }
-    }
-}
-
-dependencies {
-    add("kspCommonMainMetadata", project(":processor"))
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask<*>>().configureEach {
-    if (name != "kspCommonMainKotlinMetadata") {
-        dependsOn("kspCommonMainKotlinMetadata")
+        iosMain.dependencies {
+            implementation(libs.sqldelight.native.driver)
+        }
     }
 }

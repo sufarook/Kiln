@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.ksp)
+    id("io.github.sufarook.kiln") version "1.0.0-alpha02"
 }
 
 android {
@@ -25,14 +25,10 @@ android {
 }
 
 dependencies {
-    implementation(project(":annotations"))
-    implementation(project(":runtime"))
     implementation(libs.sqldelight.android.driver)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-
-    ksp(project(":processor"))
 
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.junit)
