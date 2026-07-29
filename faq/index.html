@@ -1842,7 +1842,7 @@
 <p><strong>KSP isn't wired to the right source set.</strong> In a KMP project, add the KSP dependency for the <code>commonMainMetadata</code> configuration:
    <div class="language-kotlin highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">// build.gradle.kts</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="n">add</span><span class="p">(</span><span class="s">&quot;kspCommonMainMetadata&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;io.github.sufarook.kiln:processor:1.0.0-alpha01&quot;</span><span class="p">)</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="n">add</span><span class="p">(</span><span class="s">&quot;kspCommonMainMetadata&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;io.github.sufarook.kiln:processor:1.0.0-alpha02&quot;</span><span class="p">)</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">}</span>
 </span></code></pre></div></p>
 </li>
@@ -1864,7 +1864,7 @@
 <p>You applied the Kiln plugin but KSP is missing. The plugin declares KSP as a required dependency — make sure you've added the KSP plugin to the plugins block:</p>
 <div class="language-kotlin highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">plugins</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="n">id</span><span class="p">(</span><span class="s">&quot;com.google.devtools.ksp&quot;</span><span class="p">)</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="s">&quot;2.3.20-1.0.31&quot;</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="n">id</span><span class="p">(</span><span class="s">&quot;io.github.sufarook.kiln&quot;</span><span class="p">)</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="s">&quot;1.0.0-alpha01&quot;</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="n">id</span><span class="p">(</span><span class="s">&quot;io.github.sufarook.kiln&quot;</span><span class="p">)</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="s">&quot;1.0.0-alpha02&quot;</span>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="p">}</span>
 </span></code></pre></div>
 <hr />
