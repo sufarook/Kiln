@@ -14,7 +14,7 @@ The generated `TaskRepository` class doesn't exist yet, or KSP didn't run.
    ```kotlin
    // build.gradle.kts
    dependencies {
-       add("kspCommonMainMetadata", "io.github.sufarook.kiln:processor:1.0.0-alpha01")
+       add("kspCommonMainMetadata", "io.github.sufarook.kiln:processor:1.0.0-alpha02")
    }
    ```
 
@@ -38,7 +38,7 @@ You applied the Kiln plugin but KSP is missing. The plugin declares KSP as a req
 ```kotlin
 plugins {
     id("com.google.devtools.ksp") version "2.3.20-1.0.31"
-    id("io.github.sufarook.kiln") version "1.0.0-alpha01"
+    id("io.github.sufarook.kiln") version "1.0.0-alpha02"
 }
 ```
 

@@ -10,12 +10,12 @@ In your module's `build.gradle.kts`:
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android") version "2.3.20"
-    id("io.github.sufarook.kiln") version "1.0.0-alpha01" // (1)!
+    id("io.github.sufarook.kiln") version "1.0.0-alpha02" // (1)!
 }
 
 dependencies {
-    implementation("io.github.sufarook.kiln:annotations:1.0.0-alpha01")
-    implementation("io.github.sufarook.kiln:runtime:1.0.0-alpha01")
+    implementation("io.github.sufarook.kiln:annotations:1.0.0-alpha02")
+    implementation("io.github.sufarook.kiln:runtime:1.0.0-alpha02")
     implementation("app.cash.sqldelight:android-driver:2.3.2")
 }
 ```

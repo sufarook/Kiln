@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
  *
  * ```kotlin
  * plugins {
- *     id("io.github.sufarook.kiln") version "1.0.0-alpha01"
+ *     id("io.github.sufarook.kiln") version "1.0.0-alpha02"
  * }
  * ```
  *
@@ -74,7 +74,7 @@ class KilnPlugin : Plugin<Project> {
 
     companion object {
         const val GROUP = "io.github.sufarook.kiln"
-        const val VERSION = "1.0.0-SNAPSHOT"
+        const val VERSION = "1.0.0-alpha02"
         const val GENERATED_DIR = "generated/kiln/commonMain/kotlin"
     }
 }

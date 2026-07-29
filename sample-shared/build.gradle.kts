@@ -20,15 +20,13 @@ kotlin {
     androidTarget()
     listOf(iosArm64(), iosX64(), iosSimulatorArm64()).forEach { target ->
         target.binaries.framework {
-            baseName = "SampleShared"   // import SampleShared in Swift
+            baseName = "SampleShared"
             isStatic = true
         }
     }
 
     sourceSets {
         val commonMain by getting {
-            // KSP generates once into the metadata output dir; adding it directly here
-            // makes the generated repositories visible to all targets (Android + iOS).
             kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
             dependencies {
                 api(project(":annotations"))
@@ -39,11 +37,9 @@ kotlin {
 }
 
 dependencies {
-    // One processor run on common metadata → one repository shared by all platforms
     add("kspCommonMainMetadata", project(":processor"))
 }
 
-// Every compilation that needs the generated sources must wait for KSP to finish.
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask<*>>().configureEach {
     if (name != "kspCommonMainKotlinMetadata") {
         dependsOn("kspCommonMainKotlinMetadata")
