@@ -4,6 +4,25 @@ All operators are used inside a lambda passed to `findWhere`, `observeWhere`, `d
 
 All values are bound as `?` parameters — SQL injection is structurally impossible.
 
+## Imports
+
+The operators are top-level functions in `io.github.sufarook.kiln.runtime`, so code in your own package must import the ones it uses:
+
+```kotlin
+import io.github.sufarook.kiln.runtime.eq
+import io.github.sufarook.kiln.runtime.and
+import io.github.sufarook.kiln.runtime.gte
+```
+
+Or bring in the whole set at once:
+
+```kotlin
+import io.github.sufarook.kiln.runtime.*
+```
+
+!!! tip "Unresolved reference `eq`?"
+    That is a missing import, not a codegen failure. The IDE offers the import on the red symbol — the examples below omit the import lines for brevity.
+
 ---
 
 ## Equality
