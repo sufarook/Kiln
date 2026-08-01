@@ -16,6 +16,8 @@ android {
 }
 
 kotlin {
+    jvmToolchain(17)
+
     applyDefaultHierarchyTemplate()
     androidTarget()
     listOf(iosArm64(), iosX64(), iosSimulatorArm64()).forEach { target ->

@@ -4,6 +4,12 @@ plugins {
     alias(libs.plugins.vanniktech.publish)
 }
 
+kotlin {
+    // Pinned so published class-file version is reproducible. 17 is safe as a floor:
+    // AGP 8.x already requires consumers to run Gradle on JDK 17+.
+    jvmToolchain(17)
+}
+
 dependencies {
     implementation(gradleApi())
     // Ships KSP on the consumer's classpath so plugins.apply("com.google.devtools.ksp") works

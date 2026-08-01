@@ -13,6 +13,10 @@ android {
 }
 
 kotlin {
+    // Pinned so published class-file version is reproducible across build machines
+    // rather than following whichever JDK happened to run the build.
+    jvmToolchain(17)
+
     androidTarget {
         publishLibraryVariants("release")
     }
