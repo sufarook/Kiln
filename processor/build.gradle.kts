@@ -13,6 +13,11 @@ dependencies {
     testImplementation(libs.kotlinpoet)     // needed to construct TypeName in tests
 }
 
+kotlin {
+    // Pinned so published class-file version is reproducible across build machines.
+    jvmToolchain(17)
+}
+
 tasks.test {
     useJUnit()
 }
