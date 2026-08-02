@@ -19,6 +19,9 @@ dependencies {
 
     testImplementation(gradleTestKit())
     testImplementation(libs.junit)
+    // KilnPlugin only configures anything once a Kotlin plugin is applied, so the
+    // tests need KGP on the classpath to exercise those callbacks at all.
+    testImplementation(kotlin("gradle-plugin"))
 }
 
 /**
@@ -73,6 +76,10 @@ gradlePlugin {
 
 tasks.test {
     useJUnit()
+    // Lets the suite assert the generated KilnBuildConfig matches what the build
+    // actually publishes — the drift that shipped a broken 1.0.0-alpha01.
+    systemProperty("kiln.expectedGroup", project.group.toString())
+    systemProperty("kiln.expectedVersion", project.version.toString())
 }
 
 mavenPublishing {
