@@ -13,7 +13,7 @@ allprojects {
     // VERSION is generated from this (see :gradle-plugin generateBuildConfig) so it
     // cannot drift from what actually gets published.
     group = "io.github.sufarook.kiln"
-    version = "1.0.0-alpha02"
+    version = "1.0.0-alpha03"
 }
 
 /** Lets CI read the version without parsing this file. */

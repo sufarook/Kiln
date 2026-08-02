@@ -50,7 +50,7 @@ One line with the Gradle plugin:
 ```kotlin
 plugins {
     kotlin("multiplatform")                        // or com.android.application + kotlin-android
-    id("io.github.sufarook.kiln") version "1.0.0-alpha02"
+    id("io.github.sufarook.kiln") version "1.0.0-alpha03"
 }
 ```
 
@@ -70,12 +70,12 @@ plugins {
 kotlin.sourceSets.commonMain {
     kotlin.srcDir(layout.buildDirectory.dir("generated/kiln/commonMain/kotlin"))
     dependencies {
-        api("io.github.sufarook.kiln:annotations:1.0.0-alpha02")
-        api("io.github.sufarook.kiln:runtime:1.0.0-alpha02")
+        api("io.github.sufarook.kiln:annotations:1.0.0-alpha03")
+        api("io.github.sufarook.kiln:runtime:1.0.0-alpha03")
     }
 }
 
-dependencies { add("kspCommonMainMetadata", "io.github.sufarook.kiln:processor:1.0.0-alpha02") }
+dependencies { add("kspCommonMainMetadata", "io.github.sufarook.kiln:processor:1.0.0-alpha03") }
 
 // KSP filters its own output dirs out of Android compilations — sync to a neutral dir
 val sync = tasks.register<Sync>("syncKilnGeneratedSources") {

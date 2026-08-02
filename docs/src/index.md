@@ -99,7 +99,7 @@ Kiln generates `TaskRepository` at compile time with:
 
 ```kotlin
 // 1. Apply the plugin in build.gradle.kts
-//    id("io.github.sufarook.kiln") version "1.0.0-alpha02"
+//    id("io.github.sufarook.kiln") version "1.0.0-alpha03"
 
 // 2. Annotate a data class
 @DbEntity(tableName = "notes")

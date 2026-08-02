@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.library)
-    id("io.github.sufarook.kiln") version "1.0.0-alpha02"
+    id("io.github.sufarook.kiln") version "1.0.0-alpha03"
 }
 
 group = "io.github.sufarook.kiln.sample"
