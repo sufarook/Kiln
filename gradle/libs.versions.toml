@@ -1,5 +1,7 @@
 [versions]
-kiln = "1.0.0-alpha01"
+# Kiln's own version lives in the root build.gradle.kts (allprojects.version) and is
+# the single source of truth — the Gradle plugin's embedded coordinates are generated
+# from it. Do not reintroduce a version here.
 kotlin = "2.3.20"
 ksp = "2.3.9"
 kotlinpoet = "2.3.0"
