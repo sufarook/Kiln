@@ -24,10 +24,9 @@ class KilnPluginTest {
     private fun newProject(): Project = ProjectBuilder.builder().build()
 
     /** Coordinates the plugin added to [configuration], as "group:name:version" strings. */
-    private fun Project.coordinatesIn(configuration: String): List<String> =
-        configurations.getByName(configuration).dependencies
-            .filterIsInstance<ExternalModuleDependency>()
-            .map { "${it.group}:${it.name}:${it.version}" }
+    private fun Project.coordinatesIn(configuration: String): List<String> = configurations.getByName(configuration).dependencies
+        .filterIsInstance<ExternalModuleDependency>()
+        .map { "${it.group}:${it.name}:${it.version}" }
 
     // ── Embedded coordinates ──────────────────────────────────────────────────
 
@@ -38,12 +37,12 @@ class KilnPluginTest {
         assertEquals(
             "plugin GROUP must match the publishing group",
             expectedGroup,
-            KilnPlugin.GROUP,
+            KilnPlugin.GROUP
         )
         assertEquals(
             "plugin VERSION must match the published version",
             expectedVersion,
-            KilnPlugin.VERSION,
+            KilnPlugin.VERSION
         )
     }
 
@@ -51,7 +50,7 @@ class KilnPluginTest {
     fun `embedded version is never a snapshot placeholder`() {
         assertFalse(
             "VERSION resolved to '${KilnPlugin.VERSION}' — a SNAPSHOT is never publishable to Maven Central",
-            KilnPlugin.VERSION.endsWith("-SNAPSHOT"),
+            KilnPlugin.VERSION.endsWith("-SNAPSHOT")
         )
         assertTrue("VERSION must not be blank", KilnPlugin.VERSION.isNotBlank())
     }
@@ -65,7 +64,7 @@ class KilnPluginTest {
 
         assertTrue(
             "the plugin's headline promise is one-line setup — KSP must be applied for us",
-            project.plugins.hasPlugin("com.google.devtools.ksp"),
+            project.plugins.hasPlugin("com.google.devtools.ksp")
         )
     }
 
@@ -86,7 +85,7 @@ class KilnPluginTest {
 
         assertFalse(
             "without a Kotlin plugin there is no compilation to wire into",
-            project.configurations.names.contains("implementation"),
+            project.configurations.names.contains("implementation")
         )
     }
 
@@ -100,17 +99,17 @@ class KilnPluginTest {
 
         assertEquals(
             listOf("$expectedGroup:processor:$expectedVersion"),
-            project.coordinatesIn("ksp"),
+            project.coordinatesIn("ksp")
         )
         assertTrue(
             "annotations must be on the consumer's compile classpath",
             project.coordinatesIn("implementation")
-                .contains("$expectedGroup:annotations:$expectedVersion"),
+                .contains("$expectedGroup:annotations:$expectedVersion")
         )
         assertTrue(
             "runtime carries CrudRepository and the driver factories",
             project.coordinatesIn("implementation")
-                .contains("$expectedGroup:runtime:$expectedVersion"),
+                .contains("$expectedGroup:runtime:$expectedVersion")
         )
     }
 
@@ -128,11 +127,11 @@ class KilnPluginTest {
 
         assertEquals(
             kotlinFirst.coordinatesIn("ksp").sorted(),
-            kilnFirst.coordinatesIn("ksp").sorted(),
+            kilnFirst.coordinatesIn("ksp").sorted()
         )
         assertEquals(
             kotlinFirst.coordinatesIn("implementation").sorted(),
-            kilnFirst.coordinatesIn("implementation").sorted(),
+            kilnFirst.coordinatesIn("implementation").sorted()
         )
     }
 
@@ -147,7 +146,7 @@ class KilnPluginTest {
         assertEquals(
             "one processor run on common metadata means one repository shared by all targets",
             listOf("$expectedGroup:processor:$expectedVersion"),
-            project.coordinatesIn("kspCommonMainMetadata"),
+            project.coordinatesIn("kspCommonMainMetadata")
         )
     }
 
@@ -160,7 +159,7 @@ class KilnPluginTest {
         val syncTask = project.tasks.findByName("syncKilnGeneratedSources")
         assertNotNull(
             "KSP filters its own output dirs out of Android compilations — the sync task is the workaround",
-            syncTask,
+            syncTask
         )
     }
 
@@ -176,7 +175,7 @@ class KilnPluginTest {
         val generatedDir = project.layout.buildDirectory.dir(KilnPlugin.GENERATED_DIR).get().asFile
         assertTrue(
             "commonMain must include the synced generated dir or repositories are unresolvable",
-            commonMain.kotlin.srcDirs.contains(generatedDir),
+            commonMain.kotlin.srcDirs.contains(generatedDir)
         )
 
         // api, not implementation: entities in commonMain are part of the consumer's
@@ -184,11 +183,11 @@ class KilnPluginTest {
         val apiCoordinates = project.coordinatesIn("commonMainApi")
         assertTrue(
             "expected annotations in commonMainApi but got $apiCoordinates",
-            apiCoordinates.contains("$expectedGroup:annotations:$expectedVersion"),
+            apiCoordinates.contains("$expectedGroup:annotations:$expectedVersion")
         )
         assertTrue(
             "expected runtime in commonMainApi but got $apiCoordinates",
-            apiCoordinates.contains("$expectedGroup:runtime:$expectedVersion"),
+            apiCoordinates.contains("$expectedGroup:runtime:$expectedVersion")
         )
     }
 }

@@ -11,6 +11,6 @@ data class Task(
     val title: String,
     @Column(index = true)
     @Relation(cascade = true)
-    val projectId: Long = 0,    // FK to Project
+    val projectId: Long = 0, // FK to Project
     val isDone: Boolean = false
 )

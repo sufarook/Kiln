@@ -6,5 +6,5 @@ import app.cash.sqldelight.driver.native.NativeSqliteDriver
 actual fun createTestDriver(): SqlDriver = NativeSqliteDriver(
     schema = EmptySchema,
     name = "test",
-    onConfiguration = { config -> config.copy(name = null, inMemory = true) },
+    onConfiguration = { config -> config.copy(name = null, inMemory = true) }
 )

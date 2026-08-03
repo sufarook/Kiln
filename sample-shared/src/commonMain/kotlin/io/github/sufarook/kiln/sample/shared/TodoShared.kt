@@ -13,5 +13,6 @@ data class TodoShared(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val title: String,
     @Column(name = "is_completed") val isCompleted: Boolean = false,
-    @Column(index = true) val priority: Int = 0   // 0 = Normal, 1 = High — indexed for sorted queries
+    // 0 = Normal, 1 = High — indexed for sorted queries
+    @Column(index = true) val priority: Int = 0
 )

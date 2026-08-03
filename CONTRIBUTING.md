@@ -29,6 +29,8 @@ actually protects.
 ./gradlew :runtime:iosSimulatorArm64Test  # same runtime suite on a real iOS simulator (Apple Silicon Mac required)
 ./gradlew :gradle-plugin:test             # Gradle plugin wiring tests
 ./gradlew apiCheck                        # binary compatibility check (see below)
+./gradlew ktlintCheck                     # formatting check (see below)
+./gradlew koverHtmlReport                 # coverage report (see below)
 ```
 
 The `runtime` test suite (`SchemaMigratorTest`, `QueryDslTest`, `TransactionTest`)
@@ -63,6 +65,54 @@ If you add, remove, or change a public signature in either module:
 
 Deleting or narrowing a public API is a breaking change — call it out explicitly
 in your PR description.
+
+### Formatting
+
+Style is enforced by [ktlint](https://github.com/pinterest/ktlint), configured
+via `.editorconfig` to Android Studio's default code style (not ktlint's own
+stricter `ktlint_official` default) — this codebase was written against Android
+Studio's formatter, and `ktlint_official` would demand a wall of unrelated
+reformatting (mandatory trailing commas, one-parameter-per-line signatures) on
+every file it touches.
+
+```bash
+./gradlew ktlintCheck   # what CI runs
+./gradlew ktlintFormat  # auto-fixes what it can; anything left needs a manual look
+```
+
+Wildcard imports are explicitly allowed (`ktlint_standard_no-wildcard-imports`
+is disabled) — the KSP/KotlinPoet-heavy processor files pull many types from a
+single package, and Android Studio's own formatter switches to wildcard imports
+above a class-count threshold by default anyway.
+
+### Coverage
+
+[Kover](https://github.com/Kotlinx/kotlinx-kover) generates a coverage report
+for `processor`, `runtime`, and `gradle-plugin` — the JVM-executable test
+suites (Kover instruments JVM bytecode only, so it doesn't cover `runtime`'s
+iOS targets separately; `jvmTest`/`iosSimulatorArm64Test` exercise the same
+`commonMain` logic either way).
+
+```bash
+./gradlew koverHtmlReport  # build/reports/kover/html/index.html (aggregated at root)
+```
+
+This is informational, not a merge gate — useful for spotting an untested code
+path, not a percentage to chase. CI publishes it as a downloadable artifact on
+every run, but it's never a required check.
+
+### API reference (Dokka)
+
+`annotations` and `runtime` — the same two modules binary-compat validation
+covers — generate a KDoc-based API reference via
+[Dokka](https://github.com/Kotlin/dokka):
+
+```bash
+./gradlew dokkaGenerate  # build/dokka/html/index.html (aggregated at root)
+```
+
+Published automatically alongside the MkDocs site at
+`https://sufarook.github.io/Kiln/api/` whenever `main` is deployed.
 
 ## Adding or changing a feature
 

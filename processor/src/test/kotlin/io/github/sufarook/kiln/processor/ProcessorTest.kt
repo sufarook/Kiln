@@ -1,9 +1,9 @@
 package io.github.sufarook.kiln.processor
 
-import com.squareup.kotlinpoet.STRING
-import com.squareup.kotlinpoet.LONG
-import com.squareup.kotlinpoet.DOUBLE
 import com.squareup.kotlinpoet.BOOLEAN
+import com.squareup.kotlinpoet.DOUBLE
+import com.squareup.kotlinpoet.LONG
+import com.squareup.kotlinpoet.STRING
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -247,7 +247,7 @@ class SqlStatementBuilderTest {
         val sql = SqlStatementBuilder.insert(assignmentMeta())
         assertTrue(sql.contains("\"taskId\""))
         assertTrue(sql.contains("\"userId\""))
-        assertEquals(3, sql.count { it == '?' })  // taskId, userId, assignedAt
+        assertEquals(3, sql.count { it == '?' }) // taskId, userId, assignedAt
     }
 
     @Test
@@ -383,9 +383,23 @@ class InferParentNameTest {
         return base.replaceFirstChar { it.uppercase() }
     }
 
-    @Test fun simpleIdSuffix()        { assertEquals("Project",    inferParentName("projectId")) }
-    @Test fun camelCaseIdSuffix()     { assertEquals("Author",     inferParentName("authorId")) }
-    @Test fun compoundIdSuffix()      { assertEquals("ParentTask", inferParentName("parentTaskId")) }
-    @Test fun noIdSuffix()            { assertEquals("Owner",      inferParentName("owner")) }
-    @Test fun singleWordCapitalized() { assertEquals("Category",   inferParentName("categoryId")) }
+    @Test fun simpleIdSuffix() {
+        assertEquals("Project", inferParentName("projectId"))
+    }
+
+    @Test fun camelCaseIdSuffix() {
+        assertEquals("Author", inferParentName("authorId"))
+    }
+
+    @Test fun compoundIdSuffix() {
+        assertEquals("ParentTask", inferParentName("parentTaskId"))
+    }
+
+    @Test fun noIdSuffix() {
+        assertEquals("Owner", inferParentName("owner"))
+    }
+
+    @Test fun singleWordCapitalized() {
+        assertEquals("Category", inferParentName("categoryId"))
+    }
 }

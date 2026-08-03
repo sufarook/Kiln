@@ -16,7 +16,7 @@ class TodoStore(driver: SqlDriver) {
     private val repo = TodoSharedRepository(driver)
 
     init {
-        repo.createTable()  // creates on first launch, auto-migrates on upgrades
+        repo.createTable() // creates on first launch, auto-migrates on upgrades
     }
 
     /** Reactive stream — emits on every insert/update/delete, high-priority first. */
@@ -40,8 +40,7 @@ class TodoStore(driver: SqlDriver) {
         repo.delete(id)
     }
 
-    suspend fun all(): List<TodoShared> =
-        repo.findAll().sortedWith(compareByDescending<TodoShared> { it.priority }.thenBy { it.id })
+    suspend fun all(): List<TodoShared> = repo.findAll().sortedWith(compareByDescending<TodoShared> { it.priority }.thenBy { it.id })
 
     // ── Type-safe query DSL in action — no SQL strings ──────────────────────────
 
@@ -49,11 +48,9 @@ class TodoStore(driver: SqlDriver) {
         repo.deleteWhere { isCompleted eq true }
     }
 
-    suspend fun highPriorityOpen(): List<TodoShared> =
-        repo.findWhere { (priority eq 1) and (isCompleted eq false) }
+    suspend fun highPriorityOpen(): List<TodoShared> = repo.findWhere { (priority eq 1) and (isCompleted eq false) }
 
-    suspend fun search(prefix: String): List<TodoShared> =
-        repo.findWhere { title like "$prefix%" }
+    suspend fun search(prefix: String): List<TodoShared> = repo.findWhere { title like "$prefix%" }
 
     suspend fun pendingCount(): Long = repo.count { isCompleted eq false }
 }

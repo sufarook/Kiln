@@ -11,8 +11,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 
 class TodoAdapter(
-    private val onToggle:    (Todo) -> Unit,
-    private val onDelete:    (Todo) -> Unit,
+    private val onToggle: (Todo) -> Unit,
+    private val onDelete: (Todo) -> Unit,
     private val onEditTitle: (Todo, String) -> Unit
 ) : RecyclerView.Adapter<TodoAdapter.ViewHolder>() {
 
@@ -25,10 +25,10 @@ class TodoAdapter(
     }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val cbDone:      CheckBox   = view.findViewById(R.id.cbDone)
-        val tvTitle:     TextView   = view.findViewById(R.id.tvTitle)
-        val tvPriority:  TextView   = view.findViewById(R.id.tvPriority)
-        val btnDelete:   ImageButton = view.findViewById(R.id.btnDelete)
+        val cbDone: CheckBox = view.findViewById(R.id.cbDone)
+        val tvTitle: TextView = view.findViewById(R.id.tvTitle)
+        val tvPriority: TextView = view.findViewById(R.id.tvPriority)
+        val btnDelete: ImageButton = view.findViewById(R.id.btnDelete)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ViewHolder(
@@ -44,10 +44,11 @@ class TodoAdapter(
         holder.tvTitle.text = todo.title
 
         // Strike-through when done
-        holder.tvTitle.paintFlags = if (todo.isCompleted)
-            holder.tvTitle.paintFlags or  Paint.STRIKE_THRU_TEXT_FLAG
-        else
+        holder.tvTitle.paintFlags = if (todo.isCompleted) {
+            holder.tvTitle.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+        } else {
             holder.tvTitle.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+        }
 
         holder.tvPriority.visibility = if (todo.priority == 1) View.VISIBLE else View.GONE
 

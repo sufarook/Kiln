@@ -6,5 +6,6 @@ annotation class Column(
     val name: String = "",
     val unique: Boolean = false,
     val index: Boolean = false,
-    val migrateFrom: String = ""  // old column name when renaming a property — migrator copies data
+    // old column name when renaming a property — migrator copies data
+    val migrateFrom: String = ""
 )

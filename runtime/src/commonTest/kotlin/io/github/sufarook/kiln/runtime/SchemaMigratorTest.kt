@@ -58,7 +58,7 @@ class SchemaMigratorTest {
 
     @Test
     fun `nonexistent table is a safe no-op`() {
-        migrator.sync("does_not_exist", v1Columns)  // must not throw
+        migrator.sync("does_not_exist", v1Columns) // must not throw
     }
 
     @Test
@@ -78,7 +78,10 @@ class SchemaMigratorTest {
         val isNull = driver.executeQuery(
             null,
             """SELECT "due_date" IS NULL FROM "todos" LIMIT 1""",
-            { c -> c.next(); QueryResult.Value(c.getLong(0) == 1L) },
+            { c ->
+                c.next()
+                QueryResult.Value(c.getLong(0) == 1L)
+            },
             0
         ).value
         assertTrue(isNull)
@@ -103,7 +106,7 @@ class SchemaMigratorTest {
 
     @Test
     fun `removed column is dropped with remaining data intact`() {
-        migrator.sync("todos", listOf(v1Columns[0], v1Columns[1]))  // priority removed
+        migrator.sync("todos", listOf(v1Columns[0], v1Columns[1])) // priority removed
 
         assertEquals(listOf("id", "title"), columnNames("todos"))
         assertEquals(2, count("todos"))
@@ -113,7 +116,7 @@ class SchemaMigratorTest {
     @Test
     fun `primary key values survive table recreation`() {
         val idsBefore = queryLongs("""SELECT "id" FROM "todos" ORDER BY "id"""")
-        migrator.sync("todos", listOf(v1Columns[0], v1Columns[1]))  // triggers slow path
+        migrator.sync("todos", listOf(v1Columns[0], v1Columns[1])) // triggers slow path
 
         assertEquals(idsBefore, queryLongs("""SELECT "id" FROM "todos" ORDER BY "id""""))
     }
@@ -122,7 +125,7 @@ class SchemaMigratorTest {
     fun `unique constraint survives table recreation`() {
         val v2 = listOf(
             v1Columns[0],
-            ColumnDef("title", "TEXT", false, "''", isUnique = true),
+            ColumnDef("title", "TEXT", false, "''", isUnique = true)
             // dropping priority forces the slow path so the table is rebuilt with UNIQUE
         )
         migrator.sync("todos", v2)
@@ -187,8 +190,8 @@ class SchemaMigratorTest {
     fun `sync is idempotent across repeated launches`() {
         val v2 = v1Columns + ColumnDef("notes", "TEXT", false, "''")
         migrator.sync("todos", v2)
-        migrator.sync("todos", v2)  // second app launch
-        migrator.sync("todos", v2)  // third app launch
+        migrator.sync("todos", v2) // second app launch
+        migrator.sync("todos", v2) // third app launch
 
         assertEquals(listOf("id", "title", "priority", "notes"), columnNames("todos"))
         assertEquals(2, count("todos"))
@@ -224,7 +227,7 @@ class SchemaMigratorTest {
         )
         exec("""INSERT INTO "assignments" VALUES (1, 10, 'x')""")
         exec("""INSERT INTO "assignments" VALUES (1, 20, 'y')""")
-        migrator.sync("assignments", assignmentColumns)  // "note" orphaned -> slow path
+        migrator.sync("assignments", assignmentColumns) // "note" orphaned -> slow path
     }
 
     @Test
@@ -236,12 +239,14 @@ class SchemaMigratorTest {
         assertEquals(
             listOf(10L, 20L),
             driver.executeQuery(
-                null, """SELECT "user_id" FROM "assignments" ORDER BY "user_id"""",
+                null,
+                """SELECT "user_id" FROM "assignments" ORDER BY "user_id"""",
                 { c ->
                     val out = mutableListOf<Long>()
                     while (c.next().value) out.add(c.getLong(0)!!)
                     QueryResult.Value(out)
-                }, 0
+                },
+                0
             ).value
         )
     }
@@ -250,7 +255,7 @@ class SchemaMigratorTest {
     fun `composite key uniqueness is still enforced after table recreation`() {
         installAssignmentsAndDropNote()
 
-        exec("""INSERT INTO "assignments" VALUES (2, 10)""")  // different composite key — OK
+        exec("""INSERT INTO "assignments" VALUES (2, 10)""") // different composite key — OK
         assertFails("duplicate composite key must violate the rebuilt PRIMARY KEY constraint") {
             exec("""INSERT INTO "assignments" VALUES (1, 10)""")
         }
@@ -260,45 +265,50 @@ class SchemaMigratorTest {
 
     private fun exec(sql: String) = driver.execute(null, sql, 0)
 
-    private fun insertTodo(title: String, priority: Long) =
-        exec("""INSERT INTO "todos" ("title", "priority") VALUES ('$title', $priority)""")
+    private fun insertTodo(title: String, priority: Long) = exec("""INSERT INTO "todos" ("title", "priority") VALUES ('$title', $priority)""")
 
-    private fun columnNames(table: String): List<String> =
-        driver.executeQuery(
-            null, """PRAGMA table_info("$table")""",
-            { cursor ->
-                val names = mutableListOf<String>()
-                while (cursor.next().value) names.add(cursor.getString(1)!!)
-                QueryResult.Value(names)
-            }, 0
-        ).value
+    private fun columnNames(table: String): List<String> = driver.executeQuery(
+        null,
+        """PRAGMA table_info("$table")""",
+        { cursor ->
+            val names = mutableListOf<String>()
+            while (cursor.next().value) names.add(cursor.getString(1)!!)
+            QueryResult.Value(names)
+        },
+        0
+    ).value
 
-    private fun columnTypes(table: String): Map<String, String> =
-        driver.executeQuery(
-            null, """PRAGMA table_info("$table")""",
-            { cursor ->
-                val types = mutableMapOf<String, String>()
-                while (cursor.next().value) types[cursor.getString(1)!!] = cursor.getString(2) ?: ""
-                QueryResult.Value(types)
-            }, 0
-        ).value
+    private fun columnTypes(table: String): Map<String, String> = driver.executeQuery(
+        null,
+        """PRAGMA table_info("$table")""",
+        { cursor ->
+            val types = mutableMapOf<String, String>()
+            while (cursor.next().value) types[cursor.getString(1)!!] = cursor.getString(2) ?: ""
+            QueryResult.Value(types)
+        },
+        0
+    ).value
 
-    private fun count(table: String): Int =
-        queryLong("""SELECT COUNT(*) FROM "$table"""").toInt()
+    private fun count(table: String): Int = queryLong("""SELECT COUNT(*) FROM "$table"""").toInt()
 
-    private fun queryLong(sql: String): Long =
-        driver.executeQuery(null, sql, { c -> c.next(); QueryResult.Value(c.getLong(0)!!) }, 0).value
+    private fun queryLong(sql: String): Long = driver.executeQuery(null, sql, { c ->
+        c.next()
+        QueryResult.Value(c.getLong(0)!!)
+    }, 0).value
 
-    private fun queryLongs(sql: String): List<Long> =
-        driver.executeQuery(
-            null, sql,
-            { c ->
-                val out = mutableListOf<Long>()
-                while (c.next().value) out.add(c.getLong(0)!!)
-                QueryResult.Value(out)
-            }, 0
-        ).value
+    private fun queryLongs(sql: String): List<Long> = driver.executeQuery(
+        null,
+        sql,
+        { c ->
+            val out = mutableListOf<Long>()
+            while (c.next().value) out.add(c.getLong(0)!!)
+            QueryResult.Value(out)
+        },
+        0
+    ).value
 
-    private fun queryString(sql: String): String =
-        driver.executeQuery(null, sql, { c -> c.next(); QueryResult.Value(c.getString(0)!!) }, 0).value
+    private fun queryString(sql: String): String = driver.executeQuery(null, sql, { c ->
+        c.next()
+        QueryResult.Value(c.getString(0)!!)
+    }, 0).value
 }
