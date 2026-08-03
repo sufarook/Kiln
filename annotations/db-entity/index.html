@@ -1524,8 +1524,8 @@
 </span></code></pre></div></p>
 </div>
 <div class="admonition warning">
-<p class="admonition-title">Exactly one @PrimaryKey required</p>
-<p>Every <code>@DbEntity</code> class must have exactly one property annotated with <code>@PrimaryKey</code>. Zero or multiple <code>@PrimaryKey</code> properties produce compile-time errors.</p>
+<p class="admonition-title">At least one @PrimaryKey required</p>
+<p>Every <code>@DbEntity</code> class must have at least one property annotated with <code>@PrimaryKey</code>. Zero produces a compile-time error; annotate two or more to form a <a href="../primary-key/">composite key</a>.</p>
 </div>
 <h2 id="generated-output">Generated output</h2>
 <p>For <code>@DbEntity(tableName = "users") data class User(...)</code>:</p>

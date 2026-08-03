@@ -1332,10 +1332,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#kiln-dbentity-must-have-exactly-one-primarykey-property" class="md-nav__link">
+  <a href="#kiln-must-have-at-least-one-primarykey-property" class="md-nav__link">
     <span class="md-ellipsis">
       
-        "Kiln: @DbEntity must have exactly one @PrimaryKey property"
+        "Kiln: '' must have at least one @PrimaryKey property"
       
     </span>
   </a>
@@ -1605,10 +1605,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#kiln-dbentity-must-have-exactly-one-primarykey-property" class="md-nav__link">
+  <a href="#kiln-must-have-at-least-one-primarykey-property" class="md-nav__link">
     <span class="md-ellipsis">
       
-        "Kiln: @DbEntity must have exactly one @PrimaryKey property"
+        "Kiln: '' must have at least one @PrimaryKey property"
       
     </span>
   </a>
@@ -1868,13 +1868,13 @@
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="p">}</span>
 </span></code></pre></div>
 <hr />
-<h3 id="kiln-dbentity-must-have-exactly-one-primarykey-property">"Kiln: @DbEntity must have exactly one @PrimaryKey property"</h3>
-<p>Every <code>@DbEntity</code> class needs exactly one property annotated with <code>@PrimaryKey</code>. Check that:</p>
+<h3 id="kiln-must-have-at-least-one-primarykey-property">"Kiln: '<Entity>' must have at least one @PrimaryKey property"</h3>
+<p>Every <code>@DbEntity</code> class needs at least one property annotated with <code>@PrimaryKey</code>. Check that:</p>
 <ul>
 <li>The annotation is on a property inside the primary constructor, not the class body.</li>
-<li>You haven't accidentally annotated two properties.</li>
 <li>You haven't forgotten it entirely.</li>
 </ul>
+<p>Annotating two or more properties is fine — it forms a <a href="../annotations/primary-key/">composite primary key</a>, not an error. <code>autoGenerate = true</code> is the one thing that isn't allowed once a class has more than one <code>@PrimaryKey</code>.</p>
 <hr />
 <h3 id="kiln-type-x-is-not-supported">"Kiln: type 'X' is not supported"</h3>
 <p>The property type isn't in the <a href="../reference/supported-types/">supported types list</a>. Options:</p>

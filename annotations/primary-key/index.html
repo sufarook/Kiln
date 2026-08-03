@@ -1445,7 +1445,7 @@
 
 
 <h1 id="primarykey">@PrimaryKey</h1>
-<p>Designates a property as the primary key column. Every <code>@DbEntity</code> class must have exactly one <code>@PrimaryKey</code> property.</p>
+<p>Designates a property as (part of) the primary key. Every <code>@DbEntity</code> class must have at least one <code>@PrimaryKey</code> property — annotate two or more to form a composite key.</p>
 <h2 id="signature">Signature</h2>
 <div class="language-kotlin highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nd">@Target</span><span class="p">(</span><span class="n">AnnotationTarget</span><span class="p">.</span><span class="na">PROPERTY</span><span class="p">)</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nd">@Retention</span><span class="p">(</span><span class="n">AnnotationRetention</span><span class="p">.</span><span class="na">SOURCE</span><span class="p">)</span>
@@ -1473,7 +1473,7 @@
 </tbody>
 </table>
 <h2 id="usage">Usage</h2>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Auto-generated integer PK</label><label for="__tabbed_1_2">Natural string PK</label><label for="__tabbed_1_3">Natural Long PK (no autoGenerate)</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:4"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Auto-generated integer PK</label><label for="__tabbed_1_2">Natural string PK</label><label for="__tabbed_1_3">Natural Long PK (no autoGenerate)</label><label for="__tabbed_1_4">Composite key</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <p>The most common pattern. Pass <code>id = 0</code> on insert — SQLite assigns the real id.</p>
@@ -1512,18 +1512,51 @@
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="p">)</span>
 </span></code></pre></div>
 </div>
+<div class="tabbed-block">
+<p>Annotate two or more properties to form a composite primary key — the usual
+case is a junction/join table, like an assignment of a user to a task.</p>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nd">@DbEntity</span><span class="p">(</span><span class="n">tableName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;assignments&quot;</span><span class="p">)</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kd">data</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">Assignment</span><span class="p">(</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="nd">@PrimaryKey</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">taskId</span><span class="p">:</span><span class="w"> </span><span class="kt">Long</span><span class="p">,</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="nd">@PrimaryKey</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">userId</span><span class="p">:</span><span class="w"> </span><span class="kt">Long</span><span class="p">,</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">assignedAt</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="p">)</span>
+</span></code></pre></div>
+<p>Kiln generates a <code>AssignmentKey(taskId, userId)</code> data class and uses it as the
+<code>ID</code> type everywhere a single-key entity would use its PK's own type directly:</p>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">val</span><span class="w"> </span><span class="nv">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AssignmentKey</span><span class="p">(</span><span class="n">taskId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1L</span><span class="p">,</span><span class="w"> </span><span class="n">userId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2L</span><span class="p">)</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">assignmentRepo</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="n">Assignment</span><span class="p">(</span><span class="n">taskId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1L</span><span class="p">,</span><span class="w"> </span><span class="n">userId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2L</span><span class="p">))</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="kd">val</span><span class="w"> </span><span class="nv">assignment</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">assignmentRepo</span><span class="p">.</span><span class="na">findById</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">assignmentRepo</span><span class="p">.</span><span class="na">delete</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</span></code></pre></div>
+<p><code>update(entity)</code> is unaffected — it still takes the whole entity and matches
+on every <code>@PrimaryKey</code> property internally, same as a single key.</p>
+</div>
 </div>
 </div>
 <h2 id="constraints">Constraints</h2>
 <div class="admonition warning">
 <p class="admonition-title">autoGenerate requires Long or Int</p>
 <p>Setting <code>autoGenerate = true</code> on a property of any other type produces a compile-time error:
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Kiln: @PrimaryKey(autoGenerate = true) requires a Long or Int property
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Kiln: @PrimaryKey(autoGenerate = true) requires a Long or Int property
 </span></code></pre></div></p>
 </div>
 <div class="admonition warning">
-<p class="admonition-title">Only one @PrimaryKey per entity</p>
-<p>Composite primary keys are not supported. Each <code>@DbEntity</code> class must have exactly one <code>@PrimaryKey</code> property.</p>
+<p class="admonition-title">autoGenerate is not available on a composite key</p>
+<p><code>autoGenerate</code> only makes sense for a single integer PK. Setting it on any
+property once a class has two or more <code>@PrimaryKey</code> properties is a
+compile-time error:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>Kiln: &#39;&lt;Entity&gt;&#39; has a composite primary key — autoGenerate is not supported
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>on any property of a composite key
+</span></code></pre></div></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">@Relation is not yet supported on a @PrimaryKey property</p>
+<p>In a junction table like <code>Assignment</code> above, <code>taskId</code>/<code>userId</code> are also
+logically foreign keys, but <code>@Relation</code>'s <code>findBy&lt;Parent&gt;</code>/<code>observeBy&lt;Parent&gt;</code>/
+<code>deleteBy&lt;Parent&gt;</code> helpers aren't generated for PK properties yet. Filter on
+them directly instead: <code>assignmentRepo.findWhere { taskId eq id }</code> — the
+column is still generated normally on <code>AssignmentColumns</code>.</p>
 </div>
 
 
