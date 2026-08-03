@@ -1,0 +1,45 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.github.sufarook.kiln:annotations>
+open annotation class io.github.sufarook.kiln.annotations/Column : kotlin/Annotation { // io.github.sufarook.kiln.annotations/Column|null[0]
+    constructor <init>(kotlin/String = ..., kotlin/Boolean = ..., kotlin/Boolean = ..., kotlin/String = ...) // io.github.sufarook.kiln.annotations/Column.<init>|<init>(kotlin.String;kotlin.Boolean;kotlin.Boolean;kotlin.String){}[0]
+
+    final val index // io.github.sufarook.kiln.annotations/Column.index|{}index[0]
+        final fun <get-index>(): kotlin/Boolean // io.github.sufarook.kiln.annotations/Column.index.<get-index>|<get-index>(){}[0]
+    final val migrateFrom // io.github.sufarook.kiln.annotations/Column.migrateFrom|{}migrateFrom[0]
+        final fun <get-migrateFrom>(): kotlin/String // io.github.sufarook.kiln.annotations/Column.migrateFrom.<get-migrateFrom>|<get-migrateFrom>(){}[0]
+    final val name // io.github.sufarook.kiln.annotations/Column.name|{}name[0]
+        final fun <get-name>(): kotlin/String // io.github.sufarook.kiln.annotations/Column.name.<get-name>|<get-name>(){}[0]
+    final val unique // io.github.sufarook.kiln.annotations/Column.unique|{}unique[0]
+        final fun <get-unique>(): kotlin/Boolean // io.github.sufarook.kiln.annotations/Column.unique.<get-unique>|<get-unique>(){}[0]
+}
+
+open annotation class io.github.sufarook.kiln.annotations/DbEntity : kotlin/Annotation { // io.github.sufarook.kiln.annotations/DbEntity|null[0]
+    constructor <init>(kotlin/String = ...) // io.github.sufarook.kiln.annotations/DbEntity.<init>|<init>(kotlin.String){}[0]
+
+    final val tableName // io.github.sufarook.kiln.annotations/DbEntity.tableName|{}tableName[0]
+        final fun <get-tableName>(): kotlin/String // io.github.sufarook.kiln.annotations/DbEntity.tableName.<get-tableName>|<get-tableName>(){}[0]
+}
+
+open annotation class io.github.sufarook.kiln.annotations/Ignore : kotlin/Annotation { // io.github.sufarook.kiln.annotations/Ignore|null[0]
+    constructor <init>() // io.github.sufarook.kiln.annotations/Ignore.<init>|<init>(){}[0]
+}
+
+open annotation class io.github.sufarook.kiln.annotations/PrimaryKey : kotlin/Annotation { // io.github.sufarook.kiln.annotations/PrimaryKey|null[0]
+    constructor <init>(kotlin/Boolean = ...) // io.github.sufarook.kiln.annotations/PrimaryKey.<init>|<init>(kotlin.Boolean){}[0]
+
+    final val autoGenerate // io.github.sufarook.kiln.annotations/PrimaryKey.autoGenerate|{}autoGenerate[0]
+        final fun <get-autoGenerate>(): kotlin/Boolean // io.github.sufarook.kiln.annotations/PrimaryKey.autoGenerate.<get-autoGenerate>|<get-autoGenerate>(){}[0]
+}
+
+open annotation class io.github.sufarook.kiln.annotations/Relation : kotlin/Annotation { // io.github.sufarook.kiln.annotations/Relation|null[0]
+    constructor <init>(kotlin/Boolean = ...) // io.github.sufarook.kiln.annotations/Relation.<init>|<init>(kotlin.Boolean){}[0]
+
+    final val cascade // io.github.sufarook.kiln.annotations/Relation.cascade|{}cascade[0]
+        final fun <get-cascade>(): kotlin/Boolean // io.github.sufarook.kiln.annotations/Relation.cascade.<get-cascade>|<get-cascade>(){}[0]
+}
