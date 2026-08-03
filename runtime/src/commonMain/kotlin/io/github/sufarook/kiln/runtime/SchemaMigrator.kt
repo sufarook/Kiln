@@ -94,19 +94,31 @@ class SchemaMigrator(private val driver: SqlDriver) {
 
     /** Rebuilds a CREATE TABLE statement from ColumnDef metadata (used for the temp table). */
     private fun buildSchemaSql(tableName: String, columns: List<ColumnDef>): String {
+        val primaryKeys = columns.filter { it.isPrimaryKey }
+        // A composite key can't use an inline column-level PRIMARY KEY — SQLite
+        // requires one table-level constraint naming every key column instead.
+        val isComposite = primaryKeys.size > 1
+
         val sb = StringBuilder("CREATE TABLE \"$tableName\" (\n")
-        columns.forEachIndexed { i, col ->
-            sb.append("    \"${col.name}\" ${col.type}")
-            if (!col.nullable) sb.append(" NOT NULL")
-            when {
-                col.isPrimaryKey && col.autoIncrement -> sb.append(" PRIMARY KEY AUTOINCREMENT")
-                col.isPrimaryKey                      -> sb.append(" PRIMARY KEY")
+        val defs = columns.map { col ->
+            buildString {
+                append("    \"${col.name}\" ${col.type}")
+                if (!col.nullable) append(" NOT NULL")
+                when {
+                    isComposite -> {}  // constraint appended separately, below
+                    col.isPrimaryKey && col.autoIncrement -> append(" PRIMARY KEY AUTOINCREMENT")
+                    col.isPrimaryKey -> append(" PRIMARY KEY")
+                }
+                if (col.isUnique && !col.isPrimaryKey) append(" UNIQUE")
             }
-            if (col.isUnique && !col.isPrimaryKey) sb.append(" UNIQUE")
-            if (i < columns.size - 1) sb.append(",")
-            sb.append("\n")
+        }.toMutableList()
+
+        if (isComposite) {
+            defs += "    PRIMARY KEY (${primaryKeys.joinToString(", ") { "\"${it.name}\"" }})"
         }
-        sb.append(")")
+
+        sb.append(defs.joinToString(",\n"))
+        sb.append("\n)")
         return sb.toString()
     }
 

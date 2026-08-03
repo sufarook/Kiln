@@ -195,6 +195,68 @@ class SchemaMigratorTest {
         assertEquals(2, count("todos"))
     }
 
+    // ── Composite primary keys ────────────────────────────────────────────────────
+    //
+    // Two ColumnDefs both marked isPrimaryKey = true used to make recreateTable()
+    // emit an inline "PRIMARY KEY" on each column — SQLite rejects that outright
+    // with "table has more than one primary key". The fix emits one table-level
+    // PRIMARY KEY (col1, col2) constraint instead; these tests exercise the slow
+    // path (table recreation) against a real composite-key table.
+
+    private val assignmentColumns = listOf(
+        ColumnDef("task_id", "INTEGER", false, "0", isPrimaryKey = true),
+        ColumnDef("user_id", "INTEGER", false, "0", isPrimaryKey = true)
+    )
+
+    /**
+     * Installs a composite-key table with an extra "note" column, then syncs down
+     * to just [assignmentColumns] — dropping "note" is what forces the slow path
+     * (table recreation). Adding a column alone would take the fast ALTER TABLE
+     * path and never touch the code this test exists to guard.
+     */
+    private fun installAssignmentsAndDropNote() {
+        exec(
+            """CREATE TABLE "assignments" (
+                "task_id" INTEGER NOT NULL,
+                "user_id" INTEGER NOT NULL,
+                "note" TEXT NOT NULL,
+                PRIMARY KEY ("task_id", "user_id")
+            )"""
+        )
+        exec("""INSERT INTO "assignments" VALUES (1, 10, 'x')""")
+        exec("""INSERT INTO "assignments" VALUES (1, 20, 'y')""")
+        migrator.sync("assignments", assignmentColumns)  // "note" orphaned -> slow path
+    }
+
+    @Test
+    fun `composite key table recreation preserves both key columns and rows`() {
+        installAssignmentsAndDropNote()
+
+        assertEquals(listOf("task_id", "user_id"), columnNames("assignments"))
+        assertEquals(2, count("assignments"))
+        assertEquals(
+            listOf(10L, 20L),
+            driver.executeQuery(
+                null, """SELECT "user_id" FROM "assignments" ORDER BY "user_id"""",
+                { c ->
+                    val out = mutableListOf<Long>()
+                    while (c.next().value) out.add(c.getLong(0)!!)
+                    QueryResult.Value(out)
+                }, 0
+            ).value
+        )
+    }
+
+    @Test
+    fun `composite key uniqueness is still enforced after table recreation`() {
+        installAssignmentsAndDropNote()
+
+        exec("""INSERT INTO "assignments" VALUES (2, 10)""")  // different composite key — OK
+        assertFails("duplicate composite key must violate the rebuilt PRIMARY KEY constraint") {
+            exec("""INSERT INTO "assignments" VALUES (1, 10)""")
+        }
+    }
+
     // ── Helpers ─────────────────────────────────────────────────────────────────
 
     private fun exec(sql: String) = driver.execute(null, sql, 0)

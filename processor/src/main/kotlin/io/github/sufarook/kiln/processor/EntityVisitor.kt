@@ -49,55 +49,67 @@ object EntityVisitor {
         }
 
         if (primaryKeyProps.isEmpty()) {
-            logger.error("Kiln: '$entityName' must have exactly one @PrimaryKey property", classDecl)
-            return null
-        }
-        if (primaryKeyProps.size > 1) {
-            logger.error("Kiln: '$entityName' has ${primaryKeyProps.size} @PrimaryKey properties — only one is allowed", classDecl)
+            logger.error("Kiln: '$entityName' must have at least one @PrimaryKey property", classDecl)
             return null
         }
 
-        val pkProp = primaryKeyProps.first()
-        val pkAnnotation = pkProp.annotations.first { it.shortName.asString() == "PrimaryKey" }
-        val autoGenerate = pkAnnotation.arguments
-            .firstOrNull { it.name?.asString() == "autoGenerate" }?.value as? Boolean ?: false
+        // Two or more @PrimaryKey properties form a composite key (e.g. a junction
+        // table's (parentId, childId) pair). autoGenerate only makes sense for a
+        // single integer PK, so it's rejected on every property once composite.
+        val isComposite = primaryKeyProps.size > 1
 
-        val pkType = pkProp.type.resolve()
-        if (autoGenerate) {
-            val fqn = pkType.declaration.qualifiedName?.asString()
-            if (fqn != "kotlin.Long" && fqn != "kotlin.Int") {
-                logger.error("Kiln: autoGenerate=true requires Long or Int primary key type in '$entityName'", pkProp)
+        val primaryKeys = primaryKeyProps.map { pkProp ->
+            val pkAnnotation = pkProp.annotations.first { it.shortName.asString() == "PrimaryKey" }
+            val autoGenerate = pkAnnotation.arguments
+                .firstOrNull { it.name?.asString() == "autoGenerate" }?.value as? Boolean ?: false
+
+            if (isComposite && autoGenerate) {
+                logger.error(
+                    "Kiln: '$entityName' has a composite primary key — autoGenerate is not supported on any property of a composite key",
+                    pkProp
+                )
                 return null
             }
+
+            val pkType = pkProp.type.resolve()
+            if (autoGenerate) {
+                val fqn = pkType.declaration.qualifiedName?.asString()
+                if (fqn != "kotlin.Long" && fqn != "kotlin.Int") {
+                    logger.error("Kiln: autoGenerate=true requires Long or Int primary key type in '$entityName'", pkProp)
+                    return null
+                }
+            }
+
+            val pkMapping = TypeMapper.map(pkType)
+            val pkColumnName = resolveColumnName(pkProp)
+            ColumnMetadata(
+                propertyName = pkProp.simpleName.asString(),
+                columnName = pkColumnName,
+                kotlinTypeName = pkType.toTypeName(),
+                sqliteType = pkMapping.sqliteType,
+                bindMethod = pkMapping.bindMethod,
+                cursorMethod = pkMapping.cursorMethod,
+                isNullable = pkType.nullability == Nullability.NULLABLE,
+                isUnique = false,
+                hasIndex = false,
+                isPrimaryKey = true,
+                autoGenerate = autoGenerate,
+                isBoolean = pkMapping.isBoolean,
+                isEnum = pkMapping.isEnum,
+                enumClassName = if (pkMapping.isEnum) pkType.declaration.qualifiedName?.asString() ?: "" else "",
+                isInt = pkMapping.isInt,
+                isFloat = pkMapping.isFloat,
+                sqlDefaultValue = pkMapping.defaultValue,
+                migrateFrom = ""  // primary keys are never renamed via migrateFrom
+            )
         }
 
-        val pkMapping = TypeMapper.map(pkType)
-        val pkColumnName = resolveColumnName(pkProp)
-        val pkMetadata = ColumnMetadata(
-            propertyName = pkProp.simpleName.asString(),
-            columnName = pkColumnName,
-            kotlinTypeName = pkType.toTypeName(),
-            sqliteType = pkMapping.sqliteType,
-            bindMethod = pkMapping.bindMethod,
-            cursorMethod = pkMapping.cursorMethod,
-            isNullable = pkType.nullability == Nullability.NULLABLE,
-            isUnique = false,
-            hasIndex = false,
-            isPrimaryKey = true,
-            autoGenerate = autoGenerate,
-            isBoolean = pkMapping.isBoolean,
-            isEnum = pkMapping.isEnum,
-            enumClassName = if (pkMapping.isEnum) pkType.declaration.qualifiedName?.asString() ?: "" else "",
-            isInt = pkMapping.isInt,
-            isFloat = pkMapping.isFloat,
-            sqlDefaultValue = pkMapping.defaultValue,
-            migrateFrom = ""  // primary keys are never renamed via migrateFrom
-        )
+        val pkPropertyNames = primaryKeyProps.map { it.simpleName.asString() }.toSet()
 
         val nonPkColumns = mutableListOf<ColumnMetadata>()
         val relations    = mutableListOf<RelationMetadata>()
 
-        for (prop in persistableProps.filter { it.simpleName.asString() != pkProp.simpleName.asString() }) {
+        for (prop in persistableProps.filter { it.simpleName.asString() !in pkPropertyNames }) {
             val resolvedType = prop.type.resolve()
             val mapping = try {
                 TypeMapper.map(resolvedType)
@@ -151,7 +163,7 @@ object EntityVisitor {
             packageName = packageName,
             entityClassName = entityName,
             tableName = tableName,
-            primaryKey = pkMetadata,
+            primaryKeys = primaryKeys,
             columns = nonPkColumns,
             relations = relations
         )

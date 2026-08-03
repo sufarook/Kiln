@@ -1,6 +1,6 @@
 # @PrimaryKey
 
-Designates a property as the primary key column. Every `@DbEntity` class must have exactly one `@PrimaryKey` property.
+Designates a property as (part of) the primary key. Every `@DbEntity` class must have at least one `@PrimaryKey` property — annotate two or more to form a composite key.
 
 ## Signature
 
@@ -66,6 +66,33 @@ annotation class PrimaryKey(
     )
     ```
 
+=== "Composite key"
+
+    Annotate two or more properties to form a composite primary key — the usual
+    case is a junction/join table, like an assignment of a user to a task.
+
+    ```kotlin
+    @DbEntity(tableName = "assignments")
+    data class Assignment(
+        @PrimaryKey val taskId: Long,
+        @PrimaryKey val userId: Long,
+        val assignedAt: String = ""
+    )
+    ```
+
+    Kiln generates a `AssignmentKey(taskId, userId)` data class and uses it as the
+    `ID` type everywhere a single-key entity would use its PK's own type directly:
+
+    ```kotlin
+    val key = AssignmentKey(taskId = 1L, userId = 2L)
+    assignmentRepo.insert(Assignment(taskId = 1L, userId = 2L))
+    val assignment = assignmentRepo.findById(key)
+    assignmentRepo.delete(key)
+    ```
+
+    `update(entity)` is unaffected — it still takes the whole entity and matches
+    on every `@PrimaryKey` property internally, same as a single key.
+
 ## Constraints
 
 !!! warning "autoGenerate requires Long or Int"
@@ -74,5 +101,18 @@ annotation class PrimaryKey(
     Kiln: @PrimaryKey(autoGenerate = true) requires a Long or Int property
     ```
 
-!!! warning "Only one @PrimaryKey per entity"
-    Composite primary keys are not supported. Each `@DbEntity` class must have exactly one `@PrimaryKey` property.
+!!! warning "autoGenerate is not available on a composite key"
+    `autoGenerate` only makes sense for a single integer PK. Setting it on any
+    property once a class has two or more `@PrimaryKey` properties is a
+    compile-time error:
+    ```
+    Kiln: '<Entity>' has a composite primary key — autoGenerate is not supported
+    on any property of a composite key
+    ```
+
+!!! note "@Relation is not yet supported on a @PrimaryKey property"
+    In a junction table like `Assignment` above, `taskId`/`userId` are also
+    logically foreign keys, but `@Relation`'s `findBy<Parent>`/`observeBy<Parent>`/
+    `deleteBy<Parent>` helpers aren't generated for PK properties yet. Filter on
+    them directly instead: `assignmentRepo.findWhere { taskId eq id }` — the
+    column is still generated normally on `AssignmentColumns`.
