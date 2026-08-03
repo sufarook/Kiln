@@ -1,0 +1,18 @@
+root = true
+
+[*.{kt,kts}]
+indent_size = 4
+indent_style = space
+max_line_length = off
+insert_final_newline = true
+# This codebase was written against Android Studio's default Kotlin formatter —
+# ktlint_official (the ktlint default) is meaningfully stricter (mandatory
+# trailing commas, one-parameter-per-line signature wrapping, forced chain
+# breaks) and would produce a wall of unrelated reformatting on every file.
+# android_studio matches what's already here.
+ktlint_code_style = android_studio
+# The KSP/KotlinPoet-heavy processor files pull many types from one package
+# (com.squareup.kotlinpoet.*, com.google.devtools.ksp.symbol.*) — a wildcard
+# import there is a reasonable choice, not sloppiness, and Android Studio's own
+# formatter switches to wildcard imports above a class-count threshold by default.
+ktlint_standard_no-wildcard-imports = disabled

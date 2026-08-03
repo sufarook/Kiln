@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.library)
     alias(libs.plugins.vanniktech.publish)
+    alias(libs.plugins.kover)
+    alias(libs.plugins.dokka)
 }
 
 android {
@@ -17,7 +19,7 @@ kotlin {
     // rather than following whichever JDK happened to run the build.
     jvmToolchain(17)
 
-    applyDefaultHierarchyTemplate()   // creates iosMain umbrella source set
+    applyDefaultHierarchyTemplate() // creates iosMain umbrella source set
     androidTarget {
         publishLibraryVariants("release")
     }
@@ -32,23 +34,23 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(libs.sqldelight.runtime)           // SqlDriver visible to consumers
-                api(libs.kotlinx.coroutines.core)      // Flow/suspend in CrudRepository
+                api(libs.sqldelight.runtime) // SqlDriver visible to consumers
+                api(libs.kotlinx.coroutines.core) // Flow/suspend in CrudRepository
             }
         }
         val androidMain by getting {
             dependencies {
-                api(libs.sqldelight.android.driver)    // AndroidDatabaseDriverFactory visible to consumers
+                api(libs.sqldelight.android.driver) // AndroidDatabaseDriverFactory visible to consumers
             }
         }
         val iosMain by getting {
             dependencies {
-                api(libs.sqldelight.native.driver)     // IosDatabaseDriverFactory visible to consumers
+                api(libs.sqldelight.native.driver) // IosDatabaseDriverFactory visible to consumers
             }
         }
         val jvmMain by getting {
             dependencies {
-                api(libs.sqldelight.sqlite.driver)  // JvmDatabaseDriverFactory
+                api(libs.sqldelight.sqlite.driver) // JvmDatabaseDriverFactory
             }
         }
         val commonTest by getting {

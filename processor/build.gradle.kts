@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.vanniktech.publish)
+    alias(libs.plugins.kover)
 }
 
 dependencies {
@@ -10,7 +11,7 @@ dependencies {
     implementation(project(":annotations"))
 
     testImplementation(libs.junit)
-    testImplementation(libs.kotlinpoet)     // needed to construct TypeName in tests
+    testImplementation(libs.kotlinpoet) // needed to construct TypeName in tests
 }
 
 kotlin {

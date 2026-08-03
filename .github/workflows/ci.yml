@@ -8,6 +8,53 @@ on:
     branches: [main]
 
 jobs:
+  ktlint-check:
+    name: Kotlin Style Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ hashFiles('**/*.gradle.kts', '**/libs.versions.toml') }}
+      - run: ./gradlew ktlintCheck --no-daemon
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: ktlint-reports
+          path: '*/build/reports/ktlint/'
+
+  coverage-report:
+    name: Coverage Report
+    # Informational only, not a required check — Kover is for spotting untested
+    # areas, not a threshold to gate merges on (that just invites gaming the number).
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ hashFiles('**/*.gradle.kts', '**/libs.versions.toml') }}
+      - run: ./gradlew koverHtmlReport --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: build/reports/kover/html/
+
   processor-tests:
     name: Processor Unit Tests
     runs-on: ubuntu-latest

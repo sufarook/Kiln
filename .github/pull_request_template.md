@@ -15,6 +15,7 @@ Be specific: which commands did you run, and what would they have caught?
 - [ ] `./gradlew :gradle-plugin:test` — if you touched `gradle-plugin`
 - [ ] Consumer smoke test (`publishToMavenLocal` + `integration-tests/consumer-smoke`) — if you touched the plugin's coordinates, versioning, or publishing config
 - [ ] `./gradlew apiCheck` — if you added/changed/removed a public symbol in `annotations` or `runtime` (run `apiDump` and commit the updated snapshot if the change is intentional)
+- [ ] `./gradlew ktlintCheck` — always; run `ktlintFormat` first if it fails
 
 ## Breaking changes
 

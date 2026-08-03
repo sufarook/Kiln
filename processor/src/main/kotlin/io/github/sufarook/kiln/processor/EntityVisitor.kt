@@ -100,14 +100,14 @@ object EntityVisitor {
                 isInt = pkMapping.isInt,
                 isFloat = pkMapping.isFloat,
                 sqlDefaultValue = pkMapping.defaultValue,
-                migrateFrom = ""  // primary keys are never renamed via migrateFrom
+                migrateFrom = "" // primary keys are never renamed via migrateFrom
             )
         }
 
         val pkPropertyNames = primaryKeyProps.map { it.simpleName.asString() }.toSet()
 
         val nonPkColumns = mutableListOf<ColumnMetadata>()
-        val relations    = mutableListOf<RelationMetadata>()
+        val relations = mutableListOf<RelationMetadata>()
 
         for (prop in persistableProps.filter { it.simpleName.asString() !in pkPropertyNames }) {
             val resolvedType = prop.type.resolve()
@@ -118,8 +118,8 @@ object EntityVisitor {
                 return null
             }
             val colAnnotation = prop.annotations.firstOrNull { it.shortName.asString() == "Column" }
-            val isUnique    = colAnnotation?.arguments?.firstOrNull { it.name?.asString() == "unique" }?.value as? Boolean ?: false
-            val hasIndex    = colAnnotation?.arguments?.firstOrNull { it.name?.asString() == "index" }?.value as? Boolean ?: false
+            val isUnique = colAnnotation?.arguments?.firstOrNull { it.name?.asString() == "unique" }?.value as? Boolean ?: false
+            val hasIndex = colAnnotation?.arguments?.firstOrNull { it.name?.asString() == "index" }?.value as? Boolean ?: false
             val migrateFrom = colAnnotation?.arguments?.firstOrNull { it.name?.asString() == "migrateFrom" }?.value as? String ?: ""
 
             val col = ColumnMetadata(
@@ -149,13 +149,15 @@ object EntityVisitor {
                 val cascade = relationAnnotation.arguments
                     .firstOrNull { it.name?.asString() == "cascade" }?.value as? Boolean ?: false
                 val propName = prop.simpleName.asString()
-                relations.add(RelationMetadata(
-                    propertyName = propName,
-                    columnName = col.columnName,
-                    kotlinTypeName = resolvedType.toTypeName(),
-                    parentEntityName = inferParentName(propName),
-                    cascade = cascade
-                ))
+                relations.add(
+                    RelationMetadata(
+                        propertyName = propName,
+                        columnName = col.columnName,
+                        kotlinTypeName = resolvedType.toTypeName(),
+                        parentEntityName = inferParentName(propName),
+                        cascade = cascade
+                    )
+                )
             }
         }
 

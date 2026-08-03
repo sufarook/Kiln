@@ -3,13 +3,13 @@ package io.github.sufarook.kiln.runtime
 import app.cash.sqldelight.Query
 import app.cash.sqldelight.db.QueryResult
 import app.cash.sqldelight.db.SqlDriver
-import kotlinx.coroutines.runBlocking
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
+import kotlinx.coroutines.runBlocking
 
 class TransactionTest {
 
@@ -22,23 +22,22 @@ class TransactionTest {
     }
 
     @AfterTest
-    fun teardown() { driver.close() }
+    fun teardown() {
+        driver.close()
+    }
 
-    private fun rowCount(): Int =
-        driver.executeQuery(null, """SELECT COUNT(*) FROM "items"""", { cursor ->
-            cursor.next()
-            QueryResult.Value(cursor.getLong(0)!!.toInt())
-        }, 0).value
+    private fun rowCount(): Int = driver.executeQuery(null, """SELECT COUNT(*) FROM "items"""", { cursor ->
+        cursor.next()
+        QueryResult.Value(cursor.getLong(0)!!.toInt())
+    }, 0).value
 
-    private fun allValues(): List<String> =
-        driver.executeQuery(null, """SELECT "value" FROM "items"""", { cursor ->
-            val out = mutableListOf<String>()
-            while (cursor.next().value) out.add(cursor.getString(0)!!)
-            QueryResult.Value(out)
-        }, 0).value
+    private fun allValues(): List<String> = driver.executeQuery(null, """SELECT "value" FROM "items"""", { cursor ->
+        val out = mutableListOf<String>()
+        while (cursor.next().value) out.add(cursor.getString(0)!!)
+        QueryResult.Value(out)
+    }, 0).value
 
-    private fun insert(value: String) =
-        driver.execute(null, """INSERT INTO "items" VALUES (?)""", 1) { bindString(0, value) }
+    private fun insert(value: String) = driver.execute(null, """INSERT INTO "items" VALUES (?)""", 1) { bindString(0, value) }
 
     // ── Commit ────────────────────────────────────────────────────────────────
 
@@ -101,11 +100,11 @@ class TransactionTest {
 
         driver.withTransaction {
             insert("a")
-            driver.notifyOrDefer("items")   // should be deferred
+            driver.notifyOrDefer("items") // should be deferred
             insert("b")
-            driver.notifyOrDefer("items")   // same table — still only one deferred entry
+            driver.notifyOrDefer("items") // same table — still only one deferred entry
             insert("c")
-            driver.notifyOrDefer("items")   // idem
+            driver.notifyOrDefer("items") // idem
             assertEquals(0, notifyCount, "no notification should fire before commit")
         }
 
@@ -147,7 +146,7 @@ class TransactionTest {
             driver.notifyOrDefer("items")
             driver.execute(null, """INSERT INTO "other" VALUES ('x')""", 0)
             driver.notifyOrDefer("other")
-            driver.notifyOrDefer("items")  // deduplication: still only one "items" notification
+            driver.notifyOrDefer("items") // deduplication: still only one "items" notification
         }
 
         driver.removeListener("items", listener = itemsListener)
@@ -163,7 +162,7 @@ class TransactionTest {
         val ctx = KilnTransactionContext()
         assertTrue(ctx.dirtyTables.isEmpty())
         ctx.dirtyTables.add("todos")
-        ctx.dirtyTables.add("todos")   // de-dup via Set
+        ctx.dirtyTables.add("todos") // de-dup via Set
         ctx.dirtyTables.add("projects")
         assertEquals(2, ctx.dirtyTables.size)
         assertTrue(ctx.dirtyTables.contains("todos"))

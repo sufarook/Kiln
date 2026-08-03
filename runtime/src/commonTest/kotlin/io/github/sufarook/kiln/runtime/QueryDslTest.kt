@@ -134,16 +134,17 @@ class QueryDslTest {
     }
 
     @AfterTest
-    fun teardown() { driver.close() }
+    fun teardown() {
+        driver.close()
+    }
 
-    private fun queryTitles(sql: String, predicate: Predicate): List<String> =
-        driver.executeQuery(null, sql, { cursor ->
-            val out = mutableListOf<String>()
-            while (cursor.next().value) out.add(cursor.getString(0)!!)
-            QueryResult.Value(out)
-        }, predicate.args.size) {
-            predicate.args.forEachIndexed { i, arg -> bindArg(i, arg) }
-        }.value
+    private fun queryTitles(sql: String, predicate: Predicate): List<String> = driver.executeQuery(null, sql, { cursor ->
+        val out = mutableListOf<String>()
+        while (cursor.next().value) out.add(cursor.getString(0)!!)
+        QueryResult.Value(out)
+    }, predicate.args.size) {
+        predicate.args.forEachIndexed { i, arg -> bindArg(i, arg) }
+    }.value
 
     @Test
     fun `predicate executes correctly against sqlite`() {

@@ -35,39 +35,29 @@ class Predicate internal constructor(
     val sql: String,
     val args: List<SqlArg>
 ) {
-    infix fun and(other: Predicate): Predicate =
-        Predicate("(${sql} AND ${other.sql})", args + other.args)
+    infix fun and(other: Predicate): Predicate = Predicate("($sql AND ${other.sql})", args + other.args)
 
-    infix fun or(other: Predicate): Predicate =
-        Predicate("(${sql} OR ${other.sql})", args + other.args)
+    infix fun or(other: Predicate): Predicate = Predicate("($sql OR ${other.sql})", args + other.args)
 }
 
-fun not(predicate: Predicate): Predicate =
-    Predicate("(NOT ${predicate.sql})", predicate.args)
+fun not(predicate: Predicate): Predicate = Predicate("(NOT ${predicate.sql})", predicate.args)
 
 // ── Comparison operators ────────────────────────────────────────────────────────
 
-infix fun <T> Column<T>.eq(value: T): Predicate =
-    Predicate("\"$name\" = ?", listOf(toArg(value)))
+infix fun <T> Column<T>.eq(value: T): Predicate = Predicate("\"$name\" = ?", listOf(toArg(value)))
 
-infix fun <T> Column<T>.neq(value: T): Predicate =
-    Predicate("\"$name\" != ?", listOf(toArg(value)))
+infix fun <T> Column<T>.neq(value: T): Predicate = Predicate("\"$name\" != ?", listOf(toArg(value)))
 
-infix fun <T> Column<T>.gt(value: T): Predicate =
-    Predicate("\"$name\" > ?", listOf(toArg(value)))
+infix fun <T> Column<T>.gt(value: T): Predicate = Predicate("\"$name\" > ?", listOf(toArg(value)))
 
-infix fun <T> Column<T>.gte(value: T): Predicate =
-    Predicate("\"$name\" >= ?", listOf(toArg(value)))
+infix fun <T> Column<T>.gte(value: T): Predicate = Predicate("\"$name\" >= ?", listOf(toArg(value)))
 
-infix fun <T> Column<T>.lt(value: T): Predicate =
-    Predicate("\"$name\" < ?", listOf(toArg(value)))
+infix fun <T> Column<T>.lt(value: T): Predicate = Predicate("\"$name\" < ?", listOf(toArg(value)))
 
-infix fun <T> Column<T>.lte(value: T): Predicate =
-    Predicate("\"$name\" <= ?", listOf(toArg(value)))
+infix fun <T> Column<T>.lte(value: T): Predicate = Predicate("\"$name\" <= ?", listOf(toArg(value)))
 
 /** SQL LIKE — use % and _ wildcards. Works on String and String? columns. */
-infix fun Column<out String?>.like(pattern: String): Predicate =
-    Predicate("\"$name\" LIKE ?", listOf(SqlArg.StringArg(pattern)))
+infix fun Column<out String?>.like(pattern: String): Predicate = Predicate("\"$name\" LIKE ?", listOf(SqlArg.StringArg(pattern)))
 
 fun Column<*>.isNull(): Predicate = Predicate("\"$name\" IS NULL", emptyList())
 
@@ -85,8 +75,7 @@ infix fun <T> Column<T>.notInList(values: Collection<T>): Predicate {
     return Predicate("\"$name\" NOT IN ($placeholders)", values.map(toArg))
 }
 
-fun <T> Column<T>.between(low: T, high: T): Predicate =
-    Predicate("\"$name\" BETWEEN ? AND ?", listOf(toArg(low), toArg(high)))
+fun <T> Column<T>.between(low: T, high: T): Predicate = Predicate("\"$name\" BETWEEN ? AND ?", listOf(toArg(low), toArg(high)))
 
 // ── Ordering & pagination ───────────────────────────────────────────────────────
 
@@ -112,8 +101,8 @@ fun buildOrderSuffix(orderBy: List<OrderSpec>, limit: Long?, offset: Long?): Str
 fun SqlPreparedStatement.bindArg(index: Int, arg: SqlArg) {
     when (arg) {
         is SqlArg.StringArg -> bindString(index, arg.value)
-        is SqlArg.LongArg   -> bindLong(index, arg.value)
+        is SqlArg.LongArg -> bindLong(index, arg.value)
         is SqlArg.DoubleArg -> bindDouble(index, arg.value)
-        is SqlArg.BytesArg  -> bindBytes(index, arg.value)
+        is SqlArg.BytesArg -> bindBytes(index, arg.value)
     }
 }

@@ -42,13 +42,16 @@ class MainActivity : AppCompatActivity() {
             adapter = this@MainActivity.adapter
         }
 
-        val etInput    = findViewById<EditText>(R.id.etTodoInput)
+        val etInput = findViewById<EditText>(R.id.etTodoInput)
         val rgPriority = findViewById<RadioGroup>(R.id.rgPriority)
-        val btnAdd     = findViewById<Button>(R.id.btnAdd)
+        val btnAdd = findViewById<Button>(R.id.btnAdd)
 
         fun addTodo() {
             val title = etInput.text.toString().trim()
-            if (title.isEmpty()) { Toast.makeText(this, "Title is empty", Toast.LENGTH_SHORT).show(); return }
+            if (title.isEmpty()) {
+                Toast.makeText(this, "Title is empty", Toast.LENGTH_SHORT).show()
+                return
+            }
             val priority = if (rgPriority.checkedRadioButtonId == R.id.rbHigh) 1 else 0
             lifecycleScope.launch { repo.insert(Todo(title = title, priority = priority)) }
             etInput.setText("")
@@ -56,7 +59,12 @@ class MainActivity : AppCompatActivity() {
 
         btnAdd.setOnClickListener { addTodo() }
         etInput.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) { addTodo(); true } else false
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                addTodo()
+                true
+            } else {
+                false
+            }
         }
 
         // Reactive list: observeAll() re-emits after every insert/update/delete —

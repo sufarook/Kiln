@@ -7,24 +7,24 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 
 object RepositoryGenerator {
 
-    private val SQL_DRIVER        = ClassName("app.cash.sqldelight.db", "SqlDriver")
-    private val QUERY_RESULT      = ClassName("app.cash.sqldelight.db", "QueryResult")
-    private val SCHEMA_MIGRATOR   = ClassName("io.github.sufarook.kiln.runtime", "SchemaMigrator")
-    private val COLUMN_DEF        = ClassName("io.github.sufarook.kiln.runtime", "ColumnDef")
+    private val SQL_DRIVER = ClassName("app.cash.sqldelight.db", "SqlDriver")
+    private val QUERY_RESULT = ClassName("app.cash.sqldelight.db", "QueryResult")
+    private val SCHEMA_MIGRATOR = ClassName("io.github.sufarook.kiln.runtime", "SchemaMigrator")
+    private val COLUMN_DEF = ClassName("io.github.sufarook.kiln.runtime", "ColumnDef")
     private val COROUTINE_CONTEXT = ClassName("kotlin.coroutines", "CoroutineContext")
-    private val DISPATCHERS       = ClassName("kotlinx.coroutines", "Dispatchers")
-    private val FLOW              = ClassName("kotlinx.coroutines.flow", "Flow")
-    private val WITH_CONTEXT      = MemberName("kotlinx.coroutines", "withContext")
-    private val OBSERVE_QUERY     = MemberName("io.github.sufarook.kiln.runtime", "observeQuery")
-    private val COLUMN              = ClassName("io.github.sufarook.kiln.runtime", "Column")
-    private val SQL_ARG             = ClassName("io.github.sufarook.kiln.runtime", "SqlArg")
-    private val PREDICATE           = ClassName("io.github.sufarook.kiln.runtime", "Predicate")
-    private val BIND_ARG            = MemberName("io.github.sufarook.kiln.runtime", "bindArg")
-    private val ORDER_SPEC          = ClassName("io.github.sufarook.kiln.runtime", "OrderSpec")
-    private val BUILD_ORDER_SUFFIX  = MemberName("io.github.sufarook.kiln.runtime", "buildOrderSuffix")
-    private val EQ_FUN              = MemberName("io.github.sufarook.kiln.runtime", "eq", isExtension = true)
-    private val NOTIFY_OR_DEFER     = MemberName("io.github.sufarook.kiln.runtime", "notifyOrDefer", isExtension = true)
-    private val WITH_TX             = MemberName("io.github.sufarook.kiln.runtime", "withTransaction", isExtension = true)
+    private val DISPATCHERS = ClassName("kotlinx.coroutines", "Dispatchers")
+    private val FLOW = ClassName("kotlinx.coroutines.flow", "Flow")
+    private val WITH_CONTEXT = MemberName("kotlinx.coroutines", "withContext")
+    private val OBSERVE_QUERY = MemberName("io.github.sufarook.kiln.runtime", "observeQuery")
+    private val COLUMN = ClassName("io.github.sufarook.kiln.runtime", "Column")
+    private val SQL_ARG = ClassName("io.github.sufarook.kiln.runtime", "SqlArg")
+    private val PREDICATE = ClassName("io.github.sufarook.kiln.runtime", "Predicate")
+    private val BIND_ARG = MemberName("io.github.sufarook.kiln.runtime", "bindArg")
+    private val ORDER_SPEC = ClassName("io.github.sufarook.kiln.runtime", "OrderSpec")
+    private val BUILD_ORDER_SUFFIX = MemberName("io.github.sufarook.kiln.runtime", "buildOrderSuffix")
+    private val EQ_FUN = MemberName("io.github.sufarook.kiln.runtime", "eq", isExtension = true)
+    private val NOTIFY_OR_DEFER = MemberName("io.github.sufarook.kiln.runtime", "notifyOrDefer", isExtension = true)
+    private val WITH_TX = MemberName("io.github.sufarook.kiln.runtime", "withTransaction", isExtension = true)
 
     fun generate(meta: EntityMetadata, codeGenerator: CodeGenerator) {
         val entityClass = ClassName(meta.packageName, meta.entityClassName)
@@ -55,9 +55,11 @@ object RepositoryGenerator {
      * Kotlin type directly; two or more generate a dedicated `<Entity>Key` data class
      * (below) so findById/delete take one value instead of a raw tuple.
      */
-    private fun idTypeName(meta: EntityMetadata): TypeName =
-        if (meta.isCompositeKey) ClassName(meta.packageName, "${meta.entityClassName}Key")
-        else meta.primaryKeys.single().kotlinTypeName
+    private fun idTypeName(meta: EntityMetadata): TypeName = if (meta.isCompositeKey) {
+        ClassName(meta.packageName, "${meta.entityClassName}Key")
+    } else {
+        meta.primaryKeys.single().kotlinTypeName
+    }
 
     /** `data class TaskKey(val projectId: Long, val taskId: Long)` */
     private fun buildCompositeKeyClass(meta: EntityMetadata): TypeSpec {
@@ -85,25 +87,22 @@ object RepositoryGenerator {
      * A single key IS the id (`id` itself); a composite key destructures one field
      * off it (`id.projectId`).
      */
-    private fun idFieldAccess(meta: EntityMetadata, idParamName: String, pk: ColumnMetadata): String =
-        if (meta.isCompositeKey) "$idParamName.${pk.propertyName}" else idParamName
+    private fun idFieldAccess(meta: EntityMetadata, idParamName: String, pk: ColumnMetadata): String = if (meta.isCompositeKey) "$idParamName.${pk.propertyName}" else idParamName
 
-    private fun buildTableObject(meta: EntityMetadata, objectName: String): TypeSpec {
-        return TypeSpec.objectBuilder(objectName)
-            .addProperty(
-                PropertySpec.builder("TABLE_NAME", String::class)
-                    .addModifiers(KModifier.CONST)
-                    .initializer("%S", meta.tableName)
-                    .build()
-            )
-            .addProperty(
-                PropertySpec.builder("CREATE_TABLE", String::class)
-                    .addModifiers(KModifier.CONST)
-                    .initializer("%S", SqlStatementBuilder.createTable(meta))
-                    .build()
-            )
-            .build()
-    }
+    private fun buildTableObject(meta: EntityMetadata, objectName: String): TypeSpec = TypeSpec.objectBuilder(objectName)
+        .addProperty(
+            PropertySpec.builder("TABLE_NAME", String::class)
+                .addModifiers(KModifier.CONST)
+                .initializer("%S", meta.tableName)
+                .build()
+        )
+        .addProperty(
+            PropertySpec.builder("CREATE_TABLE", String::class)
+                .addModifiers(KModifier.CONST)
+                .initializer("%S", SqlStatementBuilder.createTable(meta))
+                .build()
+        )
+        .build()
 
     /** `object TodoColumns { val priority: Column<Int> = Column("priority") { ... } }` */
     private fun buildColumnsObject(meta: EntityMetadata): TypeSpec {
@@ -123,16 +122,19 @@ object RepositoryGenerator {
     private fun toArgLambda(col: ColumnMetadata): CodeBlock {
         val n = col.isNullable
         return when {
-            col.isBoolean -> if (n) CodeBlock.of("{ %T.LongArg(it?.let { b -> if (b) 1L else 0L }) }", SQL_ARG)
-                             else   CodeBlock.of("{ %T.LongArg(if (it) 1L else 0L) }", SQL_ARG)
-            col.isEnum    -> CodeBlock.of("{ %T.StringArg(it%L.name) }", SQL_ARG, if (n) "?" else "")
-            col.isInt     -> CodeBlock.of("{ %T.LongArg(it%L.toLong()) }", SQL_ARG, if (n) "?" else "")
-            col.isFloat   -> CodeBlock.of("{ %T.DoubleArg(it%L.toDouble()) }", SQL_ARG, if (n) "?" else "")
+            col.isBoolean -> if (n) {
+                CodeBlock.of("{ %T.LongArg(it?.let { b -> if (b) 1L else 0L }) }", SQL_ARG)
+            } else {
+                CodeBlock.of("{ %T.LongArg(if (it) 1L else 0L) }", SQL_ARG)
+            }
+            col.isEnum -> CodeBlock.of("{ %T.StringArg(it%L.name) }", SQL_ARG, if (n) "?" else "")
+            col.isInt -> CodeBlock.of("{ %T.LongArg(it%L.toLong()) }", SQL_ARG, if (n) "?" else "")
+            col.isFloat -> CodeBlock.of("{ %T.DoubleArg(it%L.toDouble()) }", SQL_ARG, if (n) "?" else "")
             else -> when (col.bindMethod) {
                 "bindString" -> CodeBlock.of("{ %T.StringArg(it) }", SQL_ARG)
-                "bindLong"   -> CodeBlock.of("{ %T.LongArg(it) }", SQL_ARG)
+                "bindLong" -> CodeBlock.of("{ %T.LongArg(it) }", SQL_ARG)
                 "bindDouble" -> CodeBlock.of("{ %T.DoubleArg(it) }", SQL_ARG)
-                else         -> CodeBlock.of("{ %T.BytesArg(it) }", SQL_ARG)
+                else -> CodeBlock.of("{ %T.BytesArg(it) }", SQL_ARG)
             }
         }
     }
@@ -194,14 +196,13 @@ object RepositoryGenerator {
             .build()
     }
 
-    private fun columnsClass(meta: EntityMetadata) =
-        ClassName(meta.packageName, "${meta.entityClassName}Columns")
+    private fun columnsClass(meta: EntityMetadata) = ClassName(meta.packageName, "${meta.entityClassName}Columns")
 
-    private fun predicateBlockType(meta: EntityMetadata) =
-        LambdaTypeName.get(receiver = columnsClass(meta), returnType = PREDICATE)
+    private fun predicateBlockType(meta: EntityMetadata) = LambdaTypeName.get(receiver = columnsClass(meta), returnType = PREDICATE)
 
     private fun orderByParam() = ParameterSpec.builder(
-        "orderBy", List::class.asClassName().parameterizedBy(ORDER_SPEC)
+        "orderBy",
+        List::class.asClassName().parameterizedBy(ORDER_SPEC)
     ).defaultValue("emptyList()").build()
 
     private fun limitParam() = ParameterSpec.builder("limit", Long::class.asTypeName().copy(nullable = true))
@@ -236,7 +237,8 @@ object RepositoryGenerator {
             .addStatement("val predicate = %T.block()", columnsClass(meta))
             .addStatement(
                 "return %M(driver, %N.TABLE_NAME, context) { queryWhere(predicate, orderBy, limit, offset) }",
-                OBSERVE_QUERY, tableObjectName
+                OBSERVE_QUERY,
+                tableObjectName
             )
             .build()
     }
@@ -364,7 +366,7 @@ object RepositoryGenerator {
                 col.sqlDefaultValue,
                 col.migrateFrom,
                 col.isPrimaryKey,
-                col.autoGenerate,   // autoIncrement
+                col.autoGenerate, // autoIncrement
                 col.isUnique
             )
         }
@@ -470,14 +472,12 @@ object RepositoryGenerator {
             .build()
     }
 
-    private fun buildFindById(meta: EntityMetadata, entityClass: ClassName): FunSpec {
-        return FunSpec.builder("findById")
-            .addModifiers(KModifier.OVERRIDE, KModifier.SUSPEND)
-            .addParameter("id", idTypeName(meta))
-            .returns(entityClass.copy(nullable = true))
-            .addStatement("return %M(context) { queryById(id) }", WITH_CONTEXT)
-            .build()
-    }
+    private fun buildFindById(meta: EntityMetadata, entityClass: ClassName): FunSpec = FunSpec.builder("findById")
+        .addModifiers(KModifier.OVERRIDE, KModifier.SUSPEND)
+        .addParameter("id", idTypeName(meta))
+        .returns(entityClass.copy(nullable = true))
+        .addStatement("return %M(context) { queryById(id) }", WITH_CONTEXT)
+        .build()
 
     private fun buildFindAll(meta: EntityMetadata, entityClass: ClassName): FunSpec {
         val listType = List::class.asClassName().parameterizedBy(entityClass)
@@ -495,7 +495,8 @@ object RepositoryGenerator {
             .returns(flowType)
             .addStatement(
                 "return %M(driver, %N.TABLE_NAME, context) { queryAll() }",
-                OBSERVE_QUERY, tableObjectName
+                OBSERVE_QUERY,
+                tableObjectName
             )
             .build()
     }
@@ -594,9 +595,11 @@ object RepositoryGenerator {
         rel: RelationMetadata
     ): FunSpec {
         val flowType = FLOW.parameterizedBy(List::class.asClassName().parameterizedBy(entityClass))
-        val cascadeNote = if (rel.cascade)
+        val cascadeNote = if (rel.cascade) {
             "\n\nThis is the cascade-delete companion — call before deleting the parent ${rel.parentEntityName}."
-        else ""
+        } else {
+            ""
+        }
         return FunSpec.builder("observeBy${rel.parentEntityName}")
             .addKdoc("Reactive stream of ${meta.entityClassName}s for the given ${rel.parentEntityName}. Re-emits on every change.$cascadeNote")
             .addParameter(rel.propertyName, rel.kotlinTypeName)
@@ -610,9 +613,11 @@ object RepositoryGenerator {
         meta: EntityMetadata,
         rel: RelationMetadata
     ): FunSpec {
-        val cascadeNote = if (rel.cascade)
+        val cascadeNote = if (rel.cascade) {
             " Call before `delete(parentId)` to cascade."
-        else ""
+        } else {
+            ""
+        }
         return FunSpec.builder("deleteBy${rel.parentEntityName}")
             .addKdoc("Deletes all ${meta.entityClassName}s belonging to the given ${rel.parentEntityName}.$cascadeNote")
             .addModifiers(KModifier.SUSPEND)
@@ -656,31 +661,36 @@ object RepositoryGenerator {
         return b.build()
     }
 
-    private fun bindStatement(col: ColumnMetadata, valueExpr: String, index: Int): String {
-        return when {
-            col.isBoolean -> "${col.bindMethod}($index, if ($valueExpr) 1L else 0L)"
-            col.isEnum    -> "${col.bindMethod}($index, $valueExpr${if (col.isNullable) "?" else ""}.name)"
-            col.isInt     -> "${col.bindMethod}($index, $valueExpr${if (col.isNullable) "?.toLong()" else ".toLong()"})"
-            col.isFloat   -> "${col.bindMethod}($index, $valueExpr${if (col.isNullable) "?.toDouble()" else ".toDouble()"})"
-            col.isNullable -> "${col.bindMethod}($index, $valueExpr)"
-            else           -> "${col.bindMethod}($index, $valueExpr)"
-        }
+    private fun bindStatement(col: ColumnMetadata, valueExpr: String, index: Int): String = when {
+        col.isBoolean -> "${col.bindMethod}($index, if ($valueExpr) 1L else 0L)"
+        col.isEnum -> "${col.bindMethod}($index, $valueExpr${if (col.isNullable) "?" else ""}.name)"
+        col.isInt -> "${col.bindMethod}($index, $valueExpr${if (col.isNullable) "?.toLong()" else ".toLong()"})"
+        col.isFloat -> "${col.bindMethod}($index, $valueExpr${if (col.isNullable) "?.toDouble()" else ".toDouble()"})"
+        col.isNullable -> "${col.bindMethod}($index, $valueExpr)"
+        else -> "${col.bindMethod}($index, $valueExpr)"
     }
 
-    private fun cursorReadStatement(col: ColumnMetadata, index: Int): String {
-        return when {
-            col.isBoolean -> "cursor.${col.cursorMethod}($index)${if (col.isNullable) "?.let { it == 1L }" else "!! == 1L"}"
-            col.isEnum    -> {
-                val cast = "${col.enumClassName}.valueOf(cursor.${col.cursorMethod}($index)!!)"
-                if (col.isNullable) "cursor.${col.cursorMethod}($index)?.let { ${col.enumClassName}.valueOf(it) }"
-                else cast
+    private fun cursorReadStatement(col: ColumnMetadata, index: Int): String = when {
+        col.isBoolean -> "cursor.${col.cursorMethod}($index)${if (col.isNullable) "?.let { it == 1L }" else "!! == 1L"}"
+        col.isEnum -> {
+            val cast = "${col.enumClassName}.valueOf(cursor.${col.cursorMethod}($index)!!)"
+            if (col.isNullable) {
+                "cursor.${col.cursorMethod}($index)?.let { ${col.enumClassName}.valueOf(it) }"
+            } else {
+                cast
             }
-            col.isInt     -> if (col.isNullable) "cursor.${col.cursorMethod}($index)?.toInt()"
-                             else "cursor.${col.cursorMethod}($index)!!.toInt()"
-            col.isFloat   -> if (col.isNullable) "cursor.${col.cursorMethod}($index)?.toFloat()"
-                             else "cursor.${col.cursorMethod}($index)!!.toFloat()"
-            col.isNullable -> "cursor.${col.cursorMethod}($index)"
-            else           -> "cursor.${col.cursorMethod}($index)!!"
         }
+        col.isInt -> if (col.isNullable) {
+            "cursor.${col.cursorMethod}($index)?.toInt()"
+        } else {
+            "cursor.${col.cursorMethod}($index)!!.toInt()"
+        }
+        col.isFloat -> if (col.isNullable) {
+            "cursor.${col.cursorMethod}($index)?.toFloat()"
+        } else {
+            "cursor.${col.cursorMethod}($index)!!.toFloat()"
+        }
+        col.isNullable -> "cursor.${col.cursorMethod}($index)"
+        else -> "cursor.${col.cursorMethod}($index)!!"
     }
 }

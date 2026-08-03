@@ -13,6 +13,6 @@ class SampleApplication : Application() {
         super.onCreate()
         val driver = AndroidDatabaseDriverFactory(this).create("todos.db")
         todoRepo = TodoRepository(driver)
-        todoRepo.createTable()  // safe to call repeatedly — uses IF NOT EXISTS
+        todoRepo.createTable() // safe to call repeatedly — uses IF NOT EXISTS
     }
 }

@@ -19,8 +19,8 @@ import app.cash.sqldelight.db.SqlDriver
 class SchemaMigrator(private val driver: SqlDriver) {
 
     fun sync(tableName: String, expectedColumns: List<ColumnDef>) {
-        val existing = pragmaColumns(tableName)          // name → declared type
-        if (existing.isEmpty()) return  // table was just created — nothing to migrate
+        val existing = pragmaColumns(tableName) // name → declared type
+        if (existing.isEmpty()) return // table was just created — nothing to migrate
 
         val existingNames = existing.keys
         val expectedNames = expectedColumns.map { it.name }.toSet()
@@ -56,7 +56,8 @@ class SchemaMigrator(private val driver: SqlDriver) {
     private fun recreateTable(
         tableName: String,
         expectedColumns: List<ColumnDef>,
-        existing: Map<String, String>   // live column name → declared type
+        // live column name → declared type
+        existing: Map<String, String>
     ) {
         val tmpName = "__${tableName}_new"
 
@@ -64,9 +65,9 @@ class SchemaMigrator(private val driver: SqlDriver) {
         val insertCols = expectedColumns.joinToString(", ") { "\"${it.name}\"" }
         val selectCols = expectedColumns.joinToString(", ") { col ->
             val sourceName = when {
-                col.name in existing -> col.name                                        // unchanged or type-changed
-                col.migrateFrom.isNotEmpty() && col.migrateFrom in existing -> col.migrateFrom  // renamed
-                else -> null                                                            // brand new
+                col.name in existing -> col.name // unchanged or type-changed
+                col.migrateFrom.isNotEmpty() && col.migrateFrom in existing -> col.migrateFrom // renamed
+                else -> null // brand new
             }
             when {
                 sourceName == null -> col.defaultValue
@@ -81,8 +82,11 @@ class SchemaMigrator(private val driver: SqlDriver) {
         driver.execute(null, "BEGIN TRANSACTION", 0)
         try {
             driver.execute(null, buildSchemaSql(tmpName, expectedColumns), 0)
-            driver.execute(null,
-                "INSERT INTO \"$tmpName\" ($insertCols) SELECT $selectCols FROM \"$tableName\"", 0)
+            driver.execute(
+                null,
+                "INSERT INTO \"$tmpName\" ($insertCols) SELECT $selectCols FROM \"$tableName\"",
+                0
+            )
             driver.execute(null, "DROP TABLE \"$tableName\"", 0)
             driver.execute(null, "ALTER TABLE \"$tmpName\" RENAME TO \"$tableName\"", 0)
             driver.execute(null, "COMMIT", 0)
@@ -105,7 +109,7 @@ class SchemaMigrator(private val driver: SqlDriver) {
                 append("    \"${col.name}\" ${col.type}")
                 if (!col.nullable) append(" NOT NULL")
                 when {
-                    isComposite -> {}  // constraint appended separately, below
+                    isComposite -> {} // constraint appended separately, below
                     col.isPrimaryKey && col.autoIncrement -> append(" PRIMARY KEY AUTOINCREMENT")
                     col.isPrimaryKey -> append(" PRIMARY KEY")
                 }
@@ -127,25 +131,27 @@ class SchemaMigrator(private val driver: SqlDriver) {
     private fun addColumn(tableName: String, col: ColumnDef) {
         val notNull = if (!col.nullable) " NOT NULL" else ""
         val default = if (!col.nullable && col.defaultValue.isNotEmpty()) " DEFAULT ${col.defaultValue}" else ""
-        driver.execute(null,
-            "ALTER TABLE \"$tableName\" ADD COLUMN \"${col.name}\" ${col.type}$notNull$default", 0)
+        driver.execute(
+            null,
+            "ALTER TABLE \"$tableName\" ADD COLUMN \"${col.name}\" ${col.type}$notNull$default",
+            0
+        )
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────────
 
     /** Live schema as name → declared type (e.g. "title" → "TEXT"). */
-    private fun pragmaColumns(tableName: String): Map<String, String> =
-        driver.executeQuery(
-            identifier = null,
-            sql = "PRAGMA table_info(\"$tableName\")",
-            mapper = { cursor ->
-                val columns = mutableMapOf<String, String>()
-                while (cursor.next().value) {
-                    // column 1 = name, column 2 = declared type
-                    columns[cursor.getString(1)!!] = cursor.getString(2) ?: ""
-                }
-                QueryResult.Value(columns)
-            },
-            parameters = 0
-        ).value
+    private fun pragmaColumns(tableName: String): Map<String, String> = driver.executeQuery(
+        identifier = null,
+        sql = "PRAGMA table_info(\"$tableName\")",
+        mapper = { cursor ->
+            val columns = mutableMapOf<String, String>()
+            while (cursor.next().value) {
+                // column 1 = name, column 2 = declared type
+                columns[cursor.getString(1)!!] = cursor.getString(2) ?: ""
+            }
+            QueryResult.Value(columns)
+        },
+        parameters = 0
+    ).value
 }

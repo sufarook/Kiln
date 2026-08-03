@@ -15,9 +15,7 @@ import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
  * ```
  */
 class JvmDatabaseDriverFactory {
-    fun create(dbPath: String): SqlDriver =
-        JdbcSqliteDriver("jdbc:sqlite:$dbPath")
+    fun create(dbPath: String): SqlDriver = JdbcSqliteDriver("jdbc:sqlite:$dbPath")
 
-    fun createInMemory(): SqlDriver =
-        JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
+    fun createInMemory(): SqlDriver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
 }

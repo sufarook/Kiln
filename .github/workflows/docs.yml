@@ -9,19 +9,33 @@ permissions:
 
 jobs:
   deploy:
-    name: Build and deploy MkDocs
+    name: Build and deploy MkDocs + API reference
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0   # full history for git-revision-date plugin
 
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
       - name: Install MkDocs Material
-        run: pip install mkdocs-material
+        run: pip install mkdocs-material ghp-import
+
+      - name: Generate API reference (Dokka)
+        run: ./gradlew dokkaGenerate --no-daemon
+
+      - name: Build MkDocs site
+        run: mkdocs build --config-file docs/mkdocs.yml --site-dir site
+
+      - name: Add API reference to the built site
+        run: cp -r build/dokka/html site/api
 
       - name: Deploy to GitHub Pages
-        run: mkdocs gh-deploy --force --config-file docs/mkdocs.yml
+        run: ghp-import -n -p -f site

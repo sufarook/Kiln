@@ -22,7 +22,7 @@ class KilnProcessor(
             if (!seenTableNames.add(metadata.tableName)) {
                 logger.error(
                     "Kiln: duplicate table name '${metadata.tableName}' — " +
-                    "set a distinct tableName in @DbEntity on '${metadata.entityClassName}'",
+                        "set a distinct tableName in @DbEntity on '${metadata.entityClassName}'",
                     classDecl
                 )
                 return@forEach
@@ -36,6 +36,5 @@ class KilnProcessor(
 }
 
 class KilnProcessorProvider : SymbolProcessorProvider {
-    override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor =
-        KilnProcessor(environment.codeGenerator, environment.logger)
+    override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor = KilnProcessor(environment.codeGenerator, environment.logger)
 }
