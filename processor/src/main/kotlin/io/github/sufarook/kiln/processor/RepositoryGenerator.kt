@@ -31,19 +31,62 @@ object RepositoryGenerator {
         val repoClassName = "${meta.entityClassName}Repository"
         val tableObjectName = "${meta.entityClassName}Table"
 
-        val file = FileSpec.builder(meta.packageName, repoClassName)
+        val fileBuilder = FileSpec.builder(meta.packageName, repoClassName)
             .addType(buildTableObject(meta, tableObjectName))
             .addType(buildColumnsObject(meta))
-            .addType(buildRepository(meta, entityClass, repoClassName, tableObjectName))
-            .build()
+
+        if (meta.isCompositeKey) {
+            fileBuilder.addType(buildCompositeKeyClass(meta))
+        }
+
+        fileBuilder.addType(buildRepository(meta, entityClass, repoClassName, tableObjectName))
 
         val output = codeGenerator.createNewFile(
             dependencies = Dependencies(aggregating = true),
             packageName = meta.packageName,
             fileName = repoClassName
         )
+        val file = fileBuilder.build()
         output.writer().use { file.writeTo(it) }
     }
+
+    /**
+     * The `ID` type for `CrudRepository<T, ID>`. A single `@PrimaryKey` uses its own
+     * Kotlin type directly; two or more generate a dedicated `<Entity>Key` data class
+     * (below) so findById/delete take one value instead of a raw tuple.
+     */
+    private fun idTypeName(meta: EntityMetadata): TypeName =
+        if (meta.isCompositeKey) ClassName(meta.packageName, "${meta.entityClassName}Key")
+        else meta.primaryKeys.single().kotlinTypeName
+
+    /** `data class TaskKey(val projectId: Long, val taskId: Long)` */
+    private fun buildCompositeKeyClass(meta: EntityMetadata): TypeSpec {
+        val constructor = FunSpec.constructorBuilder()
+        val classBuilder = TypeSpec.classBuilder("${meta.entityClassName}Key")
+            .addModifiers(KModifier.DATA)
+            .addKdoc(
+                "Composite primary key for %L — combines %L.",
+                meta.entityClassName,
+                meta.primaryKeys.joinToString(", ") { it.propertyName }
+            )
+        meta.primaryKeys.forEach { pk ->
+            constructor.addParameter(pk.propertyName, pk.kotlinTypeName)
+            classBuilder.addProperty(
+                PropertySpec.builder(pk.propertyName, pk.kotlinTypeName)
+                    .initializer(pk.propertyName)
+                    .build()
+            )
+        }
+        return classBuilder.primaryConstructor(constructor.build()).build()
+    }
+
+    /**
+     * The read expression for one PK column given the `id` parameter's runtime value.
+     * A single key IS the id (`id` itself); a composite key destructures one field
+     * off it (`id.projectId`).
+     */
+    private fun idFieldAccess(meta: EntityMetadata, idParamName: String, pk: ColumnMetadata): String =
+        if (meta.isCompositeKey) "$idParamName.${pk.propertyName}" else idParamName
 
     private fun buildTableObject(meta: EntityMetadata, objectName: String): TypeSpec {
         return TypeSpec.objectBuilder(objectName)
@@ -101,7 +144,7 @@ object RepositoryGenerator {
         tableObjectName: String
     ): TypeSpec {
         val crudInterface = ClassName("io.github.sufarook.kiln.runtime", "CrudRepository")
-            .parameterizedBy(entityClass, meta.primaryKey.kotlinTypeName)
+            .parameterizedBy(entityClass, idTypeName(meta))
 
         return TypeSpec.classBuilder(repoClassName)
             .addSuperinterface(crudInterface)
@@ -343,7 +386,7 @@ object RepositoryGenerator {
 
     private fun buildInsert(meta: EntityMetadata, entityClass: ClassName, tableObjectName: String): FunSpec {
         val sql = SqlStatementBuilder.insert(meta)
-        val insertCols = if (meta.primaryKey.autoGenerate) meta.columns else meta.allColumns
+        val insertCols = if (!meta.isCompositeKey && meta.primaryKeys.single().autoGenerate) meta.columns else meta.allColumns
 
         val body = CodeBlock.builder()
             .add("%M(context) {\n", WITH_CONTEXT)
@@ -375,7 +418,7 @@ object RepositoryGenerator {
         }
 
         val sql = SqlStatementBuilder.update(meta)
-        val paramCount = meta.columns.size + 1
+        val paramCount = meta.columns.size + meta.primaryKeys.size
 
         val body = CodeBlock.builder()
             .add("%M(context) {\n", WITH_CONTEXT)
@@ -385,7 +428,9 @@ object RepositoryGenerator {
         meta.columns.forEachIndexed { i, col ->
             body.addStatement(bindStatement(col, "entity.${col.propertyName}", i))
         }
-        body.addStatement(bindStatement(meta.primaryKey, "entity.${meta.primaryKey.propertyName}", meta.columns.size))
+        meta.primaryKeys.forEachIndexed { i, pk ->
+            body.addStatement(bindStatement(pk, "entity.${pk.propertyName}", meta.columns.size + i))
+        }
         body.unindent()
             .addStatement("}")
             .addStatement("driver.%M(%N.TABLE_NAME)", NOTIFY_OR_DEFER, tableObjectName)
@@ -401,17 +446,20 @@ object RepositoryGenerator {
 
     private fun buildDelete(meta: EntityMetadata, tableObjectName: String): FunSpec {
         val sql = SqlStatementBuilder.delete(meta)
-        val pk = meta.primaryKey
         return FunSpec.builder("delete")
             .addModifiers(KModifier.OVERRIDE, KModifier.SUSPEND)
-            .addParameter("id", pk.kotlinTypeName)
+            .addParameter("id", idTypeName(meta))
             .addCode(
                 CodeBlock.builder()
                     .add("%M(context) {\n", WITH_CONTEXT)
                     .indent()
-                    .addStatement("driver.execute(null, %S, 1) {", sql)
+                    .addStatement("driver.execute(null, %S, %L) {", sql, meta.primaryKeys.size)
                     .indent()
-                    .addStatement(bindStatement(pk, "id", 0))
+                    .also { cb ->
+                        meta.primaryKeys.forEachIndexed { i, pk ->
+                            cb.addStatement(bindStatement(pk, idFieldAccess(meta, "id", pk), i))
+                        }
+                    }
                     .unindent()
                     .addStatement("}")
                     .addStatement("driver.%M(%N.TABLE_NAME)", NOTIFY_OR_DEFER, tableObjectName)
@@ -423,10 +471,9 @@ object RepositoryGenerator {
     }
 
     private fun buildFindById(meta: EntityMetadata, entityClass: ClassName): FunSpec {
-        val pk = meta.primaryKey
         return FunSpec.builder("findById")
             .addModifiers(KModifier.OVERRIDE, KModifier.SUSPEND)
-            .addParameter("id", pk.kotlinTypeName)
+            .addParameter("id", idTypeName(meta))
             .returns(entityClass.copy(nullable = true))
             .addStatement("return %M(context) { queryById(id) }", WITH_CONTEXT)
             .build()
@@ -456,10 +503,9 @@ object RepositoryGenerator {
     // Blocking query internals shared by findById/findAll/observeAll
     private fun buildQueryById(meta: EntityMetadata, entityClass: ClassName): FunSpec {
         val sql = SqlStatementBuilder.findById(meta)
-        val pk = meta.primaryKey
         return FunSpec.builder("queryById")
             .addModifiers(KModifier.PRIVATE)
-            .addParameter("id", pk.kotlinTypeName)
+            .addParameter("id", idTypeName(meta))
             .returns(entityClass.copy(nullable = true))
             .addCode(
                 CodeBlock.builder()
@@ -467,9 +513,13 @@ object RepositoryGenerator {
                     .indent()
                     .add(buildCursorMapper(meta, entityClass, single = true))
                     .unindent()
-                    .addStatement("}, 1) {")
+                    .addStatement("}, %L) {", meta.primaryKeys.size)
                     .indent()
-                    .addStatement(bindStatement(pk, "id", 0))
+                    .also { cb ->
+                        meta.primaryKeys.forEachIndexed { i, pk ->
+                            cb.addStatement(bindStatement(pk, idFieldAccess(meta, "id", pk), i))
+                        }
+                    }
                     .unindent()
                     .addStatement("}.value")
                     .build()

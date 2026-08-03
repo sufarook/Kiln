@@ -17,18 +17,20 @@ class SqlStatementBuilderTest {
         packageName = "com.test",
         entityClassName = "Product",
         tableName = "product",
-        primaryKey = ColumnMetadata(
-            propertyName = "id",
-            columnName = "id",
-            kotlinTypeName = STRING,
-            sqliteType = "TEXT",
-            bindMethod = "bindString",
-            cursorMethod = "getString",
-            isNullable = false,
-            isUnique = false,
-            hasIndex = false,
-            isPrimaryKey = true,
-            autoGenerate = false
+        primaryKeys = listOf(
+            ColumnMetadata(
+                propertyName = "id",
+                columnName = "id",
+                kotlinTypeName = STRING,
+                sqliteType = "TEXT",
+                bindMethod = "bindString",
+                cursorMethod = "getString",
+                isNullable = false,
+                isUnique = false,
+                hasIndex = false,
+                isPrimaryKey = true,
+                autoGenerate = false
+            )
         ),
         columns = listOf(
             ColumnMetadata(
@@ -130,18 +132,20 @@ class SqlStatementBuilderTest {
     @Test
     fun autoGeneratePrimaryKeyUsesAutoincrement() {
         val meta = productMeta().copy(
-            primaryKey = ColumnMetadata(
-                propertyName = "id",
-                columnName = "id",
-                kotlinTypeName = LONG,
-                sqliteType = "INTEGER",
-                bindMethod = "bindLong",
-                cursorMethod = "getLong",
-                isNullable = false,
-                isUnique = false,
-                hasIndex = false,
-                isPrimaryKey = true,
-                autoGenerate = true
+            primaryKeys = listOf(
+                ColumnMetadata(
+                    propertyName = "id",
+                    columnName = "id",
+                    kotlinTypeName = LONG,
+                    sqliteType = "INTEGER",
+                    bindMethod = "bindLong",
+                    cursorMethod = "getLong",
+                    isNullable = false,
+                    isUnique = false,
+                    hasIndex = false,
+                    isPrimaryKey = true,
+                    autoGenerate = true
+                )
             )
         )
         val sql = SqlStatementBuilder.createTable(meta)
@@ -158,7 +162,7 @@ class SqlStatementBuilderTest {
     @Test
     fun insertSqlSkipsPkWhenAutoGenerate() {
         val meta = productMeta().copy(
-            primaryKey = productMeta().primaryKey.copy(autoGenerate = true)
+            primaryKeys = listOf(productMeta().primaryKeys.single().copy(autoGenerate = true))
         )
         val sql = SqlStatementBuilder.insert(meta)
         assertFalse("Auto-generate PK must not be in INSERT", sql.contains("id"))
@@ -196,6 +200,72 @@ class SqlStatementBuilderTest {
         assertTrue(sql.startsWith("SELECT"))
         assertFalse(sql.contains("WHERE"))
         assertTrue(sql.contains("FROM \"product\""))
+    }
+
+    // ── Composite primary keys ────────────────────────────────────────────────────
+
+    private fun longColumn(name: String, isPk: Boolean = false) = ColumnMetadata(
+        propertyName = name,
+        columnName = name,
+        kotlinTypeName = LONG,
+        sqliteType = "INTEGER",
+        bindMethod = "bindLong",
+        cursorMethod = "getLong",
+        isNullable = false,
+        isUnique = false,
+        hasIndex = false,
+        isPrimaryKey = isPk,
+        autoGenerate = false
+    )
+
+    private fun assignmentMeta() = EntityMetadata(
+        packageName = "com.test",
+        entityClassName = "Assignment",
+        tableName = "assignment",
+        primaryKeys = listOf(longColumn("taskId", isPk = true), longColumn("userId", isPk = true)),
+        columns = listOf(longColumn("assignedAt"))
+    )
+
+    @Test
+    fun compositeKeyIsDetectedOnlyWithTwoOrMorePrimaryKeys() {
+        assertTrue(assignmentMeta().isCompositeKey)
+        assertFalse(productMeta().isCompositeKey)
+    }
+
+    @Test
+    fun compositeKeyCreateTableUsesTableLevelConstraint() {
+        val sql = SqlStatementBuilder.createTable(assignmentMeta())
+        assertTrue(sql.contains("PRIMARY KEY (\"taskId\", \"userId\")"))
+        // Neither key column should carry an inline column-level PRIMARY KEY —
+        // that would declare two separate (wrong) constraints instead of one composite key.
+        assertFalse(sql.contains("\"taskId\" INTEGER NOT NULL PRIMARY KEY"))
+        assertFalse(sql.contains("\"userId\" INTEGER NOT NULL PRIMARY KEY"))
+    }
+
+    @Test
+    fun compositeKeyInsertIncludesBothKeyColumns() {
+        val sql = SqlStatementBuilder.insert(assignmentMeta())
+        assertTrue(sql.contains("\"taskId\""))
+        assertTrue(sql.contains("\"userId\""))
+        assertEquals(3, sql.count { it == '?' })  // taskId, userId, assignedAt
+    }
+
+    @Test
+    fun compositeKeyUpdateWhereClauseAndsBothColumns() {
+        val sql = SqlStatementBuilder.update(assignmentMeta())
+        assertTrue(sql.contains("WHERE \"taskId\" = ? AND \"userId\" = ?"))
+    }
+
+    @Test
+    fun compositeKeyDeleteWhereClauseAndsBothColumns() {
+        val sql = SqlStatementBuilder.delete(assignmentMeta())
+        assertEquals("DELETE FROM \"assignment\" WHERE \"taskId\" = ? AND \"userId\" = ?", sql)
+    }
+
+    @Test
+    fun compositeKeyFindByIdWhereClauseAndsBothColumns() {
+        val sql = SqlStatementBuilder.findById(assignmentMeta())
+        assertTrue(sql.contains("WHERE \"taskId\" = ? AND \"userId\" = ?"))
     }
 
     @Test
@@ -256,7 +326,7 @@ class TypeMapperSimpleTest {
             isNullable = false, isUnique = false, hasIndex = false,
             isPrimaryKey = false, autoGenerate = false
         )
-        val meta = EntityMetadata("com.test", "Foo", "foo", pk, listOf(col))
+        val meta = EntityMetadata("com.test", "Foo", "foo", listOf(pk), listOf(col))
         assertEquals(2, meta.allColumns.size)
         assertEquals("id", meta.allColumns[0].columnName)
         assertEquals("name", meta.allColumns[1].columnName)
@@ -271,7 +341,7 @@ class TypeMapperSimpleTest {
             isNullable = false, isUnique = false, hasIndex = false,
             isPrimaryKey = true, autoGenerate = true
         )
-        val meta = EntityMetadata("com.test", "Task", "tasks", pk, emptyList())
+        val meta = EntityMetadata("com.test", "Task", "tasks", listOf(pk), emptyList())
         assertTrue(meta.relations.isEmpty())
     }
 
@@ -298,7 +368,7 @@ class TypeMapperSimpleTest {
             parentEntityName = "Project",
             cascade = true
         )
-        val meta = EntityMetadata("com.test", "Task", "tasks", pk, listOf(fkCol), listOf(relation))
+        val meta = EntityMetadata("com.test", "Task", "tasks", listOf(pk), listOf(fkCol), listOf(relation))
         assertEquals(1, meta.relations.size)
         assertEquals("projectId", meta.relations[0].propertyName)
         assertEquals("Project", meta.relations[0].parentEntityName)

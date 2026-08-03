@@ -144,7 +144,7 @@ Nullable variants of all of the above. Skip a property with `@Ignore`.
 | Annotation | Purpose |
 |---|---|
 | `@DbEntity(tableName = "")` | Marks a data class as a table (name defaults to snake_case) |
-| `@PrimaryKey(autoGenerate = false)` | Exactly one per entity; `autoGenerate` needs `Long`/`Int` |
+| `@PrimaryKey(autoGenerate = false)` | At least one per entity — two or more form a composite key; `autoGenerate` needs `Long`/`Int` and isn't available on a composite key |
 | `@Column(name, unique, index, migrateFrom)` | Column overrides and constraints |
 | `@Relation(foreignKey = "")` | Declares a FK property; generates `findBy<Parent>`, `observeBy<Parent>`, `deleteBy<Parent>` |
 | `@Ignore` | Property is not persisted |
@@ -166,8 +166,9 @@ Nullable variants of all of the above. Skip a property with `@Ignore`.
 ## Status
 
 Alpha. CRUD + reactive queries + auto-migration + `@Relation` FK helpers + transactions
-(`withTransaction`, `insertAll`, `notifyOrDefer`) are fully implemented and tested against
-real SQLite. Not yet supported: compound primary keys, pagination.
+(`withTransaction`, `insertAll`, `notifyOrDefer`) + pagination (`orderBy`/`limit`/`offset`
+on `findWhere`/`observeWhere`) + composite primary keys are fully implemented and tested
+against real SQLite. Not yet supported: `@Relation` on a composite-key property.
 
 ## License
 

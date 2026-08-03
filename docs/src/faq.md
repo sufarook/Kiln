@@ -44,13 +44,14 @@ plugins {
 
 ---
 
-### "Kiln: @DbEntity must have exactly one @PrimaryKey property"
+### "Kiln: '<Entity>' must have at least one @PrimaryKey property"
 
-Every `@DbEntity` class needs exactly one property annotated with `@PrimaryKey`. Check that:
+Every `@DbEntity` class needs at least one property annotated with `@PrimaryKey`. Check that:
 
 - The annotation is on a property inside the primary constructor, not the class body.
-- You haven't accidentally annotated two properties.
 - You haven't forgotten it entirely.
+
+Annotating two or more properties is fine — it forms a [composite primary key](annotations/primary-key.md), not an error. `autoGenerate = true` is the one thing that isn't allowed once a class has more than one `@PrimaryKey`.
 
 ---
 

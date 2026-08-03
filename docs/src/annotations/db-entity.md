@@ -52,8 +52,8 @@ data class UserProfile(
     Kiln: @DbEntity must be applied to a data class
     ```
 
-!!! warning "Exactly one @PrimaryKey required"
-    Every `@DbEntity` class must have exactly one property annotated with `@PrimaryKey`. Zero or multiple `@PrimaryKey` properties produce compile-time errors.
+!!! warning "At least one @PrimaryKey required"
+    Every `@DbEntity` class must have at least one property annotated with `@PrimaryKey`. Zero produces a compile-time error; annotate two or more to form a [composite key](primary-key.md).
 
 ## Generated output
 
