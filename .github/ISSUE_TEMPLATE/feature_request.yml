@@ -1,0 +1,39 @@
+name: Feature request
+description: Propose something Kiln doesn't do yet
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: Describe the use case, not just the API you imagine — helps evaluate whether an existing feature already covers it
+    validations:
+      required: true
+
+  - type: textarea
+    id: current
+    attributes:
+      label: What happens today?
+      description: The workaround you're using now, or the error/limitation you hit, if any
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed API (optional)
+      description: A sketch of what the annotation/method/DSL might look like
+      render: kotlin
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Annotations (@DbEntity, @PrimaryKey, @Column, @Relation, @Ignore)
+        - Query DSL (findWhere/observeWhere/deleteWhere)
+        - Schema migration
+        - Transactions
+        - Gradle plugin
+        - Documentation
+        - Other
+    validations:
+      required: true
