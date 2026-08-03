@@ -2,7 +2,6 @@ package io.github.sufarook.kiln.runtime
 
 import app.cash.sqldelight.db.QueryResult
 import app.cash.sqldelight.db.SqlDriver
-import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -126,7 +125,7 @@ class QueryDslTest {
 
     @BeforeTest
     fun setup() {
-        driver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
+        driver = createTestDriver()
         driver.execute(null, """CREATE TABLE "todos" ("title" TEXT NOT NULL, "priority" INTEGER NOT NULL, "is_completed" INTEGER NOT NULL)""", 0)
         driver.execute(null, """INSERT INTO "todos" VALUES ('Buy milk', 1, 0)""", 0)
         driver.execute(null, """INSERT INTO "todos" VALUES ('Walk dog', 0, 0)""", 0)
