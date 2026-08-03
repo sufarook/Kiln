@@ -1,0 +1,61 @@
+name: Bug report
+description: Something in Kiln isn't working as expected
+labels: ["bug"]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Kiln version
+      description: The version in your `id("io.github.sufarook.kiln") version "..."` line
+      placeholder: "1.0.0-alpha03"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      multiple: true
+      options:
+        - Android
+        - iOS
+        - JVM (desktop/server)
+    validations:
+      required: true
+
+  - type: textarea
+    id: entity
+    attributes:
+      label: Entity definition
+      description: The `@DbEntity` class involved, if applicable
+      render: kotlin
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal repro
+      description: The smallest code snippet that reproduces the issue — a link to a repo/gist is even better
+      render: kotlin
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include the full error message/stack trace if there is one
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Kotlin version, Gradle version, anything else that might be relevant
