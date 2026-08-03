@@ -114,6 +114,26 @@ jobs:
           name: consumer-smoke-results
           path: integration-tests/consumer-smoke/build/reports/tests/test/
 
+  api-check:
+    name: Binary Compatibility Check
+    # Apple-target KLib dumps only build on an Apple host — this is the one job
+    # in the pipeline that needs macOS; everything else stays on cheap Ubuntu.
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-macos-${{ hashFiles('**/*.gradle.kts', '**/libs.versions.toml') }}
+      - run: ./gradlew apiCheck --no-daemon
+
   android-integration:
     name: Android Integration Tests
     runs-on: ubuntu-latest
@@ -143,7 +163,7 @@ jobs:
     name: Publish to Maven Central
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [processor-tests, runtime-tests, gradle-plugin-tests, consumer-smoke, android-integration]
+    needs: [processor-tests, runtime-tests, gradle-plugin-tests, consumer-smoke, api-check, android-integration]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
