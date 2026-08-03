@@ -1,0 +1,7 @@
+$dokka.format:html-v1
+$dokka.linkExtension:html
+
+module:annotations
+io.github.sufarook.kiln.annotations
+module:runtime
+io.github.sufarook.kiln.runtime
