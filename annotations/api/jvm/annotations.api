@@ -1,0 +1,22 @@
+public abstract interface annotation class io/github/sufarook/kiln/annotations/Column : java/lang/annotation/Annotation {
+	public abstract fun index ()Z
+	public abstract fun migrateFrom ()Ljava/lang/String;
+	public abstract fun name ()Ljava/lang/String;
+	public abstract fun unique ()Z
+}
+
+public abstract interface annotation class io/github/sufarook/kiln/annotations/DbEntity : java/lang/annotation/Annotation {
+	public abstract fun tableName ()Ljava/lang/String;
+}
+
+public abstract interface annotation class io/github/sufarook/kiln/annotations/Ignore : java/lang/annotation/Annotation {
+}
+
+public abstract interface annotation class io/github/sufarook/kiln/annotations/PrimaryKey : java/lang/annotation/Annotation {
+	public abstract fun autoGenerate ()Z
+}
+
+public abstract interface annotation class io/github/sufarook/kiln/annotations/Relation : java/lang/annotation/Annotation {
+	public abstract fun cascade ()Z
+}
+

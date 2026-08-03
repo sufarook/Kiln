@@ -1,0 +1,192 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.github.sufarook.kiln:runtime>
+final enum class io.github.sufarook.kiln.runtime/Order : kotlin/Enum<io.github.sufarook.kiln.runtime/Order> { // io.github.sufarook.kiln.runtime/Order|null[0]
+    enum entry ASC // io.github.sufarook.kiln.runtime/Order.ASC|null[0]
+    enum entry DESC // io.github.sufarook.kiln.runtime/Order.DESC|null[0]
+
+    final val entries // io.github.sufarook.kiln.runtime/Order.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.sufarook.kiln.runtime/Order> // io.github.sufarook.kiln.runtime/Order.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    final fun valueOf(kotlin/String): io.github.sufarook.kiln.runtime/Order // io.github.sufarook.kiln.runtime/Order.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<io.github.sufarook.kiln.runtime/Order> // io.github.sufarook.kiln.runtime/Order.values|values#static(){}[0]
+}
+
+abstract interface <#A: kotlin/Any?, #B: kotlin/Any?> io.github.sufarook.kiln.runtime/CrudRepository { // io.github.sufarook.kiln.runtime/CrudRepository|null[0]
+    abstract fun observeAll(): kotlinx.coroutines.flow/Flow<kotlin.collections/List<#A>> // io.github.sufarook.kiln.runtime/CrudRepository.observeAll|observeAll(){}[0]
+    abstract suspend fun delete(#B) // io.github.sufarook.kiln.runtime/CrudRepository.delete|delete(1:1){}[0]
+    abstract suspend fun findAll(): kotlin.collections/List<#A> // io.github.sufarook.kiln.runtime/CrudRepository.findAll|findAll(){}[0]
+    abstract suspend fun findById(#B): #A? // io.github.sufarook.kiln.runtime/CrudRepository.findById|findById(1:1){}[0]
+    abstract suspend fun insert(#A) // io.github.sufarook.kiln.runtime/CrudRepository.insert|insert(1:0){}[0]
+    abstract suspend fun update(#A) // io.github.sufarook.kiln.runtime/CrudRepository.update|update(1:0){}[0]
+}
+
+sealed interface io.github.sufarook.kiln.runtime/SqlArg { // io.github.sufarook.kiln.runtime/SqlArg|null[0]
+    final class BytesArg : io.github.sufarook.kiln.runtime/SqlArg { // io.github.sufarook.kiln.runtime/SqlArg.BytesArg|null[0]
+        constructor <init>(kotlin/ByteArray?) // io.github.sufarook.kiln.runtime/SqlArg.BytesArg.<init>|<init>(kotlin.ByteArray?){}[0]
+
+        final val value // io.github.sufarook.kiln.runtime/SqlArg.BytesArg.value|{}value[0]
+            final fun <get-value>(): kotlin/ByteArray? // io.github.sufarook.kiln.runtime/SqlArg.BytesArg.value.<get-value>|<get-value>(){}[0]
+
+        final fun component1(): kotlin/ByteArray? // io.github.sufarook.kiln.runtime/SqlArg.BytesArg.component1|component1(){}[0]
+        final fun copy(kotlin/ByteArray? = ...): io.github.sufarook.kiln.runtime/SqlArg.BytesArg // io.github.sufarook.kiln.runtime/SqlArg.BytesArg.copy|copy(kotlin.ByteArray?){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.sufarook.kiln.runtime/SqlArg.BytesArg.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.sufarook.kiln.runtime/SqlArg.BytesArg.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.sufarook.kiln.runtime/SqlArg.BytesArg.toString|toString(){}[0]
+    }
+
+    final class DoubleArg : io.github.sufarook.kiln.runtime/SqlArg { // io.github.sufarook.kiln.runtime/SqlArg.DoubleArg|null[0]
+        constructor <init>(kotlin/Double?) // io.github.sufarook.kiln.runtime/SqlArg.DoubleArg.<init>|<init>(kotlin.Double?){}[0]
+
+        final val value // io.github.sufarook.kiln.runtime/SqlArg.DoubleArg.value|{}value[0]
+            final fun <get-value>(): kotlin/Double? // io.github.sufarook.kiln.runtime/SqlArg.DoubleArg.value.<get-value>|<get-value>(){}[0]
+
+        final fun component1(): kotlin/Double? // io.github.sufarook.kiln.runtime/SqlArg.DoubleArg.component1|component1(){}[0]
+        final fun copy(kotlin/Double? = ...): io.github.sufarook.kiln.runtime/SqlArg.DoubleArg // io.github.sufarook.kiln.runtime/SqlArg.DoubleArg.copy|copy(kotlin.Double?){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.sufarook.kiln.runtime/SqlArg.DoubleArg.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.sufarook.kiln.runtime/SqlArg.DoubleArg.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.sufarook.kiln.runtime/SqlArg.DoubleArg.toString|toString(){}[0]
+    }
+
+    final class LongArg : io.github.sufarook.kiln.runtime/SqlArg { // io.github.sufarook.kiln.runtime/SqlArg.LongArg|null[0]
+        constructor <init>(kotlin/Long?) // io.github.sufarook.kiln.runtime/SqlArg.LongArg.<init>|<init>(kotlin.Long?){}[0]
+
+        final val value // io.github.sufarook.kiln.runtime/SqlArg.LongArg.value|{}value[0]
+            final fun <get-value>(): kotlin/Long? // io.github.sufarook.kiln.runtime/SqlArg.LongArg.value.<get-value>|<get-value>(){}[0]
+
+        final fun component1(): kotlin/Long? // io.github.sufarook.kiln.runtime/SqlArg.LongArg.component1|component1(){}[0]
+        final fun copy(kotlin/Long? = ...): io.github.sufarook.kiln.runtime/SqlArg.LongArg // io.github.sufarook.kiln.runtime/SqlArg.LongArg.copy|copy(kotlin.Long?){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.sufarook.kiln.runtime/SqlArg.LongArg.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.sufarook.kiln.runtime/SqlArg.LongArg.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.sufarook.kiln.runtime/SqlArg.LongArg.toString|toString(){}[0]
+    }
+
+    final class StringArg : io.github.sufarook.kiln.runtime/SqlArg { // io.github.sufarook.kiln.runtime/SqlArg.StringArg|null[0]
+        constructor <init>(kotlin/String?) // io.github.sufarook.kiln.runtime/SqlArg.StringArg.<init>|<init>(kotlin.String?){}[0]
+
+        final val value // io.github.sufarook.kiln.runtime/SqlArg.StringArg.value|{}value[0]
+            final fun <get-value>(): kotlin/String? // io.github.sufarook.kiln.runtime/SqlArg.StringArg.value.<get-value>|<get-value>(){}[0]
+
+        final fun component1(): kotlin/String? // io.github.sufarook.kiln.runtime/SqlArg.StringArg.component1|component1(){}[0]
+        final fun copy(kotlin/String? = ...): io.github.sufarook.kiln.runtime/SqlArg.StringArg // io.github.sufarook.kiln.runtime/SqlArg.StringArg.copy|copy(kotlin.String?){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.sufarook.kiln.runtime/SqlArg.StringArg.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.sufarook.kiln.runtime/SqlArg.StringArg.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.sufarook.kiln.runtime/SqlArg.StringArg.toString|toString(){}[0]
+    }
+}
+
+final class <#A: kotlin/Any?> io.github.sufarook.kiln.runtime/Column { // io.github.sufarook.kiln.runtime/Column|null[0]
+    constructor <init>(kotlin/String, kotlin/Function1<#A, io.github.sufarook.kiln.runtime/SqlArg>) // io.github.sufarook.kiln.runtime/Column.<init>|<init>(kotlin.String;kotlin.Function1<1:0,io.github.sufarook.kiln.runtime.SqlArg>){}[0]
+
+    final val name // io.github.sufarook.kiln.runtime/Column.name|{}name[0]
+        final fun <get-name>(): kotlin/String // io.github.sufarook.kiln.runtime/Column.name.<get-name>|<get-name>(){}[0]
+    final val toArg // io.github.sufarook.kiln.runtime/Column.toArg|{}toArg[0]
+        final fun <get-toArg>(): kotlin/Function1<#A, io.github.sufarook.kiln.runtime/SqlArg> // io.github.sufarook.kiln.runtime/Column.toArg.<get-toArg>|<get-toArg>(){}[0]
+}
+
+final class io.github.sufarook.kiln.runtime/ColumnDef { // io.github.sufarook.kiln.runtime/ColumnDef|null[0]
+    constructor <init>(kotlin/String, kotlin/String, kotlin/Boolean, kotlin/String, kotlin/String = ..., kotlin/Boolean = ..., kotlin/Boolean = ..., kotlin/Boolean = ...) // io.github.sufarook.kiln.runtime/ColumnDef.<init>|<init>(kotlin.String;kotlin.String;kotlin.Boolean;kotlin.String;kotlin.String;kotlin.Boolean;kotlin.Boolean;kotlin.Boolean){}[0]
+
+    final val autoIncrement // io.github.sufarook.kiln.runtime/ColumnDef.autoIncrement|{}autoIncrement[0]
+        final fun <get-autoIncrement>(): kotlin/Boolean // io.github.sufarook.kiln.runtime/ColumnDef.autoIncrement.<get-autoIncrement>|<get-autoIncrement>(){}[0]
+    final val defaultValue // io.github.sufarook.kiln.runtime/ColumnDef.defaultValue|{}defaultValue[0]
+        final fun <get-defaultValue>(): kotlin/String // io.github.sufarook.kiln.runtime/ColumnDef.defaultValue.<get-defaultValue>|<get-defaultValue>(){}[0]
+    final val isPrimaryKey // io.github.sufarook.kiln.runtime/ColumnDef.isPrimaryKey|{}isPrimaryKey[0]
+        final fun <get-isPrimaryKey>(): kotlin/Boolean // io.github.sufarook.kiln.runtime/ColumnDef.isPrimaryKey.<get-isPrimaryKey>|<get-isPrimaryKey>(){}[0]
+    final val isUnique // io.github.sufarook.kiln.runtime/ColumnDef.isUnique|{}isUnique[0]
+        final fun <get-isUnique>(): kotlin/Boolean // io.github.sufarook.kiln.runtime/ColumnDef.isUnique.<get-isUnique>|<get-isUnique>(){}[0]
+    final val migrateFrom // io.github.sufarook.kiln.runtime/ColumnDef.migrateFrom|{}migrateFrom[0]
+        final fun <get-migrateFrom>(): kotlin/String // io.github.sufarook.kiln.runtime/ColumnDef.migrateFrom.<get-migrateFrom>|<get-migrateFrom>(){}[0]
+    final val name // io.github.sufarook.kiln.runtime/ColumnDef.name|{}name[0]
+        final fun <get-name>(): kotlin/String // io.github.sufarook.kiln.runtime/ColumnDef.name.<get-name>|<get-name>(){}[0]
+    final val nullable // io.github.sufarook.kiln.runtime/ColumnDef.nullable|{}nullable[0]
+        final fun <get-nullable>(): kotlin/Boolean // io.github.sufarook.kiln.runtime/ColumnDef.nullable.<get-nullable>|<get-nullable>(){}[0]
+    final val type // io.github.sufarook.kiln.runtime/ColumnDef.type|{}type[0]
+        final fun <get-type>(): kotlin/String // io.github.sufarook.kiln.runtime/ColumnDef.type.<get-type>|<get-type>(){}[0]
+
+    final fun component1(): kotlin/String // io.github.sufarook.kiln.runtime/ColumnDef.component1|component1(){}[0]
+    final fun component2(): kotlin/String // io.github.sufarook.kiln.runtime/ColumnDef.component2|component2(){}[0]
+    final fun component3(): kotlin/Boolean // io.github.sufarook.kiln.runtime/ColumnDef.component3|component3(){}[0]
+    final fun component4(): kotlin/String // io.github.sufarook.kiln.runtime/ColumnDef.component4|component4(){}[0]
+    final fun component5(): kotlin/String // io.github.sufarook.kiln.runtime/ColumnDef.component5|component5(){}[0]
+    final fun component6(): kotlin/Boolean // io.github.sufarook.kiln.runtime/ColumnDef.component6|component6(){}[0]
+    final fun component7(): kotlin/Boolean // io.github.sufarook.kiln.runtime/ColumnDef.component7|component7(){}[0]
+    final fun component8(): kotlin/Boolean // io.github.sufarook.kiln.runtime/ColumnDef.component8|component8(){}[0]
+    final fun copy(kotlin/String = ..., kotlin/String = ..., kotlin/Boolean = ..., kotlin/String = ..., kotlin/String = ..., kotlin/Boolean = ..., kotlin/Boolean = ..., kotlin/Boolean = ...): io.github.sufarook.kiln.runtime/ColumnDef // io.github.sufarook.kiln.runtime/ColumnDef.copy|copy(kotlin.String;kotlin.String;kotlin.Boolean;kotlin.String;kotlin.String;kotlin.Boolean;kotlin.Boolean;kotlin.Boolean){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.sufarook.kiln.runtime/ColumnDef.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.sufarook.kiln.runtime/ColumnDef.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.sufarook.kiln.runtime/ColumnDef.toString|toString(){}[0]
+}
+
+final class io.github.sufarook.kiln.runtime/IosDatabaseDriverFactory { // io.github.sufarook.kiln.runtime/IosDatabaseDriverFactory|null[0]
+    constructor <init>() // io.github.sufarook.kiln.runtime/IosDatabaseDriverFactory.<init>|<init>(){}[0]
+
+    final fun create(kotlin/String): app.cash.sqldelight.db/SqlDriver // io.github.sufarook.kiln.runtime/IosDatabaseDriverFactory.create|create(kotlin.String){}[0]
+}
+
+final class io.github.sufarook.kiln.runtime/KilnTransactionContext : kotlin.coroutines/CoroutineContext.Element { // io.github.sufarook.kiln.runtime/KilnTransactionContext|null[0]
+    constructor <init>(kotlin.collections/MutableSet<kotlin/String> = ...) // io.github.sufarook.kiln.runtime/KilnTransactionContext.<init>|<init>(kotlin.collections.MutableSet<kotlin.String>){}[0]
+
+    final val key // io.github.sufarook.kiln.runtime/KilnTransactionContext.key|{}key[0]
+        final fun <get-key>(): kotlin.coroutines/CoroutineContext.Key<*> // io.github.sufarook.kiln.runtime/KilnTransactionContext.key.<get-key>|<get-key>(){}[0]
+
+    final object Key : kotlin.coroutines/CoroutineContext.Key<io.github.sufarook.kiln.runtime/KilnTransactionContext> // io.github.sufarook.kiln.runtime/KilnTransactionContext.Key|null[0]
+}
+
+final class io.github.sufarook.kiln.runtime/OrderSpec { // io.github.sufarook.kiln.runtime/OrderSpec|null[0]
+    constructor <init>(kotlin/String, io.github.sufarook.kiln.runtime/Order) // io.github.sufarook.kiln.runtime/OrderSpec.<init>|<init>(kotlin.String;io.github.sufarook.kiln.runtime.Order){}[0]
+
+    final val columnName // io.github.sufarook.kiln.runtime/OrderSpec.columnName|{}columnName[0]
+        final fun <get-columnName>(): kotlin/String // io.github.sufarook.kiln.runtime/OrderSpec.columnName.<get-columnName>|<get-columnName>(){}[0]
+    final val direction // io.github.sufarook.kiln.runtime/OrderSpec.direction|{}direction[0]
+        final fun <get-direction>(): io.github.sufarook.kiln.runtime/Order // io.github.sufarook.kiln.runtime/OrderSpec.direction.<get-direction>|<get-direction>(){}[0]
+
+    final fun component1(): kotlin/String // io.github.sufarook.kiln.runtime/OrderSpec.component1|component1(){}[0]
+    final fun component2(): io.github.sufarook.kiln.runtime/Order // io.github.sufarook.kiln.runtime/OrderSpec.component2|component2(){}[0]
+    final fun copy(kotlin/String = ..., io.github.sufarook.kiln.runtime/Order = ...): io.github.sufarook.kiln.runtime/OrderSpec // io.github.sufarook.kiln.runtime/OrderSpec.copy|copy(kotlin.String;io.github.sufarook.kiln.runtime.Order){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.sufarook.kiln.runtime/OrderSpec.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.sufarook.kiln.runtime/OrderSpec.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.sufarook.kiln.runtime/OrderSpec.toString|toString(){}[0]
+}
+
+final class io.github.sufarook.kiln.runtime/Predicate { // io.github.sufarook.kiln.runtime/Predicate|null[0]
+    final val args // io.github.sufarook.kiln.runtime/Predicate.args|{}args[0]
+        final fun <get-args>(): kotlin.collections/List<io.github.sufarook.kiln.runtime/SqlArg> // io.github.sufarook.kiln.runtime/Predicate.args.<get-args>|<get-args>(){}[0]
+    final val sql // io.github.sufarook.kiln.runtime/Predicate.sql|{}sql[0]
+        final fun <get-sql>(): kotlin/String // io.github.sufarook.kiln.runtime/Predicate.sql.<get-sql>|<get-sql>(){}[0]
+
+    final fun and(io.github.sufarook.kiln.runtime/Predicate): io.github.sufarook.kiln.runtime/Predicate // io.github.sufarook.kiln.runtime/Predicate.and|and(io.github.sufarook.kiln.runtime.Predicate){}[0]
+    final fun or(io.github.sufarook.kiln.runtime/Predicate): io.github.sufarook.kiln.runtime/Predicate // io.github.sufarook.kiln.runtime/Predicate.or|or(io.github.sufarook.kiln.runtime.Predicate){}[0]
+}
+
+final class io.github.sufarook.kiln.runtime/SchemaMigrator { // io.github.sufarook.kiln.runtime/SchemaMigrator|null[0]
+    constructor <init>(app.cash.sqldelight.db/SqlDriver) // io.github.sufarook.kiln.runtime/SchemaMigrator.<init>|<init>(app.cash.sqldelight.db.SqlDriver){}[0]
+
+    final fun sync(kotlin/String, kotlin.collections/List<io.github.sufarook.kiln.runtime/ColumnDef>) // io.github.sufarook.kiln.runtime/SchemaMigrator.sync|sync(kotlin.String;kotlin.collections.List<io.github.sufarook.kiln.runtime.ColumnDef>){}[0]
+}
+
+final fun (app.cash.sqldelight.db/SqlPreparedStatement).io.github.sufarook.kiln.runtime/bindArg(kotlin/Int, io.github.sufarook.kiln.runtime/SqlArg) // io.github.sufarook.kiln.runtime/bindArg|bindArg@app.cash.sqldelight.db.SqlPreparedStatement(kotlin.Int;io.github.sufarook.kiln.runtime.SqlArg){}[0]
+final fun (io.github.sufarook.kiln.runtime/Column<*>).io.github.sufarook.kiln.runtime/isNotNull(): io.github.sufarook.kiln.runtime/Predicate // io.github.sufarook.kiln.runtime/isNotNull|isNotNull@io.github.sufarook.kiln.runtime.Column<*>(){}[0]
+final fun (io.github.sufarook.kiln.runtime/Column<*>).io.github.sufarook.kiln.runtime/isNull(): io.github.sufarook.kiln.runtime/Predicate // io.github.sufarook.kiln.runtime/isNull|isNull@io.github.sufarook.kiln.runtime.Column<*>(){}[0]
+final fun (io.github.sufarook.kiln.runtime/Column<out kotlin/String?>).io.github.sufarook.kiln.runtime/like(kotlin/String): io.github.sufarook.kiln.runtime/Predicate // io.github.sufarook.kiln.runtime/like|like@io.github.sufarook.kiln.runtime.Column<out|kotlin.String?>(kotlin.String){}[0]
+final fun <#A: kotlin/Any?> (io.github.sufarook.kiln.runtime/Column<#A>).io.github.sufarook.kiln.runtime/asc(): io.github.sufarook.kiln.runtime/OrderSpec // io.github.sufarook.kiln.runtime/asc|asc@io.github.sufarook.kiln.runtime.Column<0:0>(){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (io.github.sufarook.kiln.runtime/Column<#A>).io.github.sufarook.kiln.runtime/between(#A, #A): io.github.sufarook.kiln.runtime/Predicate // io.github.sufarook.kiln.runtime/between|between@io.github.sufarook.kiln.runtime.Column<0:0>(0:0;0:0){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (io.github.sufarook.kiln.runtime/Column<#A>).io.github.sufarook.kiln.runtime/desc(): io.github.sufarook.kiln.runtime/OrderSpec // io.github.sufarook.kiln.runtime/desc|desc@io.github.sufarook.kiln.runtime.Column<0:0>(){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (io.github.sufarook.kiln.runtime/Column<#A>).io.github.sufarook.kiln.runtime/eq(#A): io.github.sufarook.kiln.runtime/Predicate // io.github.sufarook.kiln.runtime/eq|eq@io.github.sufarook.kiln.runtime.Column<0:0>(0:0){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (io.github.sufarook.kiln.runtime/Column<#A>).io.github.sufarook.kiln.runtime/gt(#A): io.github.sufarook.kiln.runtime/Predicate // io.github.sufarook.kiln.runtime/gt|gt@io.github.sufarook.kiln.runtime.Column<0:0>(0:0){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (io.github.sufarook.kiln.runtime/Column<#A>).io.github.sufarook.kiln.runtime/gte(#A): io.github.sufarook.kiln.runtime/Predicate // io.github.sufarook.kiln.runtime/gte|gte@io.github.sufarook.kiln.runtime.Column<0:0>(0:0){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (io.github.sufarook.kiln.runtime/Column<#A>).io.github.sufarook.kiln.runtime/inList(kotlin.collections/Collection<#A>): io.github.sufarook.kiln.runtime/Predicate // io.github.sufarook.kiln.runtime/inList|inList@io.github.sufarook.kiln.runtime.Column<0:0>(kotlin.collections.Collection<0:0>){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (io.github.sufarook.kiln.runtime/Column<#A>).io.github.sufarook.kiln.runtime/lt(#A): io.github.sufarook.kiln.runtime/Predicate // io.github.sufarook.kiln.runtime/lt|lt@io.github.sufarook.kiln.runtime.Column<0:0>(0:0){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (io.github.sufarook.kiln.runtime/Column<#A>).io.github.sufarook.kiln.runtime/lte(#A): io.github.sufarook.kiln.runtime/Predicate // io.github.sufarook.kiln.runtime/lte|lte@io.github.sufarook.kiln.runtime.Column<0:0>(0:0){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (io.github.sufarook.kiln.runtime/Column<#A>).io.github.sufarook.kiln.runtime/neq(#A): io.github.sufarook.kiln.runtime/Predicate // io.github.sufarook.kiln.runtime/neq|neq@io.github.sufarook.kiln.runtime.Column<0:0>(0:0){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (io.github.sufarook.kiln.runtime/Column<#A>).io.github.sufarook.kiln.runtime/notInList(kotlin.collections/Collection<#A>): io.github.sufarook.kiln.runtime/Predicate // io.github.sufarook.kiln.runtime/notInList|notInList@io.github.sufarook.kiln.runtime.Column<0:0>(kotlin.collections.Collection<0:0>){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> io.github.sufarook.kiln.runtime/observeQuery(app.cash.sqldelight.db/SqlDriver, kotlin/String, kotlin.coroutines/CoroutineContext, kotlin/Function0<#A>): kotlinx.coroutines.flow/Flow<#A> // io.github.sufarook.kiln.runtime/observeQuery|observeQuery(app.cash.sqldelight.db.SqlDriver;kotlin.String;kotlin.coroutines.CoroutineContext;kotlin.Function0<0:0>){0§<kotlin.Any?>}[0]
+final fun io.github.sufarook.kiln.runtime/buildOrderSuffix(kotlin.collections/List<io.github.sufarook.kiln.runtime/OrderSpec>, kotlin/Long?, kotlin/Long?): kotlin/String // io.github.sufarook.kiln.runtime/buildOrderSuffix|buildOrderSuffix(kotlin.collections.List<io.github.sufarook.kiln.runtime.OrderSpec>;kotlin.Long?;kotlin.Long?){}[0]
+final fun io.github.sufarook.kiln.runtime/not(io.github.sufarook.kiln.runtime/Predicate): io.github.sufarook.kiln.runtime/Predicate // io.github.sufarook.kiln.runtime/not|not(io.github.sufarook.kiln.runtime.Predicate){}[0]
+final suspend fun (app.cash.sqldelight.db/SqlDriver).io.github.sufarook.kiln.runtime/notifyOrDefer(kotlin/String) // io.github.sufarook.kiln.runtime/notifyOrDefer|notifyOrDefer@app.cash.sqldelight.db.SqlDriver(kotlin.String){}[0]
+final suspend fun (app.cash.sqldelight.db/SqlDriver).io.github.sufarook.kiln.runtime/withTransaction(kotlin.coroutines/CoroutineContext = ..., kotlin.coroutines/SuspendFunction0<kotlin/Unit>) // io.github.sufarook.kiln.runtime/withTransaction|withTransaction@app.cash.sqldelight.db.SqlDriver(kotlin.coroutines.CoroutineContext;kotlin.coroutines.SuspendFunction0<kotlin.Unit>){}[0]
