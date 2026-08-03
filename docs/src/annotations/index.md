@@ -5,7 +5,7 @@ Kiln provides four annotations. All have `SOURCE` retention — they are consume
 | Annotation | Target | Purpose |
 |-----------|--------|---------|
 | [`@DbEntity`](db-entity.md) | Class | Marks a data class as a database table |
-| [`@PrimaryKey`](primary-key.md) | Property | Designates the primary key column |
+| [`@PrimaryKey`](primary-key.md) | Property | Designates a primary key column — two or more form a composite key |
 | [`@Column`](column.md) | Property | Overrides column name, adds constraints, hints migration |
 | [`@Ignore`](ignore.md) | Property | Excludes a property from the schema |
 | [`@Relation`](relation.md) | Property | Marks a FK property; generates `findBy<Parent>`, `observeBy<Parent>`, `deleteBy<Parent>` |

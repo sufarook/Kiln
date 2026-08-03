@@ -6,11 +6,12 @@ data class EntityMetadata(
     val packageName: String,
     val entityClassName: String,
     val tableName: String,
-    val primaryKey: ColumnMetadata,
+    val primaryKeys: List<ColumnMetadata>,
     val columns: List<ColumnMetadata>,
     val relations: List<RelationMetadata> = emptyList()
 ) {
-    val allColumns: List<ColumnMetadata> get() = listOf(primaryKey) + columns
+    val allColumns: List<ColumnMetadata> get() = primaryKeys + columns
+    val isCompositeKey: Boolean get() = primaryKeys.size > 1
 }
 
 /**
