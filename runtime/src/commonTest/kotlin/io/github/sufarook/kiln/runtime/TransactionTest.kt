@@ -3,7 +3,6 @@ package io.github.sufarook.kiln.runtime
 import app.cash.sqldelight.Query
 import app.cash.sqldelight.db.QueryResult
 import app.cash.sqldelight.db.SqlDriver
-import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import kotlinx.coroutines.runBlocking
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -18,7 +17,7 @@ class TransactionTest {
 
     @BeforeTest
     fun setup() {
-        driver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
+        driver = createTestDriver()
         driver.execute(null, """CREATE TABLE "items" ("value" TEXT NOT NULL)""", 0)
     }
 

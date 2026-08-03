@@ -22,9 +22,12 @@ kotlin {
         publishLibraryVariants("release")
     }
     jvm()
-    iosArm64()
-    iosX64()
-    iosSimulatorArm64()
+    listOf(iosArm64(), iosX64(), iosSimulatorArm64()).forEach { target ->
+        // A real iOS app gets libsqlite3 linked for free via Xcode. Our own test
+        // binary is a standalone Kotlin/Native executable with no Xcode project
+        // behind it, so the native-driver's sqlite3 symbols need linking explicitly.
+        target.binaries.all { linkerOpts("-lsqlite3") }
+    }
 
     sourceSets {
         val commonMain by getting {
@@ -48,10 +51,21 @@ kotlin {
                 api(libs.sqldelight.sqlite.driver)  // JvmDatabaseDriverFactory
             }
         }
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
         val jvmTest by getting {
             dependencies {
                 implementation(libs.junit)
-                implementation(kotlin("test"))
+            }
+        }
+        val androidUnitTest by getting {
+            dependencies {
+                // Local unit tests run on the host JVM — reuse the JDBC driver
+                // purely as a test fixture, same reasoning as jvmTest.
+                implementation(libs.sqldelight.sqlite.driver)
             }
         }
     }

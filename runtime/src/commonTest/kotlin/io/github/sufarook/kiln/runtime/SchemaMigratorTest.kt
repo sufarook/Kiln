@@ -2,7 +2,6 @@ package io.github.sufarook.kiln.runtime
 
 import app.cash.sqldelight.db.QueryResult
 import app.cash.sqldelight.db.SqlDriver
-import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -28,7 +27,7 @@ class SchemaMigratorTest {
 
     @BeforeTest
     fun setup() {
-        driver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
+        driver = createTestDriver()
         migrator = SchemaMigrator(driver)
         exec(
             """CREATE TABLE IF NOT EXISTS "todos" (
