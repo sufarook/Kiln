@@ -9,7 +9,7 @@ docs_dir: src
 
 theme:
   name: material
-  logo: assets/kiln-mark-white.svg
+  logo: assets/kiln-mark.svg
   favicon: assets/kiln-favicon.svg
   font:
     code: JetBrains Mono

@@ -1,8 +1,10 @@
 /*
  * Kiln brand palette applied to Material for MkDocs.
- * Tokens from the design handoff. The rule "never violet on ink" is honoured by
- * using the standard `violet` on light surfaces and the lighter `violet-on-dark`
- * on the slate (dark) scheme.
+ *
+ * The mark is two-tone by design — an ink top course (the source data class) over
+ * violet courses (the generated rows). That only reads on a neutral surface, so the
+ * header bar is kept paper/ink rather than violet, and violet is carried by the
+ * accents and links instead. This also honours the handoff's "never violet on ink".
  */
 
 :root {
@@ -15,36 +17,49 @@
 
 /* ── Light scheme ─────────────────────────────────────────────────────────── */
 [data-md-color-scheme="default"] {
-  /* Header/footer bar is the primary colour; white foreground reads on violet. */
-  --md-primary-fg-color:        var(--kiln-violet);
-  --md-primary-fg-color--light: var(--kiln-violet-on-dark);
+  /* Paper header so the ink-top / violet-course mark reads as generated. */
+  --md-primary-fg-color:        var(--kiln-paper);
+  --md-primary-fg-color--light: var(--kiln-paper);
   --md-primary-fg-color--dark:  var(--kiln-ink);
-  --md-primary-bg-color:        var(--kiln-paper);
+  --md-primary-bg-color:        var(--kiln-ink);   /* header title/nav/search text */
 
   --md-accent-fg-color:         var(--kiln-violet);
-
-  /* Body links pick up the brand violet. */
   --md-typeset-a-color:         var(--kiln-violet);
 }
 
 /* ── Dark (slate) scheme ──────────────────────────────────────────────────── */
 [data-md-color-scheme="slate"] {
-  /* Dark ink header in dark mode — violet-on-ink would fail contrast, so the
-     bar stays ink and the accents carry the brand colour instead. */
+  /* Ink header so the paper-top / violet-on-dark-course mark reads. */
   --md-primary-fg-color:        var(--kiln-ink-deep);
   --md-primary-fg-color--light: var(--kiln-violet-on-dark);
   --md-primary-fg-color--dark:  var(--kiln-ink-deep);
   --md-primary-bg-color:        var(--kiln-paper);
 
   --md-accent-fg-color:         var(--kiln-violet-on-dark);
-
   --md-typeset-a-color:         var(--kiln-violet-on-dark);
 }
 
-/* The mark in the header is a white knockout; give it a hair of breathing room
-   so it aligns with the wordmark next to it. */
-.md-header__button.md-logo img,
-.md-header__button.md-logo svg {
-  height: 1.6rem;
-  width: auto;
+/*
+ * Per-scheme logo. mkdocs.yml only takes a single `theme.logo`, so swap the mark
+ * with a CSS background — the real two-tone `kiln-mark.svg` on the paper header,
+ * and the dark variant on the ink header. The link keeps its `title="Kiln"`, so
+ * hiding the inner <img> doesn't cost the accessible name.
+ */
+.md-header__button.md-logo {
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 0.35rem;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  box-sizing: content-box;
+}
+.md-header__button.md-logo img {
+  display: none;
+}
+[data-md-color-scheme="default"] .md-header__button.md-logo {
+  background-image: url("../assets/kiln-mark.svg");
+}
+[data-md-color-scheme="slate"] .md-header__button.md-logo {
+  background-image: url("../assets/kiln-mark-dark.svg");
 }
