@@ -2,7 +2,11 @@ name: CI
 
 on:
   push:
-    branches: [main, develop]
+    # main is intentionally not listed here: branch protection requires PRs to
+    # be up to date before merging (strict status checks), so a merge commit's
+    # tree is always identical to what pull_request already tested — running
+    # the whole suite again on push would just repeat the same result for free.
+    branches: [develop]
     tags: ['v*']
   pull_request:
     branches: [main]
