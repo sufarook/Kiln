@@ -3,24 +3,27 @@ site_description: Compile-time CRUD generation for Kotlin Multiplatform — no S
 site_author: Syed Ummer Farook
 repo_name: Kiln
 repo_url: https://github.com/sufarook/Kiln
-copyright: Copyright &copy; 2024 Syed Ummer Farook
+copyright: Copyright &copy; 2026 Syed Ummer Farook
 
 docs_dir: src
 
 theme:
   name: material
+  logo: assets/kiln-mark.svg
+  favicon: assets/kiln-favicon.svg
+  font:
+    code: JetBrains Mono
   palette:
+    # Custom brand colours come from stylesheets/brand.css; the named
+    # primary/accent below are left at Material defaults because the CSS overrides
+    # the underlying --md-primary/--md-accent tokens per scheme.
     - media: "(prefers-color-scheme: light)"
       scheme: default
-      primary: indigo
-      accent: indigo
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      primary: indigo
-      accent: indigo
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
@@ -37,6 +40,9 @@ theme:
     - content.tabs.link
   icon:
     repo: fontawesome/brands/github
+
+extra_css:
+  - stylesheets/brand.css
 
 plugins:
   - search

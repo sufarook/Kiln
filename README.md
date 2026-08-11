@@ -1,4 +1,11 @@
-# Kiln
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/src/assets/kiln-mark-dark.svg">
+    <img src="docs/src/assets/kiln-mark.svg" width="96" height="96" alt="Kiln logo">
+  </picture>
+</p>
+
+<h1 align="center">Kiln</h1>
 
 **Compile-time CRUD generation for Kotlin Multiplatform SQLite. No SQL. No mappers. No migrations.**
 
