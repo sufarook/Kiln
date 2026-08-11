@@ -93,6 +93,23 @@ annotation class PrimaryKey(
     `update(entity)` is unaffected — it still takes the whole entity and matches
     on every `@PrimaryKey` property internally, same as a single key.
 
+    In a junction table the key columns are usually also foreign keys, so you can
+    add `@Relation` to each and get the FK helpers alongside the composite key:
+
+    ```kotlin
+    @DbEntity(tableName = "assignments")
+    data class Assignment(
+        @PrimaryKey @Relation val taskId: Long,
+        @PrimaryKey @Relation val userId: Long,
+        val assignedAt: String = ""
+    )
+
+    // Generated from @Relation on the key columns:
+    assignmentRepo.findByTask(taskId = 1L)     // List<Assignment>
+    assignmentRepo.findByUser(userId = 2L)     // List<Assignment>
+    assignmentRepo.deleteByTask(taskId = 1L)   // drop every assignment for a task
+    ```
+
 ## Constraints
 
 !!! warning "autoGenerate requires Long or Int"
@@ -110,9 +127,8 @@ annotation class PrimaryKey(
     on any property of a composite key
     ```
 
-!!! note "@Relation is not yet supported on a @PrimaryKey property"
-    In a junction table like `Assignment` above, `taskId`/`userId` are also
-    logically foreign keys, but `@Relation`'s `findBy<Parent>`/`observeBy<Parent>`/
-    `deleteBy<Parent>` helpers aren't generated for PK properties yet. Filter on
-    them directly instead: `assignmentRepo.findWhere { taskId eq id }` — the
-    column is still generated normally on `AssignmentColumns`.
+!!! tip "@Relation works on @PrimaryKey properties"
+    A key column can also carry `@Relation` (shown in the composite-key example
+    above). This covers junction tables — where each half of the composite key is a
+    foreign key — and shared-primary-key one-to-one tables, where a single PK is also
+    an FK to the parent.

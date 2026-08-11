@@ -3,7 +3,7 @@
 Kiln generates one repository per entity — it does not generate SQL JOIN queries. For data that spans multiple tables, create a store or service class that coordinates across repositories.
 
 !!! tip "@Relation shortcut"
-    If your FK property is annotated with `@Relation(foreignKey = "project_id")`, Kiln generates `taskRepo.findByProject(id)`, `taskRepo.observeByProject(id)`, and `taskRepo.deleteByProject(id)` directly on the repository. The manual `findWhere { TaskColumns.projectId eq id }` pattern below is equivalent — use whichever feels cleaner.
+    If your FK property is annotated with `@Relation`, Kiln generates `taskRepo.findByProject(id)`, `taskRepo.observeByProject(id)`, and `taskRepo.deleteByProject(id)` directly on the repository (the parent name is inferred from the property name — `projectId` → `Project`). The manual `findWhere { TaskColumns.projectId eq id }` pattern below is equivalent — use whichever feels cleaner.
 
     See [the `@Relation` reference](../annotations/relation.md) for details.
 
