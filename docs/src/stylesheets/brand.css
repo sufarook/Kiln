@@ -1,0 +1,50 @@
+/*
+ * Kiln brand palette applied to Material for MkDocs.
+ * Tokens from the design handoff. The rule "never violet on ink" is honoured by
+ * using the standard `violet` on light surfaces and the lighter `violet-on-dark`
+ * on the slate (dark) scheme.
+ */
+
+:root {
+  --kiln-ink:            #2C2438;
+  --kiln-ink-deep:       #251E30;
+  --kiln-violet:         #7A45E0;
+  --kiln-violet-on-dark: #A97BFF;
+  --kiln-paper:          #F5F3F8;
+}
+
+/* ── Light scheme ─────────────────────────────────────────────────────────── */
+[data-md-color-scheme="default"] {
+  /* Header/footer bar is the primary colour; white foreground reads on violet. */
+  --md-primary-fg-color:        var(--kiln-violet);
+  --md-primary-fg-color--light: var(--kiln-violet-on-dark);
+  --md-primary-fg-color--dark:  var(--kiln-ink);
+  --md-primary-bg-color:        var(--kiln-paper);
+
+  --md-accent-fg-color:         var(--kiln-violet);
+
+  /* Body links pick up the brand violet. */
+  --md-typeset-a-color:         var(--kiln-violet);
+}
+
+/* ── Dark (slate) scheme ──────────────────────────────────────────────────── */
+[data-md-color-scheme="slate"] {
+  /* Dark ink header in dark mode — violet-on-ink would fail contrast, so the
+     bar stays ink and the accents carry the brand colour instead. */
+  --md-primary-fg-color:        var(--kiln-ink-deep);
+  --md-primary-fg-color--light: var(--kiln-violet-on-dark);
+  --md-primary-fg-color--dark:  var(--kiln-ink-deep);
+  --md-primary-bg-color:        var(--kiln-paper);
+
+  --md-accent-fg-color:         var(--kiln-violet-on-dark);
+
+  --md-typeset-a-color:         var(--kiln-violet-on-dark);
+}
+
+/* The mark in the header is a white knockout; give it a hair of breathing room
+   so it aligns with the wordmark next to it. */
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+  height: 1.6rem;
+  width: auto;
+}
