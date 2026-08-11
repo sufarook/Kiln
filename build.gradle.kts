@@ -41,7 +41,7 @@ allprojects {
     // VERSION is generated from this (see :gradle-plugin generateBuildConfig) so it
     // cannot drift from what actually gets published.
     group = "io.github.sufarook.kiln"
-    version = "1.0.0-alpha03"
+    version = "1.0.0-alpha04"
 
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
 
