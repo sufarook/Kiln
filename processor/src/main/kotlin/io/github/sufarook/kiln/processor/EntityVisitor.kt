@@ -109,6 +109,18 @@ object EntityVisitor {
         val nonPkColumns = mutableListOf<ColumnMetadata>()
         val relations = mutableListOf<RelationMetadata>()
 
+        // A primary-key property can also be a foreign key. The two cases are a
+        // junction table (composite PK where each column is an FK, e.g.
+        // (taskId, userId)) and a shared-primary-key 1:1 (a single PK that is also
+        // an FK, e.g. UserProfile.userId -> User). @Relation on a PK property must
+        // generate the same findBy/observeBy/deleteBy helpers it does on any column;
+        // the non-PK loop below never sees these, so handle them first. primaryKeys
+        // is built from primaryKeyProps in order, so zip pairs each prop with its
+        // already-computed column metadata.
+        primaryKeyProps.zip(primaryKeys).forEach { (prop, col) ->
+            extractRelation(prop, col)?.let(relations::add)
+        }
+
         for (prop in persistableProps.filter { it.simpleName.asString() !in pkPropertyNames }) {
             val resolvedType = prop.type.resolve()
             val mapping = try {
@@ -144,21 +156,7 @@ object EntityVisitor {
             )
             nonPkColumns.add(col)
 
-            val relationAnnotation = prop.annotations.firstOrNull { it.shortName.asString() == "Relation" }
-            if (relationAnnotation != null) {
-                val cascade = relationAnnotation.arguments
-                    .firstOrNull { it.name?.asString() == "cascade" }?.value as? Boolean ?: false
-                val propName = prop.simpleName.asString()
-                relations.add(
-                    RelationMetadata(
-                        propertyName = propName,
-                        columnName = col.columnName,
-                        kotlinTypeName = resolvedType.toTypeName(),
-                        parentEntityName = inferParentName(propName),
-                        cascade = cascade
-                    )
-                )
-            }
+            extractRelation(prop, col)?.let(relations::add)
         }
 
         return EntityMetadata(
@@ -168,6 +166,27 @@ object EntityVisitor {
             primaryKeys = primaryKeys,
             columns = nonPkColumns,
             relations = relations
+        )
+    }
+
+    /**
+     * Builds [RelationMetadata] from a `@Relation`-annotated property, or returns null
+     * if the property isn't annotated. Works for both PK and non-PK columns — the
+     * column metadata (name, type) is already resolved and passed in, so this only
+     * reads the annotation. The parent entity name is inferred from the property name.
+     */
+    private fun extractRelation(prop: KSPropertyDeclaration, col: ColumnMetadata): RelationMetadata? {
+        val relationAnnotation = prop.annotations
+            .firstOrNull { it.shortName.asString() == "Relation" } ?: return null
+        val cascade = relationAnnotation.arguments
+            .firstOrNull { it.name?.asString() == "cascade" }?.value as? Boolean ?: false
+        val propName = prop.simpleName.asString()
+        return RelationMetadata(
+            propertyName = propName,
+            columnName = col.columnName,
+            kotlinTypeName = col.kotlinTypeName,
+            parentEntityName = inferParentName(propName),
+            cascade = cascade
         )
     }
 
