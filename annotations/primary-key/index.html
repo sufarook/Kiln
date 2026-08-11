@@ -1559,6 +1559,20 @@ case is a junction/join table, like an assignment of a user to a task.</p>
 </span></code></pre></div>
 <p><code>update(entity)</code> is unaffected — it still takes the whole entity and matches
 on every <code>@PrimaryKey</code> property internally, same as a single key.</p>
+<p>In a junction table the key columns are usually also foreign keys, so you can
+add <code>@Relation</code> to each and get the FK helpers alongside the composite key:</p>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nd">@DbEntity</span><span class="p">(</span><span class="n">tableName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;assignments&quot;</span><span class="p">)</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kd">data</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">Assignment</span><span class="p">(</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="nd">@PrimaryKey</span><span class="w"> </span><span class="nd">@Relation</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">taskId</span><span class="p">:</span><span class="w"> </span><span class="kt">Long</span><span class="p">,</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="nd">@PrimaryKey</span><span class="w"> </span><span class="nd">@Relation</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">userId</span><span class="p">:</span><span class="w"> </span><span class="kt">Long</span><span class="p">,</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">assignedAt</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="p">)</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="c1">// Generated from @Relation on the key columns:</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="n">assignmentRepo</span><span class="p">.</span><span class="na">findByTask</span><span class="p">(</span><span class="n">taskId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1L</span><span class="p">)</span><span class="w">     </span><span class="c1">// List&lt;Assignment&gt;</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="n">assignmentRepo</span><span class="p">.</span><span class="na">findByUser</span><span class="p">(</span><span class="n">userId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2L</span><span class="p">)</span><span class="w">     </span><span class="c1">// List&lt;Assignment&gt;</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="n">assignmentRepo</span><span class="p">.</span><span class="na">deleteByTask</span><span class="p">(</span><span class="n">taskId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1L</span><span class="p">)</span><span class="w">   </span><span class="c1">// drop every assignment for a task</span>
+</span></code></pre></div>
 </div>
 </div>
 </div>
@@ -1566,7 +1580,7 @@ on every <code>@PrimaryKey</code> property internally, same as a single key.</p>
 <div class="admonition warning">
 <p class="admonition-title">autoGenerate requires Long or Int</p>
 <p>Setting <code>autoGenerate = true</code> on a property of any other type produces a compile-time error:
-<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Kiln: @PrimaryKey(autoGenerate = true) requires a Long or Int property
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>Kiln: @PrimaryKey(autoGenerate = true) requires a Long or Int property
 </span></code></pre></div></p>
 </div>
 <div class="admonition warning">
@@ -1574,17 +1588,16 @@ on every <code>@PrimaryKey</code> property internally, same as a single key.</p>
 <p><code>autoGenerate</code> only makes sense for a single integer PK. Setting it on any
 property once a class has two or more <code>@PrimaryKey</code> properties is a
 compile-time error:
-<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>Kiln: &#39;&lt;Entity&gt;&#39; has a composite primary key — autoGenerate is not supported
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>on any property of a composite key
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Kiln: &#39;&lt;Entity&gt;&#39; has a composite primary key — autoGenerate is not supported
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>on any property of a composite key
 </span></code></pre></div></p>
 </div>
-<div class="admonition note">
-<p class="admonition-title">@Relation is not yet supported on a @PrimaryKey property</p>
-<p>In a junction table like <code>Assignment</code> above, <code>taskId</code>/<code>userId</code> are also
-logically foreign keys, but <code>@Relation</code>'s <code>findBy&lt;Parent&gt;</code>/<code>observeBy&lt;Parent&gt;</code>/
-<code>deleteBy&lt;Parent&gt;</code> helpers aren't generated for PK properties yet. Filter on
-them directly instead: <code>assignmentRepo.findWhere { taskId eq id }</code> — the
-column is still generated normally on <code>AssignmentColumns</code>.</p>
+<div class="admonition tip">
+<p class="admonition-title">@Relation works on @PrimaryKey properties</p>
+<p>A key column can also carry <code>@Relation</code> (shown in the composite-key example
+above). This covers junction tables — where each half of the composite key is a
+foreign key — and shared-primary-key one-to-one tables, where a single PK is also
+an FK to the parent.</p>
 </div>
 
 

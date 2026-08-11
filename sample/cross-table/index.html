@@ -1454,7 +1454,7 @@
 <p>Kiln generates one repository per entity — it does not generate SQL JOIN queries. For data that spans multiple tables, create a store or service class that coordinates across repositories.</p>
 <div class="admonition tip">
 <p class="admonition-title">@Relation shortcut</p>
-<p>If your FK property is annotated with <code>@Relation(foreignKey = "project_id")</code>, Kiln generates <code>taskRepo.findByProject(id)</code>, <code>taskRepo.observeByProject(id)</code>, and <code>taskRepo.deleteByProject(id)</code> directly on the repository. The manual <code>findWhere { TaskColumns.projectId eq id }</code> pattern below is equivalent — use whichever feels cleaner.</p>
+<p>If your FK property is annotated with <code>@Relation</code>, Kiln generates <code>taskRepo.findByProject(id)</code>, <code>taskRepo.observeByProject(id)</code>, and <code>taskRepo.deleteByProject(id)</code> directly on the repository (the parent name is inferred from the property name — <code>projectId</code> → <code>Project</code>). The manual <code>findWhere { TaskColumns.projectId eq id }</code> pattern below is equivalent — use whichever feels cleaner.</p>
 <p>See <a href="../../annotations/relation/">the <code>@Relation</code> reference</a> for details.</p>
 </div>
 <h2 id="data-models">Data models</h2>
