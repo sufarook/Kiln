@@ -152,9 +152,15 @@ Yes. Kiln uses the `SqlDriver` directly — it's the same driver you'd pass to S
 
 ### Is `observeAll()` efficient for large tables?
 
-`observeAll()` re-fetches the full table on every write to that table. For tables with thousands of rows, prefer `observeWhere { … }` with a predicate that limits the result set, and handle pagination in the UI.
+`observeAll()` re-fetches the full table on every write to that table. For tables with thousands of rows, prefer `observeWhere { … }` with a predicate that limits the result set, and use the built-in `orderBy` / `limit` / `offset` parameters to page through results instead of loading everything:
 
-For read-heavy screens that don't need live updates, `findAll()` and `findWhere()` are one-shot suspend functions with no listener overhead.
+```kotlin
+repo.observeWhere(orderBy = listOf(TaskColumns.priority.desc()), limit = 50, offset = page * 50) {
+    status eq "OPEN"
+}
+```
+
+For read-heavy screens that don't need live updates, `findAll()` and `findWhere()` are one-shot suspend functions with no listener overhead — and `findWhere` takes the same `orderBy` / `limit` / `offset`.
 
 ---
 
@@ -162,25 +168,28 @@ For read-heavy screens that don't need live updates, `findAll()` and `findWhere(
 
 ### Does Kiln support transactions?
 
-Not via a generated API. Use the `SqlDriver` directly:
+Yes. Wrap multiple writes in `SqlDriver.withTransaction { }` — everything inside commits atomically, and reactive flows receive a **single** notification after the commit (or none at all if it rolls back):
 
 ```kotlin
-driver.execute(null, "BEGIN TRANSACTION", 0)
-try {
+driver.withTransaction {
     taskRepo.insert(task)
     checklistRepo.insert(item)
-    driver.execute(null, "COMMIT", 0)
-} catch (e: Exception) {
-    driver.execute(null, "ROLLBACK", 0)
-    throw e
 }
 ```
+
+If the block throws, the transaction rolls back and no `observeAll()` / `observeWhere()` flow re-emits for those writes. Generated repositories also expose `insertAll(items)`, which wraps a bulk insert in a single transaction for you.
+
+You can still drop down to raw `driver.execute(null, "BEGIN TRANSACTION", 0)` if you need finer control, but `withTransaction` is the recommended path — it handles rollback and the deferred notification correctly.
 
 ---
 
 ### Does it support foreign keys?
 
-SQLite foreign keys are not enabled by default. Kiln does not emit `PRAGMA foreign_keys = ON`. Handle referential integrity manually — see [Cross-table Loading](sample/cross-table.md) for the recommended pattern.
+Two separate things, and the answer differs for each:
+
+**FK relationship helpers — yes.** Annotate a foreign-key property with `@Relation` and Kiln generates `findByParent(id)`, `observeByParent(id)`, and `deleteByParent(id)` on the repository. This works on composite-key columns too, so a junction table gets FK helpers on each key column. See the [`@Relation` reference](annotations/relation.md).
+
+**FK constraint enforcement — no.** SQLite foreign keys are off by default and Kiln does not emit `PRAGMA foreign_keys = ON`, so the database won't reject an orphaned row or cascade a delete on its own. Handle referential integrity in your code — call `deleteByParent(id)` before deleting a parent (annotate the relation `@Relation(cascade = true)` as a reminder that you're responsible for the cascade), and see [Cross-table Loading](sample/cross-table.md) for the recommended pattern.
 
 ---
 
