@@ -13,7 +13,6 @@ Kiln is a multi-module Gradle build:
 | [`processor`](processor) | The KSP processor — reads annotated classes, generates `<Entity>Repository`/`<Entity>Columns` | Applied via the Gradle plugin, never imported directly |
 | [`runtime`](runtime) | `CrudRepository`, `SchemaMigrator`, the query DSL, driver factories (`AndroidDatabaseDriverFactory`, `IosDatabaseDriverFactory`, `JvmDatabaseDriverFactory`) | Direct import |
 | [`gradle-plugin`](gradle-plugin) | `id("io.github.sufarook.kiln")` — wires KSP, the processor, and generated sources into a consumer's build | Applied via `plugins {}` |
-| [`sample-android`](sample-android), [`sample-shared`](sample-shared) | Reference apps exercising the full CRUD/DSL/relation/transaction surface | N/A — dev-only, use local `project(":...")` references |
 | [`integration-tests/consumer-smoke`](integration-tests/consumer-smoke) | A standalone build (**not** in the root `settings.gradle.kts`) that resolves Kiln purely through the published plugin, the way a real user does | N/A — CI-only gate before a release publishes |
 
 `annotations` and `runtime` are the only modules whose Kotlin API a consumer
@@ -159,12 +158,11 @@ fixtures.
 - **iOS test binaries need `-lsqlite3` linked explicitly** (see `runtime/build.gradle.kts`).
   A real iOS app gets this for free via Xcode; our own Kotlin/Native test
   executable doesn't, and `native-driver`'s sqlite3 symbols fail to link without it.
-- **Samples must stay pinned to the last *published* plugin version**, not the
-  in-development one. Bumping `sample-android`/`sample-shared` to a version
-  that hasn't been published yet breaks CI at Gradle's configuration phase
-  (before any task even runs) for every job, since there's no `mavenLocal()` in
-  the root `pluginManagement` block. Bump the samples only after a release
-  actually lands on Maven Central.
+- **Samples live in [a separate repo](https://github.com/sufarook/kiln-samples)**
+  and consume Kiln from Maven Central. They can only demonstrate *published*
+  features, so bump their pinned version only after a release actually lands.
+  In-repo integration coverage comes from `integration-tests/consumer-smoke`,
+  which tests the current (unreleased) code via `publishToMavenLocal`.
 
 ## Commit and PR conventions
 

@@ -56,15 +56,6 @@ allprojects {
             }
         }
     }
-
-    // sample-shared adds its KSP-generated sources directory to commonMain via a
-    // custom Sync task (see KilnPlugin.configureMultiplatform) rather than KSP's
-    // own automatic wiring, so Gradle can't infer the ordering on its own — every
-    // ktlint check task needs to explicitly run after anything that could still be
-    // populating that directory.
-    tasks.matching { it.name.startsWith("ktlint") || it.name.startsWith("runKtlint") }.configureEach {
-        mustRunAfter(tasks.matching { it.name == "syncKilnGeneratedSources" })
-    }
 }
 
 /** Lets CI read the version without parsing this file. */
@@ -80,7 +71,7 @@ apiValidation {
     // `processor` is consumed only through KSP and `gradle-plugin` only through
     // the `plugins {}` DSL; neither is used as a library dependency, so a
     // signature change there isn't the kind of breakage this check catches.
-    ignoredProjects += listOf("processor", "gradle-plugin", "sample-android", "sample-shared")
+    ignoredProjects += listOf("processor", "gradle-plugin")
 
     klib {
         // Off by default upstream. Kiln's entities live in commonMain and its
