@@ -167,8 +167,14 @@ Nullable variants of all of the above. Skip a property with `@Ignore`.
 
 ## Samples
 
-- [`sample-android`](sample-android) — plain Android Todo app: reactive list via `observeAll()`, full CRUD UI
-- [`sample-shared`](sample-shared) — KMP module: entity + store in `commonMain`, builds an iOS framework
+Runnable samples live in their own repository, so they consume Kiln exactly the way
+you would — from Maven Central, with no `project(":")` references:
+
+**[github.com/sufarook/kiln-samples](https://github.com/sufarook/kiln-samples)**
+
+- **`compose-multiplatform`** — one `@Composable` and one set of generated repositories
+  shared by Android and iOS, built around a many-to-many junction table
+- **`android-views`** — the same library in a traditional XML / RecyclerView app
 
 ## Status
 
