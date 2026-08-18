@@ -403,3 +403,50 @@ class InferParentNameTest {
         assertEquals("Category", inferParentName("categoryId"))
     }
 }
+
+/**
+ * Where the generated `KilnSchema` object lands. Entities can live in different
+ * packages, so the object goes in the deepest package they all share.
+ */
+class CommonPackagePrefixTest {
+
+    private fun prefix(vararg packages: String) = SchemaGenerator.commonPackagePrefix(packages.toList())
+
+    @Test
+    fun singlePackageIsUsedAsIs() {
+        assertEquals("com.app.data", prefix("com.app.data"))
+    }
+
+    @Test
+    fun identicalPackagesCollapseToThatPackage() {
+        assertEquals("com.app.data", prefix("com.app.data", "com.app.data", "com.app.data"))
+    }
+
+    @Test
+    fun siblingPackagesShareTheirParent() {
+        assertEquals("com.app", prefix("com.app.data", "com.app.model"))
+    }
+
+    @Test
+    fun nestedPackageCollapsesToTheShallowerOne() {
+        assertEquals("com.app", prefix("com.app", "com.app.data.entities"))
+    }
+
+    @Test
+    fun partialSegmentMatchIsNotTreatedAsShared() {
+        // "com.apple" must not be considered a match for "com.app"
+        assertEquals("com", prefix("com.app", "com.apple"))
+    }
+
+    @Test
+    fun disjointRootsFallBackToFirstPackageAlphabetically() {
+        // No shared root — the default package isn't a usable location, so pick
+        // a deterministic real one instead.
+        assertEquals("com.a", prefix("org.b", "com.a"))
+    }
+
+    @Test
+    fun emptyInputYieldsEmptyPrefix() {
+        assertEquals("", SchemaGenerator.commonPackagePrefix(emptyList()))
+    }
+}

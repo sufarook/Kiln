@@ -9,12 +9,16 @@ class KilnProcessor(
 ) : SymbolProcessor {
 
     private val seenTableNames = mutableSetOf<String>()
+    private var schemaGenerated = false
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
         val symbols = resolver
             .getSymbolsWithAnnotation("io.github.sufarook.kiln.annotations.DbEntity")
             .filterIsInstance<KSClassDeclaration>()
             .toList()
+
+        val entities = mutableListOf<EntityMetadata>()
+        val sourceFiles = linkedSetOf<KSFile>()
 
         symbols.forEach { classDecl ->
             val metadata = EntityVisitor.extract(classDecl, logger) ?: return@forEach
@@ -29,6 +33,17 @@ class KilnProcessor(
             }
 
             RepositoryGenerator.generate(metadata, codeGenerator)
+            entities += metadata
+            classDecl.containingFile?.let { sourceFiles += it }
+        }
+
+        // @DbEntity classes are always hand-written, so they all resolve in the
+        // first round — later rounds only see Kiln's own generated files, which
+        // carry no annotations. Emitting the aggregate once here (rather than in
+        // finish()) keeps the file inside a normal processing round.
+        if (entities.isNotEmpty() && !schemaGenerated) {
+            SchemaGenerator.generate(entities, sourceFiles.toList(), codeGenerator)
+            schemaGenerated = true
         }
 
         return emptyList()

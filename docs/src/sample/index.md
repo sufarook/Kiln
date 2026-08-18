@@ -19,7 +19,7 @@ Project (1) ──── (N) Task (1) ──── (N) ChecklistItem
 | Page | Demonstrates |
 |------|-------------|
 | [Entity Definitions](entities.md) | Three `@DbEntity` classes with `@Column(index = true)` on FK columns |
-| [Initialization](initialization.md) | One driver, three repositories, `createTable()` at startup |
+| [Initialization](initialization.md) | One driver, three repositories, `KilnSchema.createAll()` at startup |
 | [CRUD Operations](crud.md) | `insert`, `update`, `delete`, `findById`, `findAll` |
 | [Reactive Queries](reactive.md) | `observeAll()` wired into `StateFlow` via `stateIn` |
 | [Cross-table Loading](cross-table.md) | Store class coordinating multiple repositories |
