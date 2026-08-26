@@ -85,6 +85,12 @@ Kiln generates `TaskRepository` at compile time with:
 | `observeBy<Parent>(id)` | Returns `Flow<List<T>>` filtered by FK parent |
 | `deleteBy<Parent>(id)` | `suspend` — deletes all rows belonging to a FK parent |
 
+Plus a module-level `KilnSchema` object covering every `@DbEntity` you defined:
+
+| Method | Description |
+|--------|-------------|
+| `KilnSchema.createAll(driver)` | Creates and auto-migrates **every** table in one call — adding an entity later needs no change to your startup code |
+
 ## Why Kiln
 
 | | Room | SQLDelight | Kiln |
@@ -99,7 +105,7 @@ Kiln generates `TaskRepository` at compile time with:
 
 ```kotlin
 // 1. Apply the plugin in build.gradle.kts
-//    id("io.github.sufarook.kiln") version "1.0.0-alpha04"
+//    id("io.github.sufarook.kiln") version "1.0.0-alpha05"
 
 // 2. Annotate a data class
 @DbEntity(tableName = "notes")

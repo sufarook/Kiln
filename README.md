@@ -57,7 +57,7 @@ One line with the Gradle plugin:
 ```kotlin
 plugins {
     kotlin("multiplatform")                        // or com.android.application + kotlin-android
-    id("io.github.sufarook.kiln") version "1.0.0-alpha04"
+    id("io.github.sufarook.kiln") version "1.0.0-alpha05"
 }
 ```
 
@@ -77,12 +77,12 @@ plugins {
 kotlin.sourceSets.commonMain {
     kotlin.srcDir(layout.buildDirectory.dir("generated/kiln/commonMain/kotlin"))
     dependencies {
-        api("io.github.sufarook.kiln:annotations:1.0.0-alpha04")
-        api("io.github.sufarook.kiln:runtime:1.0.0-alpha04")
+        api("io.github.sufarook.kiln:annotations:1.0.0-alpha05")
+        api("io.github.sufarook.kiln:runtime:1.0.0-alpha05")
     }
 }
 
-dependencies { add("kspCommonMainMetadata", "io.github.sufarook.kiln:processor:1.0.0-alpha04") }
+dependencies { add("kspCommonMainMetadata", "io.github.sufarook.kiln:processor:1.0.0-alpha05") }
 
 // KSP filters its own output dirs out of Android compilations — sync to a neutral dir
 val sync = tasks.register<Sync>("syncKilnGeneratedSources") {
@@ -111,6 +111,13 @@ val driver = AndroidDatabaseDriverFactory(context).create("app.db")
 
 // iOS
 val driver = IosDatabaseDriverFactory().create("app.db")
+```
+
+With more than one entity, skip the per-repository `createTable()` calls — Kiln
+generates a `KilnSchema` object covering every `@DbEntity` in the module:
+
+```kotlin
+KilnSchema.createAll(driver)   // adding an entity later doesn't change this line
 ```
 
 ## Automatic migrations — no version numbers
@@ -181,8 +188,8 @@ you would — from Maven Central, with no `project(":")` references:
 Alpha. CRUD + reactive queries + auto-migration + `@Relation` FK helpers (including on
 composite-key columns, for junction tables) + transactions (`withTransaction`,
 `insertAll`, `notifyOrDefer`) + pagination (`orderBy`/`limit`/`offset` on
-`findWhere`/`observeWhere`) + composite primary keys are fully implemented and tested
-against real SQLite.
+`findWhere`/`observeWhere`) + composite primary keys + one-call schema setup
+(`KilnSchema.createAll`) are fully implemented and tested against real SQLite.
 
 ## License
 
