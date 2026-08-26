@@ -1528,7 +1528,8 @@
 <p>If the IDE shows an unresolved reference on <code>NoteRepository</code>, run <strong>Build → Make Project</strong> once. The class is generated during compilation — the IDE resolves it after the first successful build.</p>
 </div>
 <h2 id="3-initialize">3. Initialize</h2>
-<p>Call <code>createTable()</code> once per repository at app startup. It is safe to call on every launch — it creates the table if it doesn't exist and auto-migrates the schema if the entity changed.</p>
+<p>Create the schema at app startup. It is safe to call on every launch — tables are created if missing, and the schema auto-migrates if the entity changed.</p>
+<p>With a single entity, <code>createTable()</code> on the repository is the shortest thing that works. Once you have several, use the generated <code>KilnSchema.createAll(driver)</code> instead — it covers every <code>@DbEntity</code> in the module, so adding one later doesn't mean editing your startup code.</p>
 <div class="language-kotlin highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">MyApp</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Application</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="kd">lateinit</span><span class="w"> </span><span class="kd">var</span><span class="w"> </span><span class="nv">noteRepo</span><span class="p">:</span><span class="w"> </span><span class="n">NoteRepository</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
