@@ -18,10 +18,33 @@ The generated class is concrete (not an interface). Inject the `SqlDriver` direc
 fun createTable()
 ```
 
-Creates the table if it does not already exist. Call once per repository during app startup, **before** any other method.
+Creates the table if it does not already exist. Call during app startup, **before** any other method on that repository.
 
 - Uses `CREATE TABLE IF NOT EXISTS` — safe to call more than once.
 - Delegates to `SchemaMigrator.sync()` — adds, renames, removes, or recreates columns when the entity changes. See [Auto-migration](../migration.md).
+
+To set up every table at once, prefer `KilnSchema.createAll(driver)` below.
+
+---
+
+## `KilnSchema.createAll(driver)`
+
+```kotlin
+object KilnSchema {
+    fun createAll(driver: SqlDriver)
+}
+```
+
+A module-level object generated alongside your repositories, covering **every** `@DbEntity` Kiln found. Calls `createTable()` on each one:
+
+```kotlin
+KilnSchema.createAll(driver)
+```
+
+- Add a new entity and this call does not change — the object is regenerated on the next build.
+- Generated into the deepest package your entities share. Entities in `com.example.data` and `com.example.model` put it in `com.example`.
+- Order is irrelevant: Kiln emits no `FOREIGN KEY` constraints, so no table needs to exist before another.
+- Per-repository `createTable()` still exists for cases where you want a table created conditionally or at a specific moment.
 
 ---
 

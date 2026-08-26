@@ -41,7 +41,9 @@ data class Note(
 
 ## 3. Initialize
 
-Call `createTable()` once per repository at app startup. It is safe to call on every launch — it creates the table if it doesn't exist and auto-migrates the schema if the entity changed.
+Create the schema at app startup. It is safe to call on every launch — tables are created if missing, and the schema auto-migrates if the entity changed.
+
+With a single entity, `createTable()` on the repository is the shortest thing that works. Once you have several, use the generated `KilnSchema.createAll(driver)` instead — it covers every `@DbEntity` in the module, so adding one later doesn't mean editing your startup code.
 
 ```kotlin
 class MyApp : Application() {

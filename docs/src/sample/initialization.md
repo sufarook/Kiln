@@ -4,6 +4,8 @@
 
 Create one `SqlDriver` and pass it to each repository. All repositories share the same driver — SQLite is a single-file database and a single `SqlDriver` instance manages the connection.
 
+Kiln generates a `KilnSchema` object covering every `@DbEntity` in the module, so one call creates the whole schema:
+
 ```kotlin title="TaskTrackerApp.kt"
 class TaskTrackerApp : Application() {
 
@@ -15,12 +17,25 @@ class TaskTrackerApp : Application() {
         super.onCreate()
         val driver = AndroidDatabaseDriverFactory(this).create("tasktracker.db")
 
-        projectRepo   = ProjectRepository(driver).also  { it.createTable() }
-        taskRepo      = TaskRepository(driver).also     { it.createTable() }
-        checklistRepo = ChecklistItemRepository(driver).also { it.createTable() }
+        // Creates and auto-migrates every table. Add a new @DbEntity later and
+        // this line does not change.
+        KilnSchema.createAll(driver)
+
+        projectRepo   = ProjectRepository(driver)
+        taskRepo      = TaskRepository(driver)
+        checklistRepo = ChecklistItemRepository(driver)
     }
 }
 ```
+
+`KilnSchema` is generated into the deepest package your entities share — if they all live in `com.example.data`, it is `com.example.data.KilnSchema`.
+
+??? note "Creating tables individually"
+    `createAll()` is a convenience, not a replacement. Every repository still has its own `createTable()`, which is what you want if a table should only exist in certain builds or you need to control exactly when a migration runs:
+
+    ```kotlin
+    projectRepo = ProjectRepository(driver).also { it.createTable() }
+    ```
 
 Register in `AndroidManifest.xml`:
 
@@ -30,17 +45,17 @@ Register in `AndroidManifest.xml`:
     ...>
 ```
 
-## About `createTable()`
+## What table creation actually does
 
-`createTable()` does two things every time it is called:
+`KilnSchema.createAll()` calls `createTable()` on each repository, and `createTable()` does two things every time it runs:
 
 1. Runs `CREATE TABLE IF NOT EXISTS` — safe to call repeatedly; no-op if the table exists.
 2. Runs `SchemaMigrator.sync()` — diffs the live schema against the generated column list and migrates if needed.
 
 Call it on every launch. It is fast when the schema hasn't changed (just a `PRAGMA table_info` read) and performs the necessary migration when it has.
 
-!!! warning "Call order matters for foreign key integrity"
-    Call `createTable()` on the parent table before the child table if you are enforcing foreign key relationships manually. In this sample: `projectRepo.createTable()` before `taskRepo.createTable()`.
+!!! note "Creation order does not matter"
+    Kiln does not emit `FOREIGN KEY` constraints, so SQLite has no notion that one of your tables references another — no table needs to exist before any other. `@Relation` generates query helpers (`findByProject`, `deleteByProject`, …), not database-level constraints. Referential integrity is handled in your own code; see [Cross-table Loading](cross-table.md).
 
 ## Access from Activities and ViewModels
 
