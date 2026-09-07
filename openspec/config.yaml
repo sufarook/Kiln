@@ -1,0 +1,66 @@
+schema: spec-driven
+
+context: |
+  Kiln — a Kotlin Multiplatform library that generates type-safe SQLite CRUD
+  repositories at compile time via KSP. Consumers annotate a data class
+  (@DbEntity/@PrimaryKey/@Column/@Relation/@Ignore) and get a full repository
+  with no hand-written SQL, no mappers, and no versioned migration files.
+
+  Published to Maven Central as io.github.sufarook.kiln (currently 1.0.0-alpha05).
+
+  Modules:
+    annotations/   The annotation set. Public API — consumers import these directly.
+    runtime/       CrudRepository, SchemaMigrator, query DSL, driver factories.
+                   Public API — consumers import these directly.
+    processor/     The KSP processor (KotlinPoet codegen). Consumed only through
+                   KSP, never as a library dependency.
+    gradle-plugin/ The io.github.sufarook.kiln plugin — one-line consumer setup.
+                   Consumed only through the plugins {} DSL.
+    integration-tests/consumer-smoke/
+                   A standalone Gradle build OUTSIDE the root settings.gradle.kts.
+                   Resolves Kiln from mavenLocal()/Maven Central exactly as a real
+                   consumer would. Gates every release.
+    docs/          Hand-authored MkDocs Material site (docs/src/). Not generated.
+
+  Targets: Android, iOS (iosArm64/iosSimulatorArm64/iosX64), JVM. Entities live in
+  commonMain; the processor runs once on common metadata so one generated
+  repository is shared by every target.
+
+  Conventions and constraints that shape almost every change:
+    - Every change to main goes through a PR. Branch protection is on with
+      enforce_admins=true and 7 required checks; nothing lands by direct push.
+    - Binary compatibility is validated (kotlinx-binary-compatibility-validator)
+      for annotations and runtime, including the iOS KLib ABI. A public API change
+      requires a deliberate apiDump and must be called out as breaking or additive.
+    - Kiln emits NO FOREIGN KEY constraints. @Relation generates typed helper
+      methods only. Never write docs or specs implying SQLite enforces referential
+      integrity or that table creation order matters.
+    - Migration is version-less: SchemaMigrator diffs the live schema (PRAGMA
+      table_info) against the entity and reconciles. There are no migration files
+      and no version numbers to bump, ever.
+    - Style is enforced by ktlint; coverage by Kover; API docs by Dokka.
+    - Runnable samples live in a SEPARATE repo (github.com/sufarook/kiln-samples),
+      not in this one.
+
+rules:
+  proposal:
+    - State explicitly whether the change is additive or breaking to the public
+      API of annotations/runtime, since binary compatibility is validated in CI.
+    - Note whether generated code output changes shape, since that affects every
+      downstream consumer on rebuild.
+  design:
+    - Prefer solving a problem in the processor (compile time) over the runtime
+      when both are possible — zero runtime reflection is a core project claim.
+  tasks:
+    - Include a task for updating the MkDocs site under docs/src/ whenever
+      consumer-facing behavior or public API changes.
+    - Include a consumer-smoke test task for any change to generated output, so
+      it is verified through the real KSP pipeline against published artifacts.
+    - Include ./gradlew apiDump as an explicit task when public API changes.
+
+operations:
+  apply:
+    guidance:
+      - "Verify with the project's real gate before claiming done: ./gradlew
+        :processor:test :runtime:jvmTest :gradle-plugin:test ktlintCheck apiCheck"
+      - Never push directly to main; open a PR.

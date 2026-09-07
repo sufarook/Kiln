@@ -30,3 +30,6 @@ xcuserdata/
 *.xcworkspace/xcuserdata/
 DerivedData/
 .swiftpm/
+
+# Claude Code local settings (per-developer permissions, not shared)
+.claude/settings.local.json
