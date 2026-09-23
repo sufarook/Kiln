@@ -171,9 +171,10 @@ fixtures.
   separate PRs
 - Fill in the PR template's test plan; "ran the tests" is less useful than
   naming which ones and what they'd have caught
-- CI must pass before merge (`processor-tests`, `runtime-tests`,
-  `runtime-ios-tests`, `gradle-plugin-tests`, `consumer-smoke`, `api-check`,
-  `android-integration`)
+- CI must pass before merge (`ktlint-check`, `processor-tests`, `runtime-tests`,
+  `runtime-ios-tests`, `gradle-plugin-tests`, `consumer-smoke`, `api-check`) —
+  all 7 are required status checks, and `main` is protected with
+  `enforce_admins`, so nothing lands by direct push
 
 ## Reporting bugs / requesting features
 
