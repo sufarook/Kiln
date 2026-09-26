@@ -1443,6 +1443,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#driverwithtransactionawarecontextcontext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        driver.withTransactionAwareContext(context) { }
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1844,6 +1855,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#driverwithtransactionawarecontextcontext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        driver.withTransactionAwareContext(context) { }
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1894,6 +1916,7 @@
 <ul>
 <li>Uses <code>CREATE TABLE IF NOT EXISTS</code> — safe to call more than once.</li>
 <li>Delegates to <code>SchemaMigrator.sync()</code> — adds, renames, removes, or recreates columns when the entity changes. See <a href="../../migration/">Auto-migration</a>.</li>
+<li>Throws <code>IllegalStateException</code> if called while a transaction is open on the driver, before changing anything — a migration can't be done safely inside one.</li>
 </ul>
 <p>To set up every table at once, prefer <code>KilnSchema.createAll(driver)</code> below.</p>
 <hr />
@@ -2045,9 +2068,11 @@
 </span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="w">    </span><span class="n">block</span><span class="p">:</span><span class="w"> </span><span class="n">suspend</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span>
 </span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="p">)</span>
 </span></code></pre></div>
-<p>Executes <code>block</code> inside a <code>BEGIN TRANSACTION … COMMIT</code>. On any exception the transaction is rolled back and the exception re-thrown.</p>
-<p>All Kiln repository write methods (<code>insert</code>, <code>update</code>, <code>delete</code>, <code>deleteWhere</code>, <code>insertAll</code>) defer their <code>Flow</code> listener notifications when called inside <code>withTransaction</code>. After a successful commit, each affected table is notified <strong>exactly once</strong> — reactive <code>Flow</code>s receive one emission for the whole transaction rather than one per operation.</p>
+<p>Executes <code>block</code> inside a single SQLite transaction, through SQLDelight's transaction API. On any exception the transaction is rolled back and the exception re-thrown.</p>
+<p>Blocks nest: a <code>withTransaction</code> inside another joins it, and only the outermost one commits. A block run while a transaction is already open through SQLDelight's API on the same driver — a SQLDelight-generated <code>Database.transaction { }</code>, for example — joins that transaction too. A transaction opened with raw <code>BEGIN</code> SQL is invisible to Kiln and can't be joined.</p>
+<p>All Kiln repository write methods (<code>insert</code>, <code>update</code>, <code>delete</code>, <code>deleteWhere</code>, <code>insertAll</code>) defer their <code>Flow</code> listener notifications while a transaction is open. After the outermost commit — whoever opened it — each affected table is notified <strong>exactly once</strong>: reactive <code>Flow</code>s receive one emission for the whole transaction rather than one per operation.</p>
 <p>No notifications are sent when a transaction is rolled back.</p>
+<p><strong>Threading.</strong> A transaction holds one thread of <code>context</code> until it completes. SQLite transactions belong to the thread that opened them, so the block — including after any suspension — runs on that thread, and repository calls inside it run there too, whatever dispatcher the repository was constructed with. For a transaction that waits on I/O, pass <code>Dispatchers.IO</code> so it doesn't occupy one of <code>Dispatchers.Default</code>'s few threads. Inside a transaction opened by other code, repository calls join it when made on that transaction's thread; moving a Kiln call to another dispatcher inside such a transaction isn't supported.</p>
 <div class="language-kotlin highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="c1">// Cascade delete — observers see one emission each, not four</span>
 </span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="n">driver</span><span class="p">.</span><span class="na">withTransaction</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="w">    </span><span class="n">taskRepo</span><span class="p">.</span><span class="na">deleteByProject</span><span class="p">(</span><span class="n">projectId</span><span class="p">)</span><span class="w">   </span><span class="c1">// deferred</span>
@@ -2063,16 +2088,23 @@
 <h3 id="drivernotifyordefertablename"><code>driver.notifyOrDefer(tableName)</code></h3>
 <div class="language-kotlin highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="n">SqlDriver</span><span class="p">.</span><span class="nf">notifyOrDefer</span><span class="p">(</span><span class="n">tableName</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span>
 </span></code></pre></div>
-<p>Called automatically by generated repository code. Outside a transaction it calls <code>SqlDriver.notifyListeners</code> immediately. Inside a <code>withTransaction</code> block it adds the table name to the transaction's dirty set, deferring the notification to after commit. Not intended for direct use.</p>
+<p>Called automatically by generated repository code. Outside a transaction it calls <code>SqlDriver.notifyListeners</code> immediately. Inside one it adds the table name to the open transaction's pending tables, deferring the notification to after the outermost commit. Not intended for direct use.</p>
+<h3 id="driverwithtransactionawarecontextcontext"><code>driver.withTransactionAwareContext(context) { }</code></h3>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">SqlDriver</span><span class="p">.</span><span class="nf">withTransactionAwareContext</span><span class="p">(</span>
+</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="w">    </span><span class="n">context</span><span class="p">:</span><span class="w"> </span><span class="n">CoroutineContext</span><span class="p">,</span>
+</span><span id="__span-33-3"><a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="w">    </span><span class="n">block</span><span class="p">:</span><span class="w"> </span><span class="n">suspend</span><span class="w"> </span><span class="n">CoroutineScope</span><span class="p">.()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">T</span>
+</span><span id="__span-33-4"><a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="p">):</span><span class="w"> </span><span class="n">T</span>
+</span></code></pre></div>
+<p>Called automatically by generated repository code in place of <code>withContext(context)</code>. Inside a transaction it runs <code>block</code> on the transaction's thread instead of switching to <code>context</code>; otherwise it behaves exactly like <code>withContext</code>. Not intended for direct use.</p>
 <hr />
 <h2 id="companion-entitycolumns">Companion: <code>&lt;Entity&gt;Columns</code></h2>
 <p>Each entity also generates a companion <code>&lt;Entity&gt;Columns</code> object used inside DSL lambdas:</p>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="kd">object</span><span class="w"> </span><span class="nc">ProductColumns</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">id</span><span class="p">:</span><span class="w"> </span><span class="n">Column</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span>
-</span><span id="__span-33-3"><a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">name</span><span class="p">:</span><span class="w"> </span><span class="n">Column</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span>
-</span><span id="__span-33-4"><a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">price</span><span class="p">:</span><span class="w"> </span><span class="n">Column</span><span class="o">&lt;</span><span class="kt">Double</span><span class="o">&gt;</span>
-</span><span id="__span-33-5"><a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">inStock</span><span class="p">:</span><span class="w"> </span><span class="n">Column</span><span class="o">&lt;</span><span class="kt">Boolean</span><span class="o">&gt;</span>
-</span><span id="__span-33-6"><a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a><span class="p">}</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="kd">object</span><span class="w"> </span><span class="nc">ProductColumns</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">id</span><span class="p">:</span><span class="w"> </span><span class="n">Column</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span>
+</span><span id="__span-34-3"><a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">name</span><span class="p">:</span><span class="w"> </span><span class="n">Column</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span>
+</span><span id="__span-34-4"><a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">price</span><span class="p">:</span><span class="w"> </span><span class="n">Column</span><span class="o">&lt;</span><span class="kt">Double</span><span class="o">&gt;</span>
+</span><span id="__span-34-5"><a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a><span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">inStock</span><span class="p">:</span><span class="w"> </span><span class="n">Column</span><span class="o">&lt;</span><span class="kt">Boolean</span><span class="o">&gt;</span>
+</span><span id="__span-34-6"><a id="__codelineno-34-6" name="__codelineno-34-6" href="#__codelineno-34-6"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Column names reflect the actual SQL column names (accounting for <code>@Column(name = …)</code> overrides). Use these inside <code>findWhere</code>, <code>observeWhere</code>, <code>deleteWhere</code>, and <code>count</code> lambdas.</p>
 

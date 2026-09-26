@@ -1511,8 +1511,8 @@
 <h2 id="what-table-creation-actually-does">What table creation actually does</h2>
 <p><code>KilnSchema.createAll()</code> calls <code>createTable()</code> on each repository, and <code>createTable()</code> does two things every time it runs:</p>
 <ol>
+<li>Runs <code>SchemaMigrator.sync()</code> — diffs the live schema against the generated column list and migrates if needed. No-op if the table doesn't exist yet.</li>
 <li>Runs <code>CREATE TABLE IF NOT EXISTS</code> — safe to call repeatedly; no-op if the table exists.</li>
-<li>Runs <code>SchemaMigrator.sync()</code> — diffs the live schema against the generated column list and migrates if needed.</li>
 </ol>
 <p>Call it on every launch. It is fast when the schema hasn't changed (just a <code>PRAGMA table_info</code> read) and performs the necessary migration when it has.</p>
 <div class="admonition note">

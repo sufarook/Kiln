@@ -1962,6 +1962,7 @@ Run this once before calling <code>createTable()</code>, then remove it.</p>
 <hr />
 <h3 id="can-kiln-work-alongside-raw-sql-or-room">Can Kiln work alongside raw SQL or Room?</h3>
 <p>Yes. Kiln uses the <code>SqlDriver</code> directly — it's the same driver you'd pass to SQLDelight. You can call raw SQL through <code>driver.execute(…)</code> at any point. Just be aware that raw writes won't trigger Kiln's <code>Query.Listener</code>, so reactive flows won't re-emit for those changes.</p>
+<p>Kiln's migrations are safe alongside tables it doesn't own, even when other code has turned on foreign-key enforcement (Room does). When an entity change forces Kiln to rebuild its table, it switches enforcement off for the rebuild and back to its previous setting afterwards — so rows in your own tables that reference the rebuilt one, including <code>ON DELETE CASCADE</code> references, are left untouched. Call <code>createTable()</code> / <code>KilnSchema.createAll()</code> outside any transaction: Kiln refuses to migrate inside one, because it can't change enforcement or control the commit there.</p>
 <hr />
 <h2 id="performance">Performance</h2>
 <h3 id="is-observeall-efficient-for-large-tables">Is <code>observeAll()</code> efficient for large tables?</h3>
@@ -1981,7 +1982,7 @@ Run this once before calling <code>createTable()</code>, then remove it.</p>
 </span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>If the block throws, the transaction rolls back and no <code>observeAll()</code> / <code>observeWhere()</code> flow re-emits for those writes. Generated repositories also expose <code>insertAll(items)</code>, which wraps a bulk insert in a single transaction for you.</p>
-<p>You can still drop down to raw <code>driver.execute(null, "BEGIN TRANSACTION", 0)</code> if you need finer control, but <code>withTransaction</code> is the recommended path — it handles rollback and the deferred notification correctly.</p>
+<p>Blocks nest — a <code>withTransaction</code> inside another joins it, and only the outermost one commits. Kiln also joins a transaction opened through SQLDelight's API on the same driver (a SQLDelight-generated <code>Database.transaction { }</code>, say), and notifies only once that commits. Don't open transactions with raw <code>driver.execute(null, "BEGIN TRANSACTION", 0)</code>: Kiln can't see a transaction opened that way, so it can't join it.</p>
 <hr />
 <h3 id="does-it-support-foreign-keys">Does it support foreign keys?</h3>
 <p>Two separate things, and the answer differs for each:</p>

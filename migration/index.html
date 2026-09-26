@@ -1584,6 +1584,7 @@
 <div class="admonition note">
 <p class="admonition-title">The slow path is transactional</p>
 <p>Table recreation runs inside a single <code>BEGIN TRANSACTION … COMMIT</code>. If any step fails, the transaction is rolled back and the original table is left unchanged.</p>
+<p>If other code has turned on foreign-key enforcement, Kiln switches it off for the recreation and restores it afterwards, so rows in other tables that reference this one are never deleted by the rebuild. Because of that, <code>createTable()</code> must be called outside any transaction — inside one, it throws before changing anything.</p>
 </div>
 <hr />
 <h2 id="adding-a-column">Adding a column</h2>
