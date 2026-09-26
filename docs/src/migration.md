@@ -23,6 +23,8 @@ Kiln migrates your SQLite schema automatically whenever `createTable()` is calle
 !!! note "The slow path is transactional"
     Table recreation runs inside a single `BEGIN TRANSACTION … COMMIT`. If any step fails, the transaction is rolled back and the original table is left unchanged.
 
+    If other code has turned on foreign-key enforcement, Kiln switches it off for the recreation and restores it afterwards, so rows in other tables that reference this one are never deleted by the rebuild. Because of that, `createTable()` must be called outside any transaction — inside one, it throws before changing anything.
+
 ---
 
 ## Adding a column

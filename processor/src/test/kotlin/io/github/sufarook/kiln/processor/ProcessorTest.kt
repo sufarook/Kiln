@@ -450,3 +450,37 @@ class CommonPackagePrefixTest {
         assertEquals("", SchemaGenerator.commonPackagePrefix(emptyList()))
     }
 }
+
+/** The generated repository source, inspected as text — end-to-end behaviour is covered by consumer-smoke. */
+class RepositoryGeneratorTest {
+
+    private fun column(name: String, isPrimaryKey: Boolean = false) = ColumnMetadata(
+        propertyName = name, columnName = name,
+        kotlinTypeName = STRING, sqliteType = "TEXT",
+        bindMethod = "bindString", cursorMethod = "getString",
+        isNullable = false, isUnique = false, hasIndex = false,
+        isPrimaryKey = isPrimaryKey, autoGenerate = false
+    )
+
+    private fun generated(): String = RepositoryGenerator
+        .buildFile(EntityMetadata("com.test", "Note", "notes", listOf(column("id", isPrimaryKey = true)), listOf(column("body"))))
+        .toString()
+
+    @Test
+    fun repositoryMethodsRunThroughTheTransactionAwareContext() {
+        val source = generated()
+        assertTrue(source.contains("driver.withTransactionAwareContext(context)"))
+        // A bare withContext(context) would dispatch off a transaction's thread.
+        assertFalse(source.contains("withContext(context)"))
+    }
+
+    @Test
+    fun createTableReconcilesBeforeCreating() {
+        val body = generated().substringAfter("fun createTable()")
+        val sync = body.indexOf("SchemaMigrator(driver).sync(")
+        val create = body.indexOf("NoteTable.CREATE_TABLE")
+        assertTrue("sync must be generated", sync >= 0)
+        assertTrue("CREATE TABLE must be generated", create >= 0)
+        assertTrue("sync must run before CREATE TABLE, so its refusals precede any schema statement", sync < create)
+    }
+}

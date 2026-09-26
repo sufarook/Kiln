@@ -14,7 +14,7 @@ object RepositoryGenerator {
     private val COROUTINE_CONTEXT = ClassName("kotlin.coroutines", "CoroutineContext")
     private val DISPATCHERS = ClassName("kotlinx.coroutines", "Dispatchers")
     private val FLOW = ClassName("kotlinx.coroutines.flow", "Flow")
-    private val WITH_CONTEXT = MemberName("kotlinx.coroutines", "withContext")
+    private val WITH_TX_AWARE_CONTEXT = MemberName("io.github.sufarook.kiln.runtime", "withTransactionAwareContext", isExtension = true)
     private val OBSERVE_QUERY = MemberName("io.github.sufarook.kiln.runtime", "observeQuery")
     private val COLUMN = ClassName("io.github.sufarook.kiln.runtime", "Column")
     private val SQL_ARG = ClassName("io.github.sufarook.kiln.runtime", "SqlArg")
@@ -27,6 +27,17 @@ object RepositoryGenerator {
     private val WITH_TX = MemberName("io.github.sufarook.kiln.runtime", "withTransaction", isExtension = true)
 
     fun generate(meta: EntityMetadata, codeGenerator: CodeGenerator) {
+        val file = buildFile(meta)
+        val output = codeGenerator.createNewFile(
+            dependencies = Dependencies(aggregating = true),
+            packageName = meta.packageName,
+            fileName = file.name
+        )
+        output.writer().use { file.writeTo(it) }
+    }
+
+    /** The generated `<Entity>Repository.kt` — separate from [generate] so tests can inspect it without KSP. */
+    internal fun buildFile(meta: EntityMetadata): FileSpec {
         val entityClass = ClassName(meta.packageName, meta.entityClassName)
         val repoClassName = "${meta.entityClassName}Repository"
         val tableObjectName = "${meta.entityClassName}Table"
@@ -40,14 +51,7 @@ object RepositoryGenerator {
         }
 
         fileBuilder.addType(buildRepository(meta, entityClass, repoClassName, tableObjectName))
-
-        val output = codeGenerator.createNewFile(
-            dependencies = Dependencies(aggregating = true),
-            packageName = meta.packageName,
-            fileName = repoClassName
-        )
-        val file = fileBuilder.build()
-        output.writer().use { file.writeTo(it) }
+        return fileBuilder.build()
     }
 
     /**
@@ -221,7 +225,7 @@ object RepositoryGenerator {
             .addParameter(offsetParam())
             .addParameter("block", predicateBlockType(meta))
             .returns(listType)
-            .addStatement("return %M(context) { queryWhere(%T.block(), orderBy, limit, offset) }", WITH_CONTEXT, columnsClass(meta))
+            .addStatement("return driver.%M(context) { queryWhere(%T.block(), orderBy, limit, offset) }", WITH_TX_AWARE_CONTEXT, columnsClass(meta))
             .build()
     }
 
@@ -251,7 +255,7 @@ object RepositoryGenerator {
             .addParameter("block", predicateBlockType(meta))
             .addCode(
                 CodeBlock.builder()
-                    .add("%M(context) {\n", WITH_CONTEXT)
+                    .add("driver.%M(context) {\n", WITH_TX_AWARE_CONTEXT)
                     .indent()
                     .addStatement("val predicate = %T.block()", columnsClass(meta))
                     .addStatement("driver.execute(null, %S + predicate.sql, predicate.args.size) {", sql)
@@ -274,7 +278,7 @@ object RepositoryGenerator {
             .returns(Long::class)
             .addCode(
                 CodeBlock.builder()
-                    .add("return %M(context) {\n", WITH_CONTEXT)
+                    .add("return driver.%M(context) {\n", WITH_TX_AWARE_CONTEXT)
                     .indent()
                     .addStatement("driver.executeQuery(null, %S, { cursor ->", sql)
                     .indent()
@@ -298,7 +302,7 @@ object RepositoryGenerator {
             .returns(Long::class)
             .addCode(
                 CodeBlock.builder()
-                    .add("return %M(context) {\n", WITH_CONTEXT)
+                    .add("return driver.%M(context) {\n", WITH_TX_AWARE_CONTEXT)
                     .indent()
                     .addStatement("val predicate = %T.block()", columnsClass(meta))
                     .addStatement("driver.executeQuery(null, %S + predicate.sql, { cursor ->", baseSql)
@@ -347,9 +351,9 @@ object RepositoryGenerator {
 
     private fun buildCreateTable(tableObjectName: String, meta: EntityMetadata): FunSpec {
         val cb = CodeBlock.builder()
-            // First install: create the table
-            .addStatement("driver.execute(null, %N.CREATE_TABLE, 0)", tableObjectName)
-            // Upgrades: diff live schema against the data class and migrate
+            // Upgrades first: diff live schema against the data class and migrate. It
+            // is a no-op for an absent table, and any refusal (open transaction, a view
+            // by this name) then comes before a single schema statement has run.
             .add("%T(driver).sync(\n", SCHEMA_MIGRATOR)
             .indent()
             .addStatement("%S,", meta.tableName)
@@ -375,6 +379,8 @@ object RepositoryGenerator {
             .add(")\n")
             .unindent()
             .add(")\n")
+            // First install: create the table
+            .addStatement("driver.execute(null, %N.CREATE_TABLE, 0)", tableObjectName)
 
         // Indexes last — recreated automatically if the migrator rebuilt the table
         SqlStatementBuilder.createIndexes(meta).forEach { indexSql ->
@@ -391,7 +397,7 @@ object RepositoryGenerator {
         val insertCols = if (!meta.isCompositeKey && meta.primaryKeys.single().autoGenerate) meta.columns else meta.allColumns
 
         val body = CodeBlock.builder()
-            .add("%M(context) {\n", WITH_CONTEXT)
+            .add("driver.%M(context) {\n", WITH_TX_AWARE_CONTEXT)
             .indent()
             .addStatement("driver.execute(null, %S, %L) {", sql, insertCols.size)
             .indent()
@@ -423,7 +429,7 @@ object RepositoryGenerator {
         val paramCount = meta.columns.size + meta.primaryKeys.size
 
         val body = CodeBlock.builder()
-            .add("%M(context) {\n", WITH_CONTEXT)
+            .add("driver.%M(context) {\n", WITH_TX_AWARE_CONTEXT)
             .indent()
             .addStatement("driver.execute(null, %S, %L) {", sql, paramCount)
             .indent()
@@ -453,7 +459,7 @@ object RepositoryGenerator {
             .addParameter("id", idTypeName(meta))
             .addCode(
                 CodeBlock.builder()
-                    .add("%M(context) {\n", WITH_CONTEXT)
+                    .add("driver.%M(context) {\n", WITH_TX_AWARE_CONTEXT)
                     .indent()
                     .addStatement("driver.execute(null, %S, %L) {", sql, meta.primaryKeys.size)
                     .indent()
@@ -476,7 +482,7 @@ object RepositoryGenerator {
         .addModifiers(KModifier.OVERRIDE, KModifier.SUSPEND)
         .addParameter("id", idTypeName(meta))
         .returns(entityClass.copy(nullable = true))
-        .addStatement("return %M(context) { queryById(id) }", WITH_CONTEXT)
+        .addStatement("return driver.%M(context) { queryById(id) }", WITH_TX_AWARE_CONTEXT)
         .build()
 
     private fun buildFindAll(meta: EntityMetadata, entityClass: ClassName): FunSpec {
@@ -484,7 +490,7 @@ object RepositoryGenerator {
         return FunSpec.builder("findAll")
             .addModifiers(KModifier.OVERRIDE, KModifier.SUSPEND)
             .returns(listType)
-            .addStatement("return %M(context) { queryAll() }", WITH_CONTEXT)
+            .addStatement("return driver.%M(context) { queryAll() }", WITH_TX_AWARE_CONTEXT)
             .build()
     }
 
