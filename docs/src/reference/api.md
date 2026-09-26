@@ -22,6 +22,7 @@ Creates the table if it does not already exist. Call during app startup, **befor
 
 - Uses `CREATE TABLE IF NOT EXISTS` — safe to call more than once.
 - Delegates to `SchemaMigrator.sync()` — adds, renames, removes, or recreates columns when the entity changes. See [Auto-migration](../migration.md).
+- Throws `IllegalStateException` if called while a transaction is open on the driver, before changing anything — a migration can't be done safely inside one.
 
 To set up every table at once, prefer `KilnSchema.createAll(driver)` below.
 
@@ -287,11 +288,15 @@ suspend fun SqlDriver.withTransaction(
 )
 ```
 
-Executes `block` inside a `BEGIN TRANSACTION … COMMIT`. On any exception the transaction is rolled back and the exception re-thrown.
+Executes `block` inside a single SQLite transaction, through SQLDelight's transaction API. On any exception the transaction is rolled back and the exception re-thrown.
 
-All Kiln repository write methods (`insert`, `update`, `delete`, `deleteWhere`, `insertAll`) defer their `Flow` listener notifications when called inside `withTransaction`. After a successful commit, each affected table is notified **exactly once** — reactive `Flow`s receive one emission for the whole transaction rather than one per operation.
+Blocks nest: a `withTransaction` inside another joins it, and only the outermost one commits. A block run while a transaction is already open through SQLDelight's API on the same driver — a SQLDelight-generated `Database.transaction { }`, for example — joins that transaction too. A transaction opened with raw `BEGIN` SQL is invisible to Kiln and can't be joined.
+
+All Kiln repository write methods (`insert`, `update`, `delete`, `deleteWhere`, `insertAll`) defer their `Flow` listener notifications while a transaction is open. After the outermost commit — whoever opened it — each affected table is notified **exactly once**: reactive `Flow`s receive one emission for the whole transaction rather than one per operation.
 
 No notifications are sent when a transaction is rolled back.
+
+**Threading.** A transaction holds one thread of `context` until it completes. SQLite transactions belong to the thread that opened them, so the block — including after any suspension — runs on that thread, and repository calls inside it run there too, whatever dispatcher the repository was constructed with. For a transaction that waits on I/O, pass `Dispatchers.IO` so it doesn't occupy one of `Dispatchers.Default`'s few threads. Inside a transaction opened by other code, repository calls join it when made on that transaction's thread; moving a Kiln call to another dispatcher inside such a transaction isn't supported.
 
 ```kotlin
 // Cascade delete — observers see one emission each, not four
@@ -313,7 +318,18 @@ driver.withTransaction {
 suspend fun SqlDriver.notifyOrDefer(tableName: String)
 ```
 
-Called automatically by generated repository code. Outside a transaction it calls `SqlDriver.notifyListeners` immediately. Inside a `withTransaction` block it adds the table name to the transaction's dirty set, deferring the notification to after commit. Not intended for direct use.
+Called automatically by generated repository code. Outside a transaction it calls `SqlDriver.notifyListeners` immediately. Inside one it adds the table name to the open transaction's pending tables, deferring the notification to after the outermost commit. Not intended for direct use.
+
+### `driver.withTransactionAwareContext(context) { }`
+
+```kotlin
+suspend fun <T> SqlDriver.withTransactionAwareContext(
+    context: CoroutineContext,
+    block: suspend CoroutineScope.() -> T
+): T
+```
+
+Called automatically by generated repository code in place of `withContext(context)`. Inside a transaction it runs `block` on the transaction's thread instead of switching to `context`; otherwise it behaves exactly like `withContext`. Not intended for direct use.
 
 ---
 

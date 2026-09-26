@@ -1,5 +1,6 @@
 package io.github.sufarook.kiln.runtime
 
+import app.cash.sqldelight.TransacterImpl
 import app.cash.sqldelight.db.QueryResult
 import app.cash.sqldelight.db.SqlDriver
 
@@ -15,12 +16,32 @@ import app.cash.sqldelight.db.SqlDriver
  *  - Type changed        → slow path; old data CAST into the new declared type
  *
  * Removed columns are always cleaned up — they never linger as orphans.
+ *
+ * The connection is borrowed, so reconciliation leaves it as it found it: a
+ * rebuild never deletes rows in tables that reference this one, and
+ * foreign-key enforcement ends up however it started.
  */
 class SchemaMigrator(private val driver: SqlDriver) {
 
     fun sync(tableName: String, expectedColumns: List<ColumnDef>) {
+        // Inside a transaction Kiln can neither switch off foreign-key enforcement
+        // (the pragma is a no-op there) nor own the rebuild's commit — refuse
+        // before touching anything.
+        check(driver.currentTransaction() == null) {
+            "Cannot reconcile table \"$tableName\" while a transaction is open on this connection. " +
+                "Call createTable() / KilnSchema.createAll() outside any transaction."
+        }
+
+        when (val type = schemaObjectType(tableName)) {
+            null -> return // absent — createTable() creates it next
+            "table" -> {}
+            else -> error(
+                "Cannot reconcile \"$tableName\": the database has a $type by that name, not a table. " +
+                    "Rename the $type or the entity's table."
+            )
+        }
+
         val existing = pragmaColumns(tableName) // name → declared type
-        if (existing.isEmpty()) return // table was just created — nothing to migrate
 
         val existingNames = existing.keys
         val expectedNames = expectedColumns.map { it.name }.toSet()
@@ -78,21 +99,38 @@ class SchemaMigrator(private val driver: SqlDriver) {
             }
         }
 
-        driver.execute(null, "DROP TABLE IF EXISTS \"$tmpName\"", 0)
-        driver.execute(null, "BEGIN TRANSACTION", 0)
+        // Under enforcement, DROP TABLE deletes every row first — firing ON DELETE
+        // CASCADE in tables that reference this one. SQLite's documented rebuild
+        // procedure switches enforcement off around it; the pragma is ignored inside
+        // a transaction, so it brackets the transaction rather than sitting in it.
+        val enforcing = foreignKeysEnabled()
+        if (enforcing) driver.execute(null, "PRAGMA foreign_keys = OFF", 0)
+        var failure: Throwable? = null
         try {
-            driver.execute(null, buildSchemaSql(tmpName, expectedColumns), 0)
-            driver.execute(
-                null,
-                "INSERT INTO \"$tmpName\" ($insertCols) SELECT $selectCols FROM \"$tableName\"",
-                0
-            )
-            driver.execute(null, "DROP TABLE \"$tableName\"", 0)
-            driver.execute(null, "ALTER TABLE \"$tmpName\" RENAME TO \"$tableName\"", 0)
-            driver.execute(null, "COMMIT", 0)
-        } catch (e: Exception) {
-            driver.execute(null, "ROLLBACK", 0)
+            RebuildTransacter(driver).transaction(noEnclosing = true) {
+                driver.execute(null, "DROP TABLE IF EXISTS \"$tmpName\"", 0)
+                driver.execute(null, buildSchemaSql(tmpName, expectedColumns), 0)
+                driver.execute(
+                    null,
+                    "INSERT INTO \"$tmpName\" ($insertCols) SELECT $selectCols FROM \"$tableName\"",
+                    0
+                )
+                driver.execute(null, "DROP TABLE \"$tableName\"", 0)
+                driver.execute(null, "ALTER TABLE \"$tmpName\" RENAME TO \"$tableName\"", 0)
+            }
+        } catch (e: Throwable) {
+            failure = e
             throw e
+        } finally {
+            if (enforcing) {
+                try {
+                    driver.execute(null, "PRAGMA foreign_keys = ON", 0)
+                } catch (restoreFailure: Throwable) {
+                    // Don't let the restore mask why the rebuild failed.
+                    val original = failure
+                    if (original != null) original.addSuppressed(restoreFailure) else throw restoreFailure
+                }
+            }
         }
     }
 
@@ -139,6 +177,24 @@ class SchemaMigrator(private val driver: SqlDriver) {
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────────
+
+    private class RebuildTransacter(driver: SqlDriver) : TransacterImpl(driver)
+
+    /** `"table"`, `"view"`, … for whatever [name] resolves to, or null if nothing does. */
+    private fun schemaObjectType(name: String): String? = driver.executeQuery(
+        identifier = null,
+        // Identifiers are case-insensitive in SQLite; PRAGMA table_info matches the same way.
+        sql = "SELECT type FROM sqlite_master WHERE name = ? COLLATE NOCASE",
+        mapper = { cursor -> QueryResult.Value(if (cursor.next().value) cursor.getString(0) else null) },
+        parameters = 1
+    ) { bindString(0, name) }.value
+
+    private fun foreignKeysEnabled(): Boolean = driver.executeQuery(
+        identifier = null,
+        sql = "PRAGMA foreign_keys",
+        mapper = { cursor -> QueryResult.Value(cursor.next().value && cursor.getLong(0) == 1L) },
+        parameters = 0
+    ).value
 
     /** Live schema as name → declared type (e.g. "title" → "TEXT"). */
     private fun pragmaColumns(tableName: String): Map<String, String> = driver.executeQuery(

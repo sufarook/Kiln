@@ -1,12 +1,16 @@
 package io.github.sufarook.kiln.runtime
 
+import app.cash.sqldelight.TransacterImpl
 import app.cash.sqldelight.db.QueryResult
 import app.cash.sqldelight.db.SqlDriver
+import app.cash.sqldelight.db.SqlPreparedStatement
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
+import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
@@ -261,6 +265,89 @@ class SchemaMigratorTest {
         }
     }
 
+    // ── Borrowed connection ───────────────────────────────────────────────────────
+
+    /** priority → urgency: a rename, which forces the rebuild path. */
+    private val renamed = listOf(v1Columns[0], v1Columns[1], ColumnDef("urgency", "INTEGER", false, "0", migrateFrom = "priority"))
+
+    /** Fails the rebuild at its last step, after the original table has been dropped. */
+    private fun failingAtRename() = SchemaMigrator(FailingDriver(driver) { sql -> "RENAME TO" in sql })
+
+    @Test
+    fun `failed rebuild leaves the original table and rows`() {
+        val error = assertFailsWith<IllegalStateException> { failingAtRename().sync("todos", renamed) }
+
+        assertTrue("injected failure" in error.message!!, "the rebuild's own error must propagate")
+        assertEquals(listOf("id", "title", "priority"), columnNames("todos"))
+        assertEquals(2, count("todos"))
+        assertEquals("Buy milk", queryString("""SELECT "title" FROM "todos" WHERE "priority" = 1"""))
+        assertEquals(0, queryLong("""SELECT COUNT(*) FROM sqlite_master WHERE name = '__todos_new'""").toInt())
+    }
+
+    @Test
+    fun `rebuild keeps rows in a table referencing it with ON DELETE CASCADE`() {
+        exec("PRAGMA foreign_keys = ON")
+        exec("""CREATE TABLE "comments" ("id" INTEGER PRIMARY KEY, "todo_id" INTEGER NOT NULL REFERENCES "todos"("id") ON DELETE CASCADE)""")
+        exec("""INSERT INTO "comments" ("todo_id") VALUES (1), (1), (2)""")
+
+        migrator.sync("todos", renamed)
+
+        assertEquals(listOf("id", "title", "urgency"), columnNames("todos"))
+        assertEquals(3, count("comments"), "a rebuild must not cascade-delete rows it does not own")
+    }
+
+    @Test
+    fun `enforcement that was on is on again after a rebuild`() {
+        exec("PRAGMA foreign_keys = ON")
+        migrator.sync("todos", renamed)
+        assertTrue(foreignKeysEnabled())
+    }
+
+    @Test
+    fun `enforcement that was off stays off after a rebuild`() {
+        exec("PRAGMA foreign_keys = OFF")
+        migrator.sync("todos", renamed)
+        assertFalse(foreignKeysEnabled())
+    }
+
+    @Test
+    fun `enforcement that was on is on again when the rebuild fails`() {
+        exec("PRAGMA foreign_keys = ON")
+        assertFails { failingAtRename().sync("todos", renamed) }
+        assertTrue(foreignKeysEnabled())
+    }
+
+    @Test
+    fun `enforcement that was off stays off when the rebuild fails`() {
+        exec("PRAGMA foreign_keys = OFF")
+        assertFails { failingAtRename().sync("todos", renamed) }
+        assertFalse(foreignKeysEnabled())
+    }
+
+    @Test
+    fun `refuses to reconcile inside an open transaction and runs nothing`() {
+        val recording = RecordingDriver(driver)
+        OtherCodesTransacter(recording).transaction {
+            recording.executed.clear()
+            val error = assertFailsWith<IllegalStateException> { SchemaMigrator(recording).sync("todos", renamed) }
+            assertTrue("transaction is open" in error.message!!, error.message)
+            assertEquals(emptyList(), recording.executed, "no statement may run before the refusal")
+        }
+        assertEquals(listOf("id", "title", "priority"), columnNames("todos"))
+    }
+
+    @Test
+    fun `refuses to reconcile a view that has the entity's table name`() {
+        exec("""CREATE VIEW "todo_titles" AS SELECT "id", "title" FROM "todos"""")
+
+        val error = assertFailsWith<IllegalStateException> { migrator.sync("todo_titles", v1Columns) }
+
+        assertTrue("\"todo_titles\"" in error.message!! && "view" in error.message!!, error.message)
+        assertEquals("view", queryString("""SELECT type FROM sqlite_master WHERE name = 'todo_titles'"""))
+        assertEquals(listOf("id", "title"), columnNames("todo_titles"))
+        assertEquals(2, count("todo_titles"))
+    }
+
     // ── Helpers ─────────────────────────────────────────────────────────────────
 
     private fun exec(sql: String) = driver.execute(null, sql, 0)
@@ -289,6 +376,8 @@ class SchemaMigratorTest {
         0
     ).value
 
+    private fun foreignKeysEnabled(): Boolean = queryLong("PRAGMA foreign_keys") == 1L
+
     private fun count(table: String): Int = queryLong("""SELECT COUNT(*) FROM "$table"""").toInt()
 
     private fun queryLong(sql: String): Long = driver.executeQuery(null, sql, { c ->
@@ -311,4 +400,35 @@ class SchemaMigratorTest {
         c.next()
         QueryResult.Value(c.getString(0)!!)
     }, 0).value
+}
+
+/** Stands in for other code sharing the driver, opening its own transaction. */
+private class OtherCodesTransacter(driver: SqlDriver) : TransacterImpl(driver)
+
+/** Throws instead of running the first statement matching [failOn]. */
+private class FailingDriver(private val delegate: SqlDriver, private val failOn: (String) -> Boolean) : SqlDriver by delegate {
+    override fun execute(
+        identifier: Int?,
+        sql: String,
+        parameters: Int,
+        binders: (SqlPreparedStatement.() -> Unit)?
+    ): QueryResult<Long> {
+        if (failOn(sql)) throw IllegalStateException("injected failure: $sql")
+        return delegate.execute(identifier, sql, parameters, binders)
+    }
+}
+
+/** Records every statement run through [execute] — schema changes all go through it. */
+private class RecordingDriver(private val delegate: SqlDriver) : SqlDriver by delegate {
+    val executed = mutableListOf<String>()
+
+    override fun execute(
+        identifier: Int?,
+        sql: String,
+        parameters: Int,
+        binders: (SqlPreparedStatement.() -> Unit)?
+    ): QueryResult<Long> {
+        executed += sql
+        return delegate.execute(identifier, sql, parameters, binders)
+    }
 }

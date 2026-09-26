@@ -129,15 +129,6 @@ final class io.github.sufarook.kiln.runtime/IosDatabaseDriverFactory { // io.git
     final fun create(kotlin/String): app.cash.sqldelight.db/SqlDriver // io.github.sufarook.kiln.runtime/IosDatabaseDriverFactory.create|create(kotlin.String){}[0]
 }
 
-final class io.github.sufarook.kiln.runtime/KilnTransactionContext : kotlin.coroutines/CoroutineContext.Element { // io.github.sufarook.kiln.runtime/KilnTransactionContext|null[0]
-    constructor <init>(kotlin.collections/MutableSet<kotlin/String> = ...) // io.github.sufarook.kiln.runtime/KilnTransactionContext.<init>|<init>(kotlin.collections.MutableSet<kotlin.String>){}[0]
-
-    final val key // io.github.sufarook.kiln.runtime/KilnTransactionContext.key|{}key[0]
-        final fun <get-key>(): kotlin.coroutines/CoroutineContext.Key<*> // io.github.sufarook.kiln.runtime/KilnTransactionContext.key.<get-key>|<get-key>(){}[0]
-
-    final object Key : kotlin.coroutines/CoroutineContext.Key<io.github.sufarook.kiln.runtime/KilnTransactionContext> // io.github.sufarook.kiln.runtime/KilnTransactionContext.Key|null[0]
-}
-
 final class io.github.sufarook.kiln.runtime/OrderSpec { // io.github.sufarook.kiln.runtime/OrderSpec|null[0]
     constructor <init>(kotlin/String, io.github.sufarook.kiln.runtime/Order) // io.github.sufarook.kiln.runtime/OrderSpec.<init>|<init>(kotlin.String;io.github.sufarook.kiln.runtime.Order){}[0]
 
@@ -190,3 +181,4 @@ final fun io.github.sufarook.kiln.runtime/buildOrderSuffix(kotlin.collections/Li
 final fun io.github.sufarook.kiln.runtime/not(io.github.sufarook.kiln.runtime/Predicate): io.github.sufarook.kiln.runtime/Predicate // io.github.sufarook.kiln.runtime/not|not(io.github.sufarook.kiln.runtime.Predicate){}[0]
 final suspend fun (app.cash.sqldelight.db/SqlDriver).io.github.sufarook.kiln.runtime/notifyOrDefer(kotlin/String) // io.github.sufarook.kiln.runtime/notifyOrDefer|notifyOrDefer@app.cash.sqldelight.db.SqlDriver(kotlin.String){}[0]
 final suspend fun (app.cash.sqldelight.db/SqlDriver).io.github.sufarook.kiln.runtime/withTransaction(kotlin.coroutines/CoroutineContext = ..., kotlin.coroutines/SuspendFunction0<kotlin/Unit>) // io.github.sufarook.kiln.runtime/withTransaction|withTransaction@app.cash.sqldelight.db.SqlDriver(kotlin.coroutines.CoroutineContext;kotlin.coroutines.SuspendFunction0<kotlin.Unit>){}[0]
+final suspend fun <#A: kotlin/Any?> (app.cash.sqldelight.db/SqlDriver).io.github.sufarook.kiln.runtime/withTransactionAwareContext(kotlin.coroutines/CoroutineContext, kotlin.coroutines/SuspendFunction1<kotlinx.coroutines/CoroutineScope, #A>): #A // io.github.sufarook.kiln.runtime/withTransactionAwareContext|withTransactionAwareContext@app.cash.sqldelight.db.SqlDriver(kotlin.coroutines.CoroutineContext;kotlin.coroutines.SuspendFunction1<kotlinx.coroutines.CoroutineScope,0:0>){0§<kotlin.Any?>}[0]

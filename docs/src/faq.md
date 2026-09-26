@@ -146,6 +146,8 @@ Yes. Point the driver at your existing database file and call `createTable()`. T
 
 Yes. Kiln uses the `SqlDriver` directly — it's the same driver you'd pass to SQLDelight. You can call raw SQL through `driver.execute(…)` at any point. Just be aware that raw writes won't trigger Kiln's `Query.Listener`, so reactive flows won't re-emit for those changes.
 
+Kiln's migrations are safe alongside tables it doesn't own, even when other code has turned on foreign-key enforcement (Room does). When an entity change forces Kiln to rebuild its table, it switches enforcement off for the rebuild and back to its previous setting afterwards — so rows in your own tables that reference the rebuilt one, including `ON DELETE CASCADE` references, are left untouched. Call `createTable()` / `KilnSchema.createAll()` outside any transaction: Kiln refuses to migrate inside one, because it can't change enforcement or control the commit there.
+
 ---
 
 ## Performance
@@ -179,7 +181,7 @@ driver.withTransaction {
 
 If the block throws, the transaction rolls back and no `observeAll()` / `observeWhere()` flow re-emits for those writes. Generated repositories also expose `insertAll(items)`, which wraps a bulk insert in a single transaction for you.
 
-You can still drop down to raw `driver.execute(null, "BEGIN TRANSACTION", 0)` if you need finer control, but `withTransaction` is the recommended path — it handles rollback and the deferred notification correctly.
+Blocks nest — a `withTransaction` inside another joins it, and only the outermost one commits. Kiln also joins a transaction opened through SQLDelight's API on the same driver (a SQLDelight-generated `Database.transaction { }`, say), and notifies only once that commits. Don't open transactions with raw `driver.execute(null, "BEGIN TRANSACTION", 0)`: Kiln can't see a transaction opened that way, so it can't join it.
 
 ---
 

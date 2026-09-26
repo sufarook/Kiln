@@ -21,6 +21,23 @@ starting a second one.
 - **THEN** no write from any level of the nesting is committed, and the original
   exception is propagated to the caller
 
+### Requirement: A transaction stays on one thread
+A transaction's work SHALL run on the thread that opened it for the transaction's
+whole lifetime, so that suspending inside a transaction block cannot leave the
+transaction unfinished on the connection.
+
+#### Scenario: The block suspends and resumes
+- **WHEN** a transaction block suspends before completing — for example by
+  switching to another dispatcher and returning
+- **THEN** the transaction commits exactly once, and no transaction remains open
+  on the connection afterwards
+
+#### Scenario: A repository with a different dispatcher writes inside a transaction
+- **WHEN** a repository constructed with a dispatcher different from the
+  transaction's writes inside a transaction block
+- **THEN** its writes are part of that transaction: they commit with it, and are
+  discarded if it rolls back
+
 ### Requirement: Kiln joins a transaction opened by other code
 The connection may be shared with code that manages its own transactions. When a
 transaction is already open on the connection, Kiln writes SHALL participate in

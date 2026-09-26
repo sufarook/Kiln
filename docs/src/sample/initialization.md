@@ -49,8 +49,8 @@ Register in `AndroidManifest.xml`:
 
 `KilnSchema.createAll()` calls `createTable()` on each repository, and `createTable()` does two things every time it runs:
 
-1. Runs `CREATE TABLE IF NOT EXISTS` — safe to call repeatedly; no-op if the table exists.
-2. Runs `SchemaMigrator.sync()` — diffs the live schema against the generated column list and migrates if needed.
+1. Runs `SchemaMigrator.sync()` — diffs the live schema against the generated column list and migrates if needed. No-op if the table doesn't exist yet.
+2. Runs `CREATE TABLE IF NOT EXISTS` — safe to call repeatedly; no-op if the table exists.
 
 Call it on every launch. It is fast when the schema hasn't changed (just a `PRAGMA table_info` read) and performs the necessary migration when it has.
 

@@ -45,21 +45,6 @@ public final class io/github/sufarook/kiln/runtime/JvmDatabaseDriverFactory {
 	public final fun createInMemory ()Lapp/cash/sqldelight/db/SqlDriver;
 }
 
-public final class io/github/sufarook/kiln/runtime/KilnTransactionContext : kotlin/coroutines/CoroutineContext$Element {
-	public static final field Key Lio/github/sufarook/kiln/runtime/KilnTransactionContext$Key;
-	public fun <init> ()V
-	public fun <init> (Ljava/util/Set;)V
-	public synthetic fun <init> (Ljava/util/Set;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public fun fold (Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)Ljava/lang/Object;
-	public fun get (Lkotlin/coroutines/CoroutineContext$Key;)Lkotlin/coroutines/CoroutineContext$Element;
-	public fun getKey ()Lkotlin/coroutines/CoroutineContext$Key;
-	public fun minusKey (Lkotlin/coroutines/CoroutineContext$Key;)Lkotlin/coroutines/CoroutineContext;
-	public fun plus (Lkotlin/coroutines/CoroutineContext;)Lkotlin/coroutines/CoroutineContext;
-}
-
-public final class io/github/sufarook/kiln/runtime/KilnTransactionContext$Key : kotlin/coroutines/CoroutineContext$Key {
-}
-
 public final class io/github/sufarook/kiln/runtime/Order : java/lang/Enum {
 	public static final field ASC Lio/github/sufarook/kiln/runtime/Order;
 	public static final field DESC Lio/github/sufarook/kiln/runtime/Order;
@@ -168,5 +153,6 @@ public final class io/github/sufarook/kiln/runtime/TransactionKt {
 	public static final fun notifyOrDefer (Lapp/cash/sqldelight/db/SqlDriver;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static final fun withTransaction (Lapp/cash/sqldelight/db/SqlDriver;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun withTransaction$default (Lapp/cash/sqldelight/db/SqlDriver;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun withTransactionAwareContext (Lapp/cash/sqldelight/db/SqlDriver;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
