@@ -9,7 +9,7 @@ For the detail behind active work, see `openspec/changes/<name>/` or run
 
 ## Where things stand
 
-`1.0.0-alpha05` on Maven Central. Implemented and tested against real SQLite:
+`1.0.0-alpha06` on Maven Central. Implemented and tested against real SQLite:
 
 - CRUD, reactive queries (`observeAll` / `observeWhere`), type-safe query DSL
 - Version-less auto-migration, including column add, remove, rename, and type change
