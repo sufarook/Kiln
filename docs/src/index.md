@@ -105,7 +105,7 @@ Plus a module-level `KilnSchema` object covering every `@DbEntity` you defined:
 
 ```kotlin
 // 1. Apply the plugin in build.gradle.kts
-//    id("io.github.sufarook.kiln") version "1.0.0-alpha07"
+//    id("io.github.sufarook.kiln") version "1.0.0-alpha08"
 
 // 2. Annotate a data class
 @DbEntity(tableName = "notes")
