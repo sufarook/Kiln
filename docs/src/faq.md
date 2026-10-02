@@ -77,7 +77,7 @@ Without `@Column(migrateFrom = "old_name")`, Kiln treats the old column as dropp
 val newPropertyName: String = ""
 ```
 
-**Recovering existing data:** If the data is still on device and you haven't uninstalled, you can write a one-time migration using the raw `SqlDriver`:
+**Recovering existing data:** If the data is still on device and you haven't uninstalled, you can write a one-time migration using the raw `KilnDriver`:
 ```kotlin
 driver.execute(null, "UPDATE tasks SET new_name = old_name", 0)
 ```
@@ -100,7 +100,7 @@ val newFlag: Boolean = false
 
 ### `observeAll()` isn't updating after insert
 
-The flow won't re-emit if the write and the observer use different `SqlDriver` instances. All repositories that share the same driver instance share the same `Query.Listener` channel.
+The flow won't re-emit if the write and the observer use different `KilnDriver` instances. All repositories that share the same driver instance share the same `KilnListener` channel.
 
 **Make sure you pass the same driver to every repository:**
 ```kotlin
@@ -144,7 +144,7 @@ Yes. Point the driver at your existing database file and call `createTable()`. T
 
 ### Can Kiln work alongside raw SQL or Room?
 
-Yes. Kiln uses the `SqlDriver` directly — it's the same driver you'd pass to SQLDelight. You can call raw SQL through `driver.execute(…)` at any point. Just be aware that raw writes won't trigger Kiln's `Query.Listener`, so reactive flows won't re-emit for those changes.
+Yes. Kiln uses the `KilnDriver` directly. You can call raw SQL through `driver.execute(…)` at any point. Just be aware that raw writes won't trigger Kiln's `KilnListener`, so reactive flows won't re-emit for those changes.
 
 Kiln's migrations are safe alongside tables it doesn't own, even when other code has turned on foreign-key enforcement (Room does). When an entity change forces Kiln to rebuild its table, it switches enforcement off for the rebuild and back to its previous setting afterwards — so rows in your own tables that reference the rebuilt one, including `ON DELETE CASCADE` references, are left untouched. Call `createTable()` / `KilnSchema.createAll()` outside any transaction: Kiln refuses to migrate inside one, because it can't change enforcement or control the commit there.
 
@@ -170,7 +170,7 @@ For read-heavy screens that don't need live updates, `findAll()` and `findWhere(
 
 ### Does Kiln support transactions?
 
-Yes. Wrap multiple writes in `SqlDriver.withTransaction { }` — everything inside commits atomically, and reactive flows receive a **single** notification after the commit (or none at all if it rolls back):
+Yes. Wrap multiple writes in `driver.withTransaction { }` — everything inside commits atomically, and reactive flows receive a **single** notification after the commit (or none at all if it rolls back):
 
 ```kotlin
 driver.withTransaction {
@@ -181,7 +181,7 @@ driver.withTransaction {
 
 If the block throws, the transaction rolls back and no `observeAll()` / `observeWhere()` flow re-emits for those writes. Generated repositories also expose `insertAll(items)`, which wraps a bulk insert in a single transaction for you.
 
-Blocks nest — a `withTransaction` inside another joins it, and only the outermost one commits. Kiln also joins a transaction opened through SQLDelight's API on the same driver (a SQLDelight-generated `Database.transaction { }`, say), and notifies only once that commits. Don't open transactions with raw `driver.execute(null, "BEGIN TRANSACTION", 0)`: Kiln can't see a transaction opened that way, so it can't join it.
+Blocks nest — a `withTransaction` inside another joins it, and only the outermost one commits. Kiln also joins a transaction opened via `driver.newTransaction()` on the same driver, and notifies only once that commits. Don't open transactions with raw `driver.execute(null, "BEGIN TRANSACTION", 0)`: Kiln can't see a transaction opened that way, so it can't join it.
 
 ---
 
@@ -197,12 +197,18 @@ Two separate things, and the answer differs for each:
 
 ### Can I use Kiln in a pure JVM project (no Android)?
 
-Yes. Pass a `JdbcSqliteDriver` from SQLDelight's `sqlite-driver` artifact:
+Yes. Use `JvmDatabaseDriverFactory` to create a driver:
 
 ```kotlin
-val driver: SqlDriver = JdbcSqliteDriver("jdbc:sqlite:myapp.db")
+val driver = JvmDatabaseDriverFactory().create("myapp.db")
 val repo = ProductRepository(driver)
 repo.createTable()
 ```
 
-The generated code only depends on `app.cash.sqldelight:runtime` — it has no Android dependency.
+For tests, use an in-memory database:
+
+```kotlin
+val driver = JvmDatabaseDriverFactory().createInMemory()
+```
+
+The generated code depends on `io.github.sufarook.kiln:runtime` — it has no Android dependency.

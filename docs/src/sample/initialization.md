@@ -2,7 +2,7 @@
 
 ## Create driver and repositories
 
-Create one `SqlDriver` and pass it to each repository. All repositories share the same driver — SQLite is a single-file database and a single `SqlDriver` instance manages the connection.
+Create one `KilnDriver` and pass it to each repository. All repositories share the same driver — SQLite is a single-file database and a single `KilnDriver` instance manages the connection.
 
 Kiln generates a `KilnSchema` object covering every `@DbEntity` in the module, so one call creates the whole schema:
 

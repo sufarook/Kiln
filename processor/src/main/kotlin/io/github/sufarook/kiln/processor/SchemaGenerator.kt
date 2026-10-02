@@ -22,7 +22,7 @@ import com.squareup.kotlinpoet.TypeSpec
  */
 object SchemaGenerator {
 
-    private val SQL_DRIVER = ClassName("app.cash.sqldelight.db", "SqlDriver")
+    private val KILN_DRIVER = ClassName("io.github.sufarook.kiln.runtime", "KilnDriver")
 
     fun generate(
         entities: List<EntityMetadata>,
@@ -47,7 +47,7 @@ object SchemaGenerator {
                     "`createTable()` on all %L generated repositories.\n",
                 ordered.size
             )
-            .addParameter("driver", SQL_DRIVER)
+            .addParameter("driver", KILN_DRIVER)
 
         ordered.forEach { meta ->
             val repository = ClassName(meta.packageName, "${meta.entityClassName}Repository")

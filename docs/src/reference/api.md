@@ -5,10 +5,10 @@ Every `@DbEntity` class gets one generated repository. This page documents every
 ## Repository signature
 
 ```kotlin
-class ProductRepository(private val driver: SqlDriver)
+class ProductRepository(private val driver: KilnDriver)
 ```
 
-The generated class is concrete (not an interface). Inject the `SqlDriver` directly — see [Initialization](../sample/initialization.md).
+The generated class is concrete (not an interface). Inject the `KilnDriver` directly — see [Initialization](../sample/initialization.md).
 
 ---
 
@@ -32,7 +32,7 @@ To set up every table at once, prefer `KilnSchema.createAll(driver)` below.
 
 ```kotlin
 object KilnSchema {
-    fun createAll(driver: SqlDriver)
+    fun createAll(driver: KilnDriver)
 }
 ```
 
@@ -171,7 +171,7 @@ fun observeAll(): Flow<List<T>>
 
 Returns a cold `Flow` that emits the full table on collection and re-emits on every subsequent write (`insert`, `update`, `delete`, `deleteWhere`) to the same table.
 
-Uses SQLDelight `Query.Listener` internally — no polling.
+Uses `KilnListener` internally — no polling.
 
 ```kotlin
 productRepo.observeAll()
@@ -282,21 +282,21 @@ For cleaner cascade semantics, wrap both calls in `driver.withTransaction { … 
 ### `driver.withTransaction { }`
 
 ```kotlin
-suspend fun SqlDriver.withTransaction(
+suspend fun KilnDriver.withTransaction(
     context: CoroutineContext = Dispatchers.Default,
     block: suspend () -> Unit
 )
 ```
 
-Executes `block` inside a single SQLite transaction, through SQLDelight's transaction API. On any exception the transaction is rolled back and the exception re-thrown.
+Executes `block` inside a single SQLite transaction. On any exception the transaction is rolled back and the exception re-thrown.
 
-Blocks nest: a `withTransaction` inside another joins it, and only the outermost one commits. A block run while a transaction is already open through SQLDelight's API on the same driver — a SQLDelight-generated `Database.transaction { }`, for example — joins that transaction too. A transaction opened with raw `BEGIN` SQL is invisible to Kiln and can't be joined.
+Blocks nest: a `withTransaction` inside another joins it, and only the outermost one commits. A block run while a transaction is already open via `driver.newTransaction()` joins that transaction too. A transaction opened with raw `BEGIN` SQL is invisible to Kiln and can't be joined.
 
-All Kiln repository write methods (`insert`, `update`, `delete`, `deleteWhere`, `insertAll`) defer their `Flow` listener notifications while a transaction is open. After the outermost commit — whoever opened it — each affected table is notified **exactly once**: reactive `Flow`s receive one emission for the whole transaction rather than one per operation.
+All Kiln repository write methods (`insert`, `update`, `delete`, `deleteWhere`, `insertAll`) defer their `Flow` listener notifications while a transaction is open. After the outermost commit each affected table is notified **exactly once**: reactive `Flow`s receive one emission for the whole transaction rather than one per operation.
 
 No notifications are sent when a transaction is rolled back.
 
-**Threading.** A transaction holds one thread of `context` until it completes. SQLite transactions belong to the thread that opened them, so the block — including after any suspension — runs on that thread, and repository calls inside it run there too, whatever dispatcher the repository was constructed with. For a transaction that waits on I/O, pass `Dispatchers.IO` so it doesn't occupy one of `Dispatchers.Default`'s few threads. Inside a transaction opened by other code, repository calls join it when made on that transaction's thread; moving a Kiln call to another dispatcher inside such a transaction isn't supported.
+**Threading.** A transaction holds one thread of `context` until it completes. SQLite transactions belong to the thread that opened them, so the block — including after any suspension — runs on that thread, and repository calls inside it run there too, whatever dispatcher the repository was constructed with. For a transaction that waits on I/O, pass `Dispatchers.IO` so it doesn't occupy one of `Dispatchers.Default`'s few threads.
 
 ```kotlin
 // Cascade delete — observers see one emission each, not four
@@ -315,15 +315,15 @@ driver.withTransaction {
 ### `driver.notifyOrDefer(tableName)`
 
 ```kotlin
-suspend fun SqlDriver.notifyOrDefer(tableName: String)
+suspend fun KilnDriver.notifyOrDefer(tableName: String)
 ```
 
-Called automatically by generated repository code. Outside a transaction it calls `SqlDriver.notifyListeners` immediately. Inside one it adds the table name to the open transaction's pending tables, deferring the notification to after the outermost commit. Not intended for direct use.
+Called automatically by generated repository code. Outside a transaction it calls `KilnDriver.notifyListeners` immediately. Inside one it adds the table name to the open transaction's pending tables, deferring the notification to after the outermost commit. Not intended for direct use.
 
 ### `driver.withTransactionAwareContext(context) { }`
 
 ```kotlin
-suspend fun <T> SqlDriver.withTransactionAwareContext(
+suspend fun <T> KilnDriver.withTransactionAwareContext(
     context: CoroutineContext,
     block: suspend CoroutineScope.() -> T
 ): T

@@ -1,6 +1,5 @@
 package io.github.sufarook.kiln.runtime
 
-import app.cash.sqldelight.db.SqlDriver
-import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
+import java.sql.DriverManager
 
-actual fun createTestDriver(): SqlDriver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
+actual fun createTestDriver(): KilnDriver = JvmKilnDriver(DriverManager.getConnection("jdbc:sqlite::memory:"))

@@ -1,7 +1,5 @@
 package io.github.sufarook.kiln.runtime
 
-import app.cash.sqldelight.db.SqlPreparedStatement
-
 /**
  * Type-safe WHERE clauses without SQL strings. The processor generates a
  * `<Entity>Columns` object per entity; predicates compose with infix operators:
@@ -98,7 +96,7 @@ fun buildOrderSuffix(orderBy: List<OrderSpec>, limit: Long?, offset: Long?): Str
 
 // ── Statement binding (used by generated code) ─────────────────────────────────
 
-fun SqlPreparedStatement.bindArg(index: Int, arg: SqlArg) {
+fun KilnPreparedStatement.bindArg(index: Int, arg: SqlArg) {
     when (arg) {
         is SqlArg.StringArg -> bindString(index, arg.value)
         is SqlArg.LongArg -> bindLong(index, arg.value)

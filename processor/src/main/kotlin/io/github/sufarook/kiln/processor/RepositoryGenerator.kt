@@ -7,8 +7,7 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 
 object RepositoryGenerator {
 
-    private val SQL_DRIVER = ClassName("app.cash.sqldelight.db", "SqlDriver")
-    private val QUERY_RESULT = ClassName("app.cash.sqldelight.db", "QueryResult")
+    private val KILN_DRIVER = ClassName("io.github.sufarook.kiln.runtime", "KilnDriver")
     private val SCHEMA_MIGRATOR = ClassName("io.github.sufarook.kiln.runtime", "SchemaMigrator")
     private val COLUMN_DEF = ClassName("io.github.sufarook.kiln.runtime", "ColumnDef")
     private val COROUTINE_CONTEXT = ClassName("kotlin.coroutines", "CoroutineContext")
@@ -156,7 +155,7 @@ object RepositoryGenerator {
             .addSuperinterface(crudInterface)
             .primaryConstructor(
                 FunSpec.constructorBuilder()
-                    .addParameter("driver", SQL_DRIVER)
+                    .addParameter("driver", KILN_DRIVER)
                     .addParameter(
                         ParameterSpec.builder("context", COROUTINE_CONTEXT)
                             .defaultValue("%T.Default", DISPATCHERS)
@@ -165,7 +164,7 @@ object RepositoryGenerator {
                     .build()
             )
             .addProperty(
-                PropertySpec.builder("driver", SQL_DRIVER, KModifier.PRIVATE)
+                PropertySpec.builder("driver", KILN_DRIVER, KModifier.PRIVATE)
                     .initializer("driver")
                     .build()
             )
@@ -283,9 +282,9 @@ object RepositoryGenerator {
                     .addStatement("driver.executeQuery(null, %S, { cursor ->", sql)
                     .indent()
                     .addStatement("cursor.next()")
-                    .addStatement("%T.Value(cursor.getLong(0)!!)", QUERY_RESULT)
+                    .addStatement("cursor.getLong(0)!!")
                     .unindent()
-                    .addStatement("}, 0).value")
+                    .addStatement("}, 0)")
                     .unindent()
                     .add("}\n")
                     .build()
@@ -308,13 +307,13 @@ object RepositoryGenerator {
                     .addStatement("driver.executeQuery(null, %S + predicate.sql, { cursor ->", baseSql)
                     .indent()
                     .addStatement("cursor.next()")
-                    .addStatement("%T.Value(cursor.getLong(0)!!)", QUERY_RESULT)
+                    .addStatement("cursor.getLong(0)!!")
                     .unindent()
                     .addStatement("}, predicate.args.size) {")
                     .indent()
                     .addStatement("predicate.args.forEachIndexed { index, arg -> %M(index, arg) }", BIND_ARG)
                     .unindent()
-                    .addStatement("}.value")
+                    .addStatement("}")
                     .unindent()
                     .add("}\n")
                     .build()
@@ -343,7 +342,7 @@ object RepositoryGenerator {
                     .indent()
                     .addStatement("predicate.args.forEachIndexed { index, arg -> %M(index, arg) }", BIND_ARG)
                     .unindent()
-                    .addStatement("}.value")
+                    .addStatement("}")
                     .build()
             )
             .build()
@@ -528,7 +527,7 @@ object RepositoryGenerator {
                         }
                     }
                     .unindent()
-                    .addStatement("}.value")
+                    .addStatement("}")
                     .build()
             )
             .build()
@@ -546,7 +545,7 @@ object RepositoryGenerator {
                     .indent()
                     .add(buildCursorMapper(meta, entityClass, single = false))
                     .unindent()
-                    .addStatement("}, 0).value")
+                    .addStatement("}, 0)")
                     .build()
             )
             .build()
@@ -635,21 +634,21 @@ object RepositoryGenerator {
     private fun buildCursorMapper(meta: EntityMetadata, entityClass: ClassName, single: Boolean): CodeBlock {
         val b = CodeBlock.builder()
         if (single) {
-            b.addStatement("if (cursor.next().value) {")
+            b.addStatement("if (cursor.next()) {")
             b.indent()
             b.add(buildEntityConstruction(meta, entityClass))
-            b.addStatement("%T.Value(entity)", QUERY_RESULT)
+            b.addStatement("entity")
             b.unindent()
-            b.addStatement("} else %T.Value(null)", QUERY_RESULT)
+            b.addStatement("} else null")
         } else {
             b.addStatement("val result = mutableListOf<%T>()", entityClass)
-            b.addStatement("while (cursor.next().value) {")
+            b.addStatement("while (cursor.next()) {")
             b.indent()
             b.add(buildEntityConstruction(meta, entityClass))
             b.addStatement("result.add(entity)")
             b.unindent()
             b.addStatement("}")
-            b.addStatement("%T.Value(result)", QUERY_RESULT)
+            b.addStatement("result")
         }
         return b.build()
     }

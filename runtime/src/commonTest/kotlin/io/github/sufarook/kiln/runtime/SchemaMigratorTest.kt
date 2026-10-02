@@ -1,9 +1,5 @@
 package io.github.sufarook.kiln.runtime
 
-import app.cash.sqldelight.TransacterImpl
-import app.cash.sqldelight.db.QueryResult
-import app.cash.sqldelight.db.SqlDriver
-import app.cash.sqldelight.db.SqlPreparedStatement
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -13,13 +9,9 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-/**
- * Runs SchemaMigrator against a real in-memory SQLite database via the JDBC driver.
- * Mirrors the manual upgrade checklist: install v1 of an entity, "ship" v2, sync, verify.
- */
 class SchemaMigratorTest {
 
-    private lateinit var driver: SqlDriver
+    private lateinit var driver: KilnDriver
     private lateinit var migrator: SchemaMigrator
 
     // v1 schema used as the "already installed" baseline in most tests
@@ -84,10 +76,10 @@ class SchemaMigratorTest {
             """SELECT "due_date" IS NULL FROM "todos" LIMIT 1""",
             { c ->
                 c.next()
-                QueryResult.Value(c.getLong(0) == 1L)
+                c.getLong(0) == 1L
             },
             0
-        ).value
+        )
         assertTrue(isNull)
     }
 
@@ -104,7 +96,6 @@ class SchemaMigratorTest {
         assertTrue("urgency" in cols, "new column must exist")
         assertTrue("priority" !in cols, "old column must be gone, not orphaned")
         assertEquals(2, count("todos"))
-        // Buy milk had priority=1 — value must survive the rename
         assertEquals(1L, queryLong("""SELECT "urgency" FROM "todos" WHERE "title" = 'Buy milk'"""))
     }
 
@@ -158,7 +149,6 @@ class SchemaMigratorTest {
 
     @Test
     fun `type change triggers recreation and casts data`() {
-        // priority was Int (INTEGER) — developer changes the property to String (TEXT)
         val v2 = listOf(
             v1Columns[0],
             v1Columns[1],
@@ -169,7 +159,6 @@ class SchemaMigratorTest {
         val types = columnTypes("todos")
         assertEquals("TEXT", types["priority"])
         assertEquals(2, count("todos"))
-        // Buy milk had priority=1 (INTEGER) — must survive as the string "1"
         assertEquals("1", queryString("""SELECT "priority" FROM "todos" WHERE "title" = 'Buy milk'"""))
     }
 
@@ -202,24 +191,12 @@ class SchemaMigratorTest {
     }
 
     // ── Composite primary keys ────────────────────────────────────────────────────
-    //
-    // Two ColumnDefs both marked isPrimaryKey = true used to make recreateTable()
-    // emit an inline "PRIMARY KEY" on each column — SQLite rejects that outright
-    // with "table has more than one primary key". The fix emits one table-level
-    // PRIMARY KEY (col1, col2) constraint instead; these tests exercise the slow
-    // path (table recreation) against a real composite-key table.
 
     private val assignmentColumns = listOf(
         ColumnDef("task_id", "INTEGER", false, "0", isPrimaryKey = true),
         ColumnDef("user_id", "INTEGER", false, "0", isPrimaryKey = true)
     )
 
-    /**
-     * Installs a composite-key table with an extra "note" column, then syncs down
-     * to just [assignmentColumns] — dropping "note" is what forces the slow path
-     * (table recreation). Adding a column alone would take the fast ALTER TABLE
-     * path and never touch the code this test exists to guard.
-     */
     private fun installAssignmentsAndDropNote() {
         exec(
             """CREATE TABLE "assignments" (
@@ -247,11 +224,11 @@ class SchemaMigratorTest {
                 """SELECT "user_id" FROM "assignments" ORDER BY "user_id"""",
                 { c ->
                     val out = mutableListOf<Long>()
-                    while (c.next().value) out.add(c.getLong(0)!!)
-                    QueryResult.Value(out)
+                    while (c.next()) out.add(c.getLong(0)!!)
+                    out
                 },
                 0
-            ).value
+            )
         )
     }
 
@@ -267,10 +244,8 @@ class SchemaMigratorTest {
 
     // ── Borrowed connection ───────────────────────────────────────────────────────
 
-    /** priority → urgency: a rename, which forces the rebuild path. */
     private val renamed = listOf(v1Columns[0], v1Columns[1], ColumnDef("urgency", "INTEGER", false, "0", migrateFrom = "priority"))
 
-    /** Fails the rebuild at its last step, after the original table has been dropped. */
     private fun failingAtRename() = SchemaMigrator(FailingDriver(driver) { sql -> "RENAME TO" in sql })
 
     @Test
@@ -327,11 +302,14 @@ class SchemaMigratorTest {
     @Test
     fun `refuses to reconcile inside an open transaction and runs nothing`() {
         val recording = RecordingDriver(driver)
-        OtherCodesTransacter(recording).transaction {
+        val tx = recording.newTransaction()
+        try {
             recording.executed.clear()
             val error = assertFailsWith<IllegalStateException> { SchemaMigrator(recording).sync("todos", renamed) }
             assertTrue("transaction is open" in error.message!!, error.message)
             assertEquals(emptyList(), recording.executed, "no statement may run before the refusal")
+        } finally {
+            tx.endTransaction(successful = false)
         }
         assertEquals(listOf("id", "title", "priority"), columnNames("todos"))
     }
@@ -359,22 +337,22 @@ class SchemaMigratorTest {
         """PRAGMA table_info("$table")""",
         { cursor ->
             val names = mutableListOf<String>()
-            while (cursor.next().value) names.add(cursor.getString(1)!!)
-            QueryResult.Value(names)
+            while (cursor.next()) names.add(cursor.getString(1)!!)
+            names
         },
         0
-    ).value
+    )
 
     private fun columnTypes(table: String): Map<String, String> = driver.executeQuery(
         null,
         """PRAGMA table_info("$table")""",
         { cursor ->
             val types = mutableMapOf<String, String>()
-            while (cursor.next().value) types[cursor.getString(1)!!] = cursor.getString(2) ?: ""
-            QueryResult.Value(types)
+            while (cursor.next()) types[cursor.getString(1)!!] = cursor.getString(2) ?: ""
+            types
         },
         0
-    ).value
+    )
 
     private fun foreignKeysEnabled(): Boolean = queryLong("PRAGMA foreign_keys") == 1L
 
@@ -382,52 +360,47 @@ class SchemaMigratorTest {
 
     private fun queryLong(sql: String): Long = driver.executeQuery(null, sql, { c ->
         c.next()
-        QueryResult.Value(c.getLong(0)!!)
-    }, 0).value
+        c.getLong(0)!!
+    }, 0)
 
     private fun queryLongs(sql: String): List<Long> = driver.executeQuery(
         null,
         sql,
         { c ->
             val out = mutableListOf<Long>()
-            while (c.next().value) out.add(c.getLong(0)!!)
-            QueryResult.Value(out)
+            while (c.next()) out.add(c.getLong(0)!!)
+            out
         },
         0
-    ).value
+    )
 
     private fun queryString(sql: String): String = driver.executeQuery(null, sql, { c ->
         c.next()
-        QueryResult.Value(c.getString(0)!!)
-    }, 0).value
+        c.getString(0)!!
+    }, 0)
 }
 
-/** Stands in for other code sharing the driver, opening its own transaction. */
-private class OtherCodesTransacter(driver: SqlDriver) : TransacterImpl(driver)
-
-/** Throws instead of running the first statement matching [failOn]. */
-private class FailingDriver(private val delegate: SqlDriver, private val failOn: (String) -> Boolean) : SqlDriver by delegate {
+private class FailingDriver(private val delegate: KilnDriver, private val failOn: (String) -> Boolean) : KilnDriver by delegate {
     override fun execute(
         identifier: Int?,
         sql: String,
         parameters: Int,
-        binders: (SqlPreparedStatement.() -> Unit)?
-    ): QueryResult<Long> {
+        binders: (KilnPreparedStatement.() -> Unit)?
+    ): Long {
         if (failOn(sql)) throw IllegalStateException("injected failure: $sql")
         return delegate.execute(identifier, sql, parameters, binders)
     }
 }
 
-/** Records every statement run through [execute] — schema changes all go through it. */
-private class RecordingDriver(private val delegate: SqlDriver) : SqlDriver by delegate {
+private class RecordingDriver(private val delegate: KilnDriver) : KilnDriver by delegate {
     val executed = mutableListOf<String>()
 
     override fun execute(
         identifier: Int?,
         sql: String,
         parameters: Int,
-        binders: (SqlPreparedStatement.() -> Unit)?
-    ): QueryResult<Long> {
+        binders: (KilnPreparedStatement.() -> Unit)?
+    ): Long {
         executed += sql
         return delegate.execute(identifier, sql, parameters, binders)
     }

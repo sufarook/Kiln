@@ -100,7 +100,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask<*>>().con
 
 ```kotlin
 // commonMain — all your logic
-class TodoStore(driver: SqlDriver) {
+class TodoStore(driver: KilnDriver) {
     private val repo = TodoRepository(driver)
     init { repo.createTable() }
     fun observeAll(): Flow<List<Todo>> = repo.observeAll()

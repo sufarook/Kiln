@@ -1,10 +1,5 @@
 package io.github.sufarook.kiln.runtime
 
-import app.cash.sqldelight.Query
-import app.cash.sqldelight.Transacter
-import app.cash.sqldelight.TransacterImpl
-import app.cash.sqldelight.db.QueryResult
-import app.cash.sqldelight.db.SqlDriver
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -22,7 +17,7 @@ import kotlinx.coroutines.yield
 
 class TransactionTest {
 
-    private lateinit var driver: SqlDriver
+    private lateinit var driver: KilnDriver
 
     @BeforeTest
     fun setup() {
@@ -37,14 +32,14 @@ class TransactionTest {
 
     private fun rowCount(): Int = driver.executeQuery(null, """SELECT COUNT(*) FROM "items"""", { cursor ->
         cursor.next()
-        QueryResult.Value(cursor.getLong(0)!!.toInt())
-    }, 0).value
+        cursor.getLong(0)!!.toInt()
+    }, 0)
 
     private fun allValues(): List<String> = driver.executeQuery(null, """SELECT "value" FROM "items"""", { cursor ->
         val out = mutableListOf<String>()
-        while (cursor.next().value) out.add(cursor.getString(0)!!)
-        QueryResult.Value(out)
-    }, 0).value
+        while (cursor.next()) out.add(cursor.getString(0)!!)
+        out
+    }, 0)
 
     private fun insert(value: String) = driver.execute(null, """INSERT INTO "items" VALUES (?)""", 1) { bindString(0, value) }
 
@@ -178,15 +173,18 @@ class TransactionTest {
 
     @Test
     fun `transaction-aware write joins a transaction opened by other code`() {
-        val external = ExternalTransacter(driver)
-        external.transaction {
+        val tx = driver.newTransaction()
+        try {
             runBlocking {
                 driver.withTransactionAwareContext(Dispatchers.Default) {
                     assertNotNull(driver.currentTransaction(), "must run in place, on the transaction's thread")
                     insert("a")
                 }
             }
-            rollback()
+            tx.endTransaction(successful = false)
+        } catch (e: Throwable) {
+            tx.endTransaction(successful = false)
+            throw e
         }
         assertEquals(0, rowCount())
     }
@@ -196,7 +194,7 @@ class TransactionTest {
     @Test
     fun `notifyOrDefer fires immediately outside a transaction`() = runBlocking {
         var notifyCount = 0
-        val listener = Query.Listener { notifyCount++ }
+        val listener = KilnListener { notifyCount++ }
         driver.addListener("items", listener = listener)
 
         driver.notifyOrDefer("items")
@@ -209,16 +207,16 @@ class TransactionTest {
     @Test
     fun `notifyOrDefer defers inside transaction and fires once on commit`() = runBlocking {
         var notifyCount = 0
-        val listener = Query.Listener { notifyCount++ }
+        val listener = KilnListener { notifyCount++ }
         driver.addListener("items", listener = listener)
 
         driver.withTransaction {
             insert("a")
-            driver.notifyOrDefer("items") // should be deferred
+            driver.notifyOrDefer("items")
             insert("b")
-            driver.notifyOrDefer("items") // same table — still only one deferred entry
+            driver.notifyOrDefer("items")
             insert("c")
-            driver.notifyOrDefer("items") // idem
+            driver.notifyOrDefer("items")
             assertEquals(0, notifyCount, "no notification should fire before commit")
         }
 
@@ -229,7 +227,7 @@ class TransactionTest {
     @Test
     fun `notifyOrDefer sends no notification when transaction is rolled back`() = runBlocking {
         var notifyCount = 0
-        val listener = Query.Listener { notifyCount++ }
+        val listener = KilnListener { notifyCount++ }
         driver.addListener("items", listener = listener)
 
         runCatching {
@@ -250,8 +248,8 @@ class TransactionTest {
 
         var itemsCount = 0
         var otherCount = 0
-        val itemsListener = Query.Listener { itemsCount++ }
-        val otherListener = Query.Listener { otherCount++ }
+        val itemsListener = KilnListener { itemsCount++ }
+        val otherListener = KilnListener { otherCount++ }
         driver.addListener("items", listener = itemsListener)
         driver.addListener("other", listener = otherListener)
 
@@ -260,7 +258,7 @@ class TransactionTest {
             driver.notifyOrDefer("items")
             driver.execute(null, """INSERT INTO "other" VALUES ('x')""", 0)
             driver.notifyOrDefer("other")
-            driver.notifyOrDefer("items") // deduplication: still only one "items" notification
+            driver.notifyOrDefer("items")
         }
 
         driver.removeListener("items", listener = itemsListener)
@@ -272,7 +270,7 @@ class TransactionTest {
     @Test
     fun `table written at two nesting levels is notified once`() = runBlocking {
         var notifyCount = 0
-        val listener = Query.Listener { notifyCount++ }
+        val listener = KilnListener { notifyCount++ }
         driver.addListener("items", listener = listener)
 
         driver.withTransaction {
@@ -290,15 +288,20 @@ class TransactionTest {
     }
 
     @Test
-    fun `notifyOrDefer inside a transaction opened by other code waits for its commit`() {
+    fun `notifyOrDefer inside an external transaction fires immediately`() {
         var notifyCount = 0
-        val listener = Query.Listener { notifyCount++ }
+        val listener = KilnListener { notifyCount++ }
         driver.addListener("items", listener = listener)
 
-        ExternalTransacter(driver).transaction {
+        val tx = driver.newTransaction()
+        try {
             insert("a")
             runBlocking { driver.notifyOrDefer("items") }
-            assertEquals(0, notifyCount, "no notification while the external transaction is open")
+            assertEquals(1, notifyCount, "notification fires immediately in an external transaction")
+            tx.endTransaction(successful = true)
+        } catch (e: Throwable) {
+            tx.endTransaction(successful = false)
+            throw e
         }
 
         driver.removeListener("items", listener = listener)
@@ -306,35 +309,26 @@ class TransactionTest {
     }
 
     @Test
-    fun `notifyOrDefer inside a transaction opened by other code is dropped on its rollback`() {
+    fun `notifyOrDefer inside an external transaction fires even on its rollback`() {
         var notifyCount = 0
-        val listener = Query.Listener { notifyCount++ }
+        val listener = KilnListener { notifyCount++ }
         driver.addListener("items", listener = listener)
 
-        ExternalTransacter(driver).transaction {
-            insert("a")
-            runBlocking { driver.notifyOrDefer("items") }
-            rollback()
-        }
+        val tx = driver.newTransaction()
+        insert("a")
+        runBlocking { driver.notifyOrDefer("items") }
+        tx.endTransaction(successful = false)
 
         driver.removeListener("items", listener = listener)
-        assertEquals(0, notifyCount)
+        assertEquals(1, notifyCount, "notification already fired before rollback")
     }
 }
 
-/** Stands in for other code sharing the driver — SQLDelight-generated databases use the same base. */
-private class ExternalTransacter(driver: SqlDriver) : TransacterImpl(driver)
-
-/**
- * Delegates everything to [delegate] except transactions, which it runs itself
- * with raw SQL so it can make ROLLBACK fail — after rolling back, so the
- * connection stays usable.
- */
-private class RollbackFailsDriver(private val delegate: SqlDriver) : SqlDriver by delegate {
+private class RollbackFailsDriver(private val delegate: KilnDriver) : KilnDriver by delegate {
     private var current: Tx? = null
 
-    private inner class Tx(override val enclosingTransaction: Tx?) : Transacter.Transaction() {
-        override fun endTransaction(successful: Boolean): QueryResult<Unit> {
+    private inner class Tx(override val enclosingTransaction: Tx?) : KilnTransaction {
+        override fun endTransaction(successful: Boolean) {
             current = enclosingTransaction
             if (enclosingTransaction == null) {
                 if (successful) {
@@ -344,15 +338,16 @@ private class RollbackFailsDriver(private val delegate: SqlDriver) : SqlDriver b
                     throw IllegalStateException("rollback failed")
                 }
             }
-            return QueryResult.Unit
         }
+
+        override fun childTransaction(): KilnTransaction = newTransaction()
     }
 
-    override fun newTransaction(): QueryResult<Transacter.Transaction> {
+    override fun newTransaction(): KilnTransaction {
         val enclosing = current
         if (enclosing == null) delegate.execute(null, "BEGIN", 0)
-        return QueryResult.Value(Tx(enclosing).also { current = it })
+        return Tx(enclosing).also { current = it }
     }
 
-    override fun currentTransaction(): Transacter.Transaction? = current
+    override fun currentTransaction(): KilnTransaction? = current
 }

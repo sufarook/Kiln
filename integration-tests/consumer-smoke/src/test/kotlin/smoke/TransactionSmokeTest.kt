@@ -1,8 +1,8 @@
 package smoke
 
-import app.cash.sqldelight.Query
-import app.cash.sqldelight.db.SqlDriver
 import io.github.sufarook.kiln.runtime.JvmDatabaseDriverFactory
+import io.github.sufarook.kiln.runtime.KilnDriver
+import io.github.sufarook.kiln.runtime.KilnListener
 import io.github.sufarook.kiln.runtime.withTransaction
 import java.io.File
 import java.util.concurrent.Executors
@@ -25,7 +25,7 @@ import kotlin.test.assertFailsWith
 class TransactionSmokeTest {
 
     private lateinit var file: File
-    private lateinit var driver: SqlDriver
+    private lateinit var driver: KilnDriver
     private lateinit var elsewhere: ExecutorCoroutineDispatcher
     private lateinit var repo: NoteRepository
 
@@ -49,7 +49,7 @@ class TransactionSmokeTest {
 
     private fun countNotifications(block: () -> Unit): Int {
         var count = 0
-        val listener = Query.Listener { count++ }
+        val listener = KilnListener { count++ }
         driver.addListener("notes", listener = listener)
         try {
             block()

@@ -1,7 +1,5 @@
 package io.github.sufarook.kiln.runtime
 
-import app.cash.sqldelight.db.QueryResult
-import app.cash.sqldelight.db.SqlDriver
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -121,7 +119,7 @@ class QueryDslTest {
 
     // ── End-to-end against a real database ─────────────────────────────────────
 
-    private lateinit var driver: SqlDriver
+    private lateinit var driver: KilnDriver
 
     @BeforeTest
     fun setup() {
@@ -140,11 +138,11 @@ class QueryDslTest {
 
     private fun queryTitles(sql: String, predicate: Predicate): List<String> = driver.executeQuery(null, sql, { cursor ->
         val out = mutableListOf<String>()
-        while (cursor.next().value) out.add(cursor.getString(0)!!)
-        QueryResult.Value(out)
+        while (cursor.next()) out.add(cursor.getString(0)!!)
+        out
     }, predicate.args.size) {
         predicate.args.forEachIndexed { i, arg -> bindArg(i, arg) }
-    }.value
+    }
 
     @Test
     fun `predicate executes correctly against sqlite`() {
