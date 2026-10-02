@@ -38,7 +38,7 @@ every generated repository constructor, in `withTransaction`, in
 
 ```kotlin
 // build.gradle.kts
-plugins { id("io.github.sufarook.kiln") version "1.0.0-alpha06" }
+plugins { id("io.github.sufarook.kiln") version "1.0.0-alpha07" }
 dependencies {
     implementation("app.cash.sqldelight:android-driver:2.3.2") // consumer must add
 }
