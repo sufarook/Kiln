@@ -1,10 +1,7 @@
 package io.github.sufarook.kiln.runtime
 
-import app.cash.sqldelight.TransacterImpl
-import app.cash.sqldelight.db.QueryResult
-import app.cash.sqldelight.db.SqlDriver
-import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import java.io.File
+import java.sql.DriverManager
 import java.util.concurrent.Executors
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -26,16 +23,14 @@ import kotlinx.coroutines.yield
  */
 class ThreadBoundDriverTest {
 
-    private class ExternalTransacter(driver: SqlDriver) : TransacterImpl(driver)
-
     private lateinit var file: File
-    private lateinit var driver: SqlDriver
+    private lateinit var driver: KilnDriver
     private lateinit var elsewhere: ExecutorCoroutineDispatcher
 
     @BeforeTest
     fun setup() {
         file = File.createTempFile("kiln-thread-bound", ".db")
-        driver = JdbcSqliteDriver("jdbc:sqlite:${file.absolutePath}")
+        driver = JvmKilnDriver(DriverManager.getConnection("jdbc:sqlite:${file.absolutePath}"))
         driver.execute(null, """CREATE TABLE "items" ("value" TEXT NOT NULL)""", 0)
         elsewhere = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
     }
@@ -51,8 +46,8 @@ class ThreadBoundDriverTest {
 
     private fun rowCount(): Int = driver.executeQuery(null, """SELECT COUNT(*) FROM "items"""", { cursor ->
         cursor.next()
-        QueryResult.Value(cursor.getLong(0)!!.toInt())
-    }, 0).value
+        cursor.getLong(0)!!.toInt()
+    }, 0)
 
     @Test
     fun `write routed from another dispatcher commits with the Kiln transaction`() = runBlocking {
@@ -75,9 +70,13 @@ class ThreadBoundDriverTest {
 
     @Test
     fun `write rolls back with a transaction opened by other code`() {
-        ExternalTransacter(driver).transaction {
+        val tx = driver.newTransaction()
+        try {
             runBlocking { driver.withTransactionAwareContext(elsewhere) { insert("a") } }
-            rollback()
+            tx.endTransaction(successful = false)
+        } catch (e: Throwable) {
+            tx.endTransaction(successful = false)
+            throw e
         }
         assertEquals(0, rowCount())
     }

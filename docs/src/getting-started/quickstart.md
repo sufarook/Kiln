@@ -16,7 +16,6 @@ plugins {
 dependencies {
     implementation("io.github.sufarook.kiln:annotations:1.0.0-alpha06")
     implementation("io.github.sufarook.kiln:runtime:1.0.0-alpha06")
-    implementation("app.cash.sqldelight:android-driver:2.3.2")
 }
 ```
 

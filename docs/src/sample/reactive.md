@@ -2,7 +2,7 @@
 
 ## How it works
 
-Every generated repository exposes `observeAll()` returning `Flow<List<T>>`. Internally it wraps SQLDelight's `Query.Listener` — when any write operation (`insert`, `update`, `delete`, `deleteWhere`) completes, the listener is notified and the flow re-emits the updated list.
+Every generated repository exposes `observeAll()` returning `Flow<List<T>>`. Internally it uses `KilnListener` — when any write operation (`insert`, `update`, `delete`, `deleteWhere`) completes, the listener is notified and the flow re-emits the updated list.
 
 No polling. No manual `invalidate()` calls. No `postValue()`.
 
@@ -107,7 +107,7 @@ class TaskDetailViewModel(
 
 ## Cross-table reactivity
 
-All repositories that share the same `SqlDriver` instance share the same listener channel. A write to `taskRepo` triggers re-emission on all active `taskRepo.observeAll()` and `taskRepo.observeWhere()` collectors — it does **not** trigger collectors on `projectRepo` or `checklistRepo`.
+All repositories that share the same `KilnDriver` instance share the same listener channel. A write to `taskRepo` triggers re-emission on all active `taskRepo.observeAll()` and `taskRepo.observeWhere()` collectors — it does **not** trigger collectors on `projectRepo` or `checklistRepo`.
 
 To react to changes across tables, combine flows:
 

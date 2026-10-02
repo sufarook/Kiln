@@ -19,38 +19,30 @@ kotlin {
     // rather than following whichever JDK happened to run the build.
     jvmToolchain(17)
 
-    applyDefaultHierarchyTemplate() // creates iosMain umbrella source set
     androidTarget {
         publishLibraryVariants("release")
     }
     jvm()
     listOf(iosArm64(), iosX64(), iosSimulatorArm64()).forEach { target ->
-        // A real iOS app gets libsqlite3 linked for free via Xcode. Our own test
-        // binary is a standalone Kotlin/Native executable with no Xcode project
-        // behind it, so the native-driver's sqlite3 symbols need linking explicitly.
+        target.compilations.getByName("main") {
+            cinterops {
+                create("sqlite3") {
+                    definitionFile.set(project.file("src/nativeInterop/cinterop/sqlite3.def"))
+                }
+            }
+        }
         target.binaries.all { linkerOpts("-lsqlite3") }
     }
 
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(libs.sqldelight.runtime) // SqlDriver visible to consumers
                 api(libs.kotlinx.coroutines.core) // Flow/suspend in CrudRepository
-            }
-        }
-        val androidMain by getting {
-            dependencies {
-                api(libs.sqldelight.android.driver) // AndroidDatabaseDriverFactory visible to consumers
-            }
-        }
-        val iosMain by getting {
-            dependencies {
-                api(libs.sqldelight.native.driver) // IosDatabaseDriverFactory visible to consumers
             }
         }
         val jvmMain by getting {
             dependencies {
-                api(libs.sqldelight.sqlite.driver) // JvmDatabaseDriverFactory
+                implementation(libs.xerial.sqlite.jdbc)
             }
         }
         val commonTest by getting {
@@ -65,9 +57,7 @@ kotlin {
         }
         val androidUnitTest by getting {
             dependencies {
-                // Local unit tests run on the host JVM — reuse the JDBC driver
-                // purely as a test fixture, same reasoning as jvmTest.
-                implementation(libs.sqldelight.sqlite.driver)
+                implementation(libs.xerial.sqlite.jdbc)
             }
         }
     }

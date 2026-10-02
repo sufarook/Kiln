@@ -62,7 +62,7 @@ class TaskStore(
     // ── Coordinated writes ────────────────────────────────────────────────────
 
     /** Mark a task done and tick off every unfinished checklist item atomically. */
-    suspend fun completeTask(driver: SqlDriver, task: Task) {
+    suspend fun completeTask(driver: KilnDriver, task: Task) {
         driver.withTransaction {
             taskRepo.update(task.copy(isCompleted = true, status = "DONE"))
             val items = checklistRepo.findWhere { ChecklistItemColumns.taskId eq task.id }
@@ -79,7 +79,7 @@ class TaskStore(
      * This method handles the cascade explicitly inside a transaction so either
      * every deletion succeeds or the database is left unchanged.
      */
-    suspend fun archiveProject(driver: SqlDriver, project: Project) {
+    suspend fun archiveProject(driver: KilnDriver, project: Project) {
         driver.withTransaction {
             // 1. Find and delete all checklist items for each task
             val tasks = taskRepo.findWhere { TaskColumns.projectId eq project.id }

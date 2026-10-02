@@ -147,7 +147,7 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: gradle-macos-${{ hashFiles('**/*.gradle.kts', '**/libs.versions.toml') }}
+          key: gradle-macos-${{ hashFiles('**/*.gradle.kts', '**/libs.versions.toml', 'gradle.properties') }}
       - name: Run tests (retried — see below)
         uses: nick-fields/retry@v4.0.0
         with:
@@ -220,7 +220,7 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: gradle-macos-${{ hashFiles('**/*.gradle.kts', '**/libs.versions.toml') }}
+          key: gradle-macos-${{ hashFiles('**/*.gradle.kts', '**/libs.versions.toml', 'gradle.properties') }}
       - run: ./gradlew apiCheck --no-daemon
 
   publish:

@@ -26,6 +26,44 @@ abstract interface <#A: kotlin/Any?, #B: kotlin/Any?> io.github.sufarook.kiln.ru
     abstract suspend fun update(#A) // io.github.sufarook.kiln.runtime/CrudRepository.update|update(1:0){}[0]
 }
 
+abstract interface io.github.sufarook.kiln.runtime/KilnCursor { // io.github.sufarook.kiln.runtime/KilnCursor|null[0]
+    abstract fun getBytes(kotlin/Int): kotlin/ByteArray? // io.github.sufarook.kiln.runtime/KilnCursor.getBytes|getBytes(kotlin.Int){}[0]
+    abstract fun getDouble(kotlin/Int): kotlin/Double? // io.github.sufarook.kiln.runtime/KilnCursor.getDouble|getDouble(kotlin.Int){}[0]
+    abstract fun getLong(kotlin/Int): kotlin/Long? // io.github.sufarook.kiln.runtime/KilnCursor.getLong|getLong(kotlin.Int){}[0]
+    abstract fun getString(kotlin/Int): kotlin/String? // io.github.sufarook.kiln.runtime/KilnCursor.getString|getString(kotlin.Int){}[0]
+    abstract fun next(): kotlin/Boolean // io.github.sufarook.kiln.runtime/KilnCursor.next|next(){}[0]
+}
+
+abstract interface io.github.sufarook.kiln.runtime/KilnDriver : kotlin/AutoCloseable { // io.github.sufarook.kiln.runtime/KilnDriver|null[0]
+    abstract fun <#A1: kotlin/Any?> executeQuery(kotlin/Int?, kotlin/String, kotlin/Function1<io.github.sufarook.kiln.runtime/KilnCursor, #A1>, kotlin/Int, kotlin/Function1<io.github.sufarook.kiln.runtime/KilnPreparedStatement, kotlin/Unit>? = ...): #A1 // io.github.sufarook.kiln.runtime/KilnDriver.executeQuery|executeQuery(kotlin.Int?;kotlin.String;kotlin.Function1<io.github.sufarook.kiln.runtime.KilnCursor,0:0>;kotlin.Int;kotlin.Function1<io.github.sufarook.kiln.runtime.KilnPreparedStatement,kotlin.Unit>?){0§<kotlin.Any?>}[0]
+    abstract fun addListener(kotlin/Array<out kotlin/String>..., io.github.sufarook.kiln.runtime/KilnListener) // io.github.sufarook.kiln.runtime/KilnDriver.addListener|addListener(kotlin.Array<out|kotlin.String>...;io.github.sufarook.kiln.runtime.KilnListener){}[0]
+    abstract fun close() // io.github.sufarook.kiln.runtime/KilnDriver.close|close(){}[0]
+    abstract fun currentTransaction(): io.github.sufarook.kiln.runtime/KilnTransaction? // io.github.sufarook.kiln.runtime/KilnDriver.currentTransaction|currentTransaction(){}[0]
+    abstract fun execute(kotlin/Int?, kotlin/String, kotlin/Int, kotlin/Function1<io.github.sufarook.kiln.runtime/KilnPreparedStatement, kotlin/Unit>? = ...): kotlin/Long // io.github.sufarook.kiln.runtime/KilnDriver.execute|execute(kotlin.Int?;kotlin.String;kotlin.Int;kotlin.Function1<io.github.sufarook.kiln.runtime.KilnPreparedStatement,kotlin.Unit>?){}[0]
+    abstract fun newTransaction(): io.github.sufarook.kiln.runtime/KilnTransaction // io.github.sufarook.kiln.runtime/KilnDriver.newTransaction|newTransaction(){}[0]
+    abstract fun notifyListeners(kotlin/Array<out kotlin/String>...) // io.github.sufarook.kiln.runtime/KilnDriver.notifyListeners|notifyListeners(kotlin.Array<out|kotlin.String>...){}[0]
+    abstract fun removeListener(kotlin/Array<out kotlin/String>..., io.github.sufarook.kiln.runtime/KilnListener) // io.github.sufarook.kiln.runtime/KilnDriver.removeListener|removeListener(kotlin.Array<out|kotlin.String>...;io.github.sufarook.kiln.runtime.KilnListener){}[0]
+}
+
+abstract fun interface io.github.sufarook.kiln.runtime/KilnListener { // io.github.sufarook.kiln.runtime/KilnListener|null[0]
+    abstract fun queryResultsChanged() // io.github.sufarook.kiln.runtime/KilnListener.queryResultsChanged|queryResultsChanged(){}[0]
+}
+
+abstract interface io.github.sufarook.kiln.runtime/KilnPreparedStatement { // io.github.sufarook.kiln.runtime/KilnPreparedStatement|null[0]
+    abstract fun bindBytes(kotlin/Int, kotlin/ByteArray?) // io.github.sufarook.kiln.runtime/KilnPreparedStatement.bindBytes|bindBytes(kotlin.Int;kotlin.ByteArray?){}[0]
+    abstract fun bindDouble(kotlin/Int, kotlin/Double?) // io.github.sufarook.kiln.runtime/KilnPreparedStatement.bindDouble|bindDouble(kotlin.Int;kotlin.Double?){}[0]
+    abstract fun bindLong(kotlin/Int, kotlin/Long?) // io.github.sufarook.kiln.runtime/KilnPreparedStatement.bindLong|bindLong(kotlin.Int;kotlin.Long?){}[0]
+    abstract fun bindString(kotlin/Int, kotlin/String?) // io.github.sufarook.kiln.runtime/KilnPreparedStatement.bindString|bindString(kotlin.Int;kotlin.String?){}[0]
+}
+
+abstract interface io.github.sufarook.kiln.runtime/KilnTransaction { // io.github.sufarook.kiln.runtime/KilnTransaction|null[0]
+    abstract val enclosingTransaction // io.github.sufarook.kiln.runtime/KilnTransaction.enclosingTransaction|{}enclosingTransaction[0]
+        abstract fun <get-enclosingTransaction>(): io.github.sufarook.kiln.runtime/KilnTransaction? // io.github.sufarook.kiln.runtime/KilnTransaction.enclosingTransaction.<get-enclosingTransaction>|<get-enclosingTransaction>(){}[0]
+
+    abstract fun childTransaction(): io.github.sufarook.kiln.runtime/KilnTransaction // io.github.sufarook.kiln.runtime/KilnTransaction.childTransaction|childTransaction(){}[0]
+    abstract fun endTransaction(kotlin/Boolean) // io.github.sufarook.kiln.runtime/KilnTransaction.endTransaction|endTransaction(kotlin.Boolean){}[0]
+}
+
 sealed interface io.github.sufarook.kiln.runtime/SqlArg { // io.github.sufarook.kiln.runtime/SqlArg|null[0]
     final class BytesArg : io.github.sufarook.kiln.runtime/SqlArg { // io.github.sufarook.kiln.runtime/SqlArg.BytesArg|null[0]
         constructor <init>(kotlin/ByteArray?) // io.github.sufarook.kiln.runtime/SqlArg.BytesArg.<init>|<init>(kotlin.ByteArray?){}[0]
@@ -80,6 +118,22 @@ sealed interface io.github.sufarook.kiln.runtime/SqlArg { // io.github.sufarook.
     }
 }
 
+abstract class io.github.sufarook.kiln.runtime/BaseKilnDriver : io.github.sufarook.kiln.runtime/KilnDriver { // io.github.sufarook.kiln.runtime/BaseKilnDriver|null[0]
+    constructor <init>() // io.github.sufarook.kiln.runtime/BaseKilnDriver.<init>|<init>(){}[0]
+
+    final var transactionStack // io.github.sufarook.kiln.runtime/BaseKilnDriver.transactionStack|{}transactionStack[0]
+        final fun <get-transactionStack>(): io.github.sufarook.kiln.runtime/KilnTransaction? // io.github.sufarook.kiln.runtime/BaseKilnDriver.transactionStack.<get-transactionStack>|<get-transactionStack>(){}[0]
+        final fun <set-transactionStack>(io.github.sufarook.kiln.runtime/KilnTransaction?) // io.github.sufarook.kiln.runtime/BaseKilnDriver.transactionStack.<set-transactionStack>|<set-transactionStack>(io.github.sufarook.kiln.runtime.KilnTransaction?){}[0]
+
+    abstract fun doClose() // io.github.sufarook.kiln.runtime/BaseKilnDriver.doClose|doClose(){}[0]
+    final fun checkNotClosed() // io.github.sufarook.kiln.runtime/BaseKilnDriver.checkNotClosed|checkNotClosed(){}[0]
+    open fun addListener(kotlin/Array<out kotlin/String>..., io.github.sufarook.kiln.runtime/KilnListener) // io.github.sufarook.kiln.runtime/BaseKilnDriver.addListener|addListener(kotlin.Array<out|kotlin.String>...;io.github.sufarook.kiln.runtime.KilnListener){}[0]
+    open fun close() // io.github.sufarook.kiln.runtime/BaseKilnDriver.close|close(){}[0]
+    open fun currentTransaction(): io.github.sufarook.kiln.runtime/KilnTransaction? // io.github.sufarook.kiln.runtime/BaseKilnDriver.currentTransaction|currentTransaction(){}[0]
+    open fun notifyListeners(kotlin/Array<out kotlin/String>...) // io.github.sufarook.kiln.runtime/BaseKilnDriver.notifyListeners|notifyListeners(kotlin.Array<out|kotlin.String>...){}[0]
+    open fun removeListener(kotlin/Array<out kotlin/String>..., io.github.sufarook.kiln.runtime/KilnListener) // io.github.sufarook.kiln.runtime/BaseKilnDriver.removeListener|removeListener(kotlin.Array<out|kotlin.String>...;io.github.sufarook.kiln.runtime.KilnListener){}[0]
+}
+
 final class <#A: kotlin/Any?> io.github.sufarook.kiln.runtime/Column { // io.github.sufarook.kiln.runtime/Column|null[0]
     constructor <init>(kotlin/String, kotlin/Function1<#A, io.github.sufarook.kiln.runtime/SqlArg>) // io.github.sufarook.kiln.runtime/Column.<init>|<init>(kotlin.String;kotlin.Function1<1:0,io.github.sufarook.kiln.runtime.SqlArg>){}[0]
 
@@ -126,7 +180,7 @@ final class io.github.sufarook.kiln.runtime/ColumnDef { // io.github.sufarook.ki
 final class io.github.sufarook.kiln.runtime/IosDatabaseDriverFactory { // io.github.sufarook.kiln.runtime/IosDatabaseDriverFactory|null[0]
     constructor <init>() // io.github.sufarook.kiln.runtime/IosDatabaseDriverFactory.<init>|<init>(){}[0]
 
-    final fun create(kotlin/String): app.cash.sqldelight.db/SqlDriver // io.github.sufarook.kiln.runtime/IosDatabaseDriverFactory.create|create(kotlin.String){}[0]
+    final fun create(kotlin/String): io.github.sufarook.kiln.runtime/KilnDriver // io.github.sufarook.kiln.runtime/IosDatabaseDriverFactory.create|create(kotlin.String){}[0]
 }
 
 final class io.github.sufarook.kiln.runtime/OrderSpec { // io.github.sufarook.kiln.runtime/OrderSpec|null[0]
@@ -156,12 +210,12 @@ final class io.github.sufarook.kiln.runtime/Predicate { // io.github.sufarook.ki
 }
 
 final class io.github.sufarook.kiln.runtime/SchemaMigrator { // io.github.sufarook.kiln.runtime/SchemaMigrator|null[0]
-    constructor <init>(app.cash.sqldelight.db/SqlDriver) // io.github.sufarook.kiln.runtime/SchemaMigrator.<init>|<init>(app.cash.sqldelight.db.SqlDriver){}[0]
+    constructor <init>(io.github.sufarook.kiln.runtime/KilnDriver) // io.github.sufarook.kiln.runtime/SchemaMigrator.<init>|<init>(io.github.sufarook.kiln.runtime.KilnDriver){}[0]
 
     final fun sync(kotlin/String, kotlin.collections/List<io.github.sufarook.kiln.runtime/ColumnDef>) // io.github.sufarook.kiln.runtime/SchemaMigrator.sync|sync(kotlin.String;kotlin.collections.List<io.github.sufarook.kiln.runtime.ColumnDef>){}[0]
 }
 
-final fun (app.cash.sqldelight.db/SqlPreparedStatement).io.github.sufarook.kiln.runtime/bindArg(kotlin/Int, io.github.sufarook.kiln.runtime/SqlArg) // io.github.sufarook.kiln.runtime/bindArg|bindArg@app.cash.sqldelight.db.SqlPreparedStatement(kotlin.Int;io.github.sufarook.kiln.runtime.SqlArg){}[0]
+final fun (io.github.sufarook.kiln.runtime/KilnPreparedStatement).io.github.sufarook.kiln.runtime/bindArg(kotlin/Int, io.github.sufarook.kiln.runtime/SqlArg) // io.github.sufarook.kiln.runtime/bindArg|bindArg@io.github.sufarook.kiln.runtime.KilnPreparedStatement(kotlin.Int;io.github.sufarook.kiln.runtime.SqlArg){}[0]
 final fun (io.github.sufarook.kiln.runtime/Column<*>).io.github.sufarook.kiln.runtime/isNotNull(): io.github.sufarook.kiln.runtime/Predicate // io.github.sufarook.kiln.runtime/isNotNull|isNotNull@io.github.sufarook.kiln.runtime.Column<*>(){}[0]
 final fun (io.github.sufarook.kiln.runtime/Column<*>).io.github.sufarook.kiln.runtime/isNull(): io.github.sufarook.kiln.runtime/Predicate // io.github.sufarook.kiln.runtime/isNull|isNull@io.github.sufarook.kiln.runtime.Column<*>(){}[0]
 final fun (io.github.sufarook.kiln.runtime/Column<out kotlin/String?>).io.github.sufarook.kiln.runtime/like(kotlin/String): io.github.sufarook.kiln.runtime/Predicate // io.github.sufarook.kiln.runtime/like|like@io.github.sufarook.kiln.runtime.Column<out|kotlin.String?>(kotlin.String){}[0]
@@ -176,9 +230,9 @@ final fun <#A: kotlin/Any?> (io.github.sufarook.kiln.runtime/Column<#A>).io.gith
 final fun <#A: kotlin/Any?> (io.github.sufarook.kiln.runtime/Column<#A>).io.github.sufarook.kiln.runtime/lte(#A): io.github.sufarook.kiln.runtime/Predicate // io.github.sufarook.kiln.runtime/lte|lte@io.github.sufarook.kiln.runtime.Column<0:0>(0:0){0§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (io.github.sufarook.kiln.runtime/Column<#A>).io.github.sufarook.kiln.runtime/neq(#A): io.github.sufarook.kiln.runtime/Predicate // io.github.sufarook.kiln.runtime/neq|neq@io.github.sufarook.kiln.runtime.Column<0:0>(0:0){0§<kotlin.Any?>}[0]
 final fun <#A: kotlin/Any?> (io.github.sufarook.kiln.runtime/Column<#A>).io.github.sufarook.kiln.runtime/notInList(kotlin.collections/Collection<#A>): io.github.sufarook.kiln.runtime/Predicate // io.github.sufarook.kiln.runtime/notInList|notInList@io.github.sufarook.kiln.runtime.Column<0:0>(kotlin.collections.Collection<0:0>){0§<kotlin.Any?>}[0]
-final fun <#A: kotlin/Any?> io.github.sufarook.kiln.runtime/observeQuery(app.cash.sqldelight.db/SqlDriver, kotlin/String, kotlin.coroutines/CoroutineContext, kotlin/Function0<#A>): kotlinx.coroutines.flow/Flow<#A> // io.github.sufarook.kiln.runtime/observeQuery|observeQuery(app.cash.sqldelight.db.SqlDriver;kotlin.String;kotlin.coroutines.CoroutineContext;kotlin.Function0<0:0>){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> io.github.sufarook.kiln.runtime/observeQuery(io.github.sufarook.kiln.runtime/KilnDriver, kotlin/String, kotlin.coroutines/CoroutineContext, kotlin/Function0<#A>): kotlinx.coroutines.flow/Flow<#A> // io.github.sufarook.kiln.runtime/observeQuery|observeQuery(io.github.sufarook.kiln.runtime.KilnDriver;kotlin.String;kotlin.coroutines.CoroutineContext;kotlin.Function0<0:0>){0§<kotlin.Any?>}[0]
 final fun io.github.sufarook.kiln.runtime/buildOrderSuffix(kotlin.collections/List<io.github.sufarook.kiln.runtime/OrderSpec>, kotlin/Long?, kotlin/Long?): kotlin/String // io.github.sufarook.kiln.runtime/buildOrderSuffix|buildOrderSuffix(kotlin.collections.List<io.github.sufarook.kiln.runtime.OrderSpec>;kotlin.Long?;kotlin.Long?){}[0]
 final fun io.github.sufarook.kiln.runtime/not(io.github.sufarook.kiln.runtime/Predicate): io.github.sufarook.kiln.runtime/Predicate // io.github.sufarook.kiln.runtime/not|not(io.github.sufarook.kiln.runtime.Predicate){}[0]
-final suspend fun (app.cash.sqldelight.db/SqlDriver).io.github.sufarook.kiln.runtime/notifyOrDefer(kotlin/String) // io.github.sufarook.kiln.runtime/notifyOrDefer|notifyOrDefer@app.cash.sqldelight.db.SqlDriver(kotlin.String){}[0]
-final suspend fun (app.cash.sqldelight.db/SqlDriver).io.github.sufarook.kiln.runtime/withTransaction(kotlin.coroutines/CoroutineContext = ..., kotlin.coroutines/SuspendFunction0<kotlin/Unit>) // io.github.sufarook.kiln.runtime/withTransaction|withTransaction@app.cash.sqldelight.db.SqlDriver(kotlin.coroutines.CoroutineContext;kotlin.coroutines.SuspendFunction0<kotlin.Unit>){}[0]
-final suspend fun <#A: kotlin/Any?> (app.cash.sqldelight.db/SqlDriver).io.github.sufarook.kiln.runtime/withTransactionAwareContext(kotlin.coroutines/CoroutineContext, kotlin.coroutines/SuspendFunction1<kotlinx.coroutines/CoroutineScope, #A>): #A // io.github.sufarook.kiln.runtime/withTransactionAwareContext|withTransactionAwareContext@app.cash.sqldelight.db.SqlDriver(kotlin.coroutines.CoroutineContext;kotlin.coroutines.SuspendFunction1<kotlinx.coroutines.CoroutineScope,0:0>){0§<kotlin.Any?>}[0]
+final suspend fun (io.github.sufarook.kiln.runtime/KilnDriver).io.github.sufarook.kiln.runtime/notifyOrDefer(kotlin/String) // io.github.sufarook.kiln.runtime/notifyOrDefer|notifyOrDefer@io.github.sufarook.kiln.runtime.KilnDriver(kotlin.String){}[0]
+final suspend fun (io.github.sufarook.kiln.runtime/KilnDriver).io.github.sufarook.kiln.runtime/withTransaction(kotlin.coroutines/CoroutineContext = ..., kotlin.coroutines/SuspendFunction0<kotlin/Unit>) // io.github.sufarook.kiln.runtime/withTransaction|withTransaction@io.github.sufarook.kiln.runtime.KilnDriver(kotlin.coroutines.CoroutineContext;kotlin.coroutines.SuspendFunction0<kotlin.Unit>){}[0]
+final suspend fun <#A: kotlin/Any?> (io.github.sufarook.kiln.runtime/KilnDriver).io.github.sufarook.kiln.runtime/withTransactionAwareContext(kotlin.coroutines/CoroutineContext, kotlin.coroutines/SuspendFunction1<kotlinx.coroutines/CoroutineScope, #A>): #A // io.github.sufarook.kiln.runtime/withTransactionAwareContext|withTransactionAwareContext@io.github.sufarook.kiln.runtime.KilnDriver(kotlin.coroutines.CoroutineContext;kotlin.coroutines.SuspendFunction1<kotlinx.coroutines.CoroutineScope,0:0>){0§<kotlin.Any?>}[0]

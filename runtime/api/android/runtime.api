@@ -1,6 +1,19 @@
 public final class io/github/sufarook/kiln/runtime/AndroidDatabaseDriverFactory {
 	public fun <init> (Landroid/content/Context;)V
-	public final fun create (Ljava/lang/String;)Lapp/cash/sqldelight/db/SqlDriver;
+	public final fun create (Ljava/lang/String;)Lio/github/sufarook/kiln/runtime/KilnDriver;
+}
+
+public abstract class io/github/sufarook/kiln/runtime/BaseKilnDriver : io/github/sufarook/kiln/runtime/KilnDriver {
+	public fun <init> ()V
+	public fun addListener ([Ljava/lang/String;Lio/github/sufarook/kiln/runtime/KilnListener;)V
+	protected final fun checkNotClosed ()V
+	public fun close ()V
+	public fun currentTransaction ()Lio/github/sufarook/kiln/runtime/KilnTransaction;
+	protected abstract fun doClose ()V
+	protected final fun getTransactionStack ()Lio/github/sufarook/kiln/runtime/KilnTransaction;
+	public fun notifyListeners ([Ljava/lang/String;)V
+	public fun removeListener ([Ljava/lang/String;Lio/github/sufarook/kiln/runtime/KilnListener;)V
+	protected final fun setTransactionStack (Lio/github/sufarook/kiln/runtime/KilnTransaction;)V
 }
 
 public final class io/github/sufarook/kiln/runtime/Column {
@@ -44,6 +57,49 @@ public abstract interface class io/github/sufarook/kiln/runtime/CrudRepository {
 	public abstract fun update (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
+public abstract interface class io/github/sufarook/kiln/runtime/KilnCursor {
+	public abstract fun getBytes (I)[B
+	public abstract fun getDouble (I)Ljava/lang/Double;
+	public abstract fun getLong (I)Ljava/lang/Long;
+	public abstract fun getString (I)Ljava/lang/String;
+	public abstract fun next ()Z
+}
+
+public abstract interface class io/github/sufarook/kiln/runtime/KilnDriver : java/lang/AutoCloseable {
+	public abstract fun addListener ([Ljava/lang/String;Lio/github/sufarook/kiln/runtime/KilnListener;)V
+	public abstract fun close ()V
+	public abstract fun currentTransaction ()Lio/github/sufarook/kiln/runtime/KilnTransaction;
+	public abstract fun execute (Ljava/lang/Integer;Ljava/lang/String;ILkotlin/jvm/functions/Function1;)J
+	public static synthetic fun execute$default (Lio/github/sufarook/kiln/runtime/KilnDriver;Ljava/lang/Integer;Ljava/lang/String;ILkotlin/jvm/functions/Function1;ILjava/lang/Object;)J
+	public abstract fun executeQuery (Ljava/lang/Integer;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public static synthetic fun executeQuery$default (Lio/github/sufarook/kiln/runtime/KilnDriver;Ljava/lang/Integer;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun newTransaction ()Lio/github/sufarook/kiln/runtime/KilnTransaction;
+	public abstract fun notifyListeners ([Ljava/lang/String;)V
+	public abstract fun removeListener ([Ljava/lang/String;Lio/github/sufarook/kiln/runtime/KilnListener;)V
+}
+
+public final class io/github/sufarook/kiln/runtime/KilnDriver$DefaultImpls {
+	public static synthetic fun execute$default (Lio/github/sufarook/kiln/runtime/KilnDriver;Ljava/lang/Integer;Ljava/lang/String;ILkotlin/jvm/functions/Function1;ILjava/lang/Object;)J
+	public static synthetic fun executeQuery$default (Lio/github/sufarook/kiln/runtime/KilnDriver;Ljava/lang/Integer;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public abstract interface class io/github/sufarook/kiln/runtime/KilnListener {
+	public abstract fun queryResultsChanged ()V
+}
+
+public abstract interface class io/github/sufarook/kiln/runtime/KilnPreparedStatement {
+	public abstract fun bindBytes (I[B)V
+	public abstract fun bindDouble (ILjava/lang/Double;)V
+	public abstract fun bindLong (ILjava/lang/Long;)V
+	public abstract fun bindString (ILjava/lang/String;)V
+}
+
+public abstract interface class io/github/sufarook/kiln/runtime/KilnTransaction {
+	public abstract fun childTransaction ()Lio/github/sufarook/kiln/runtime/KilnTransaction;
+	public abstract fun endTransaction (Z)V
+	public abstract fun getEnclosingTransaction ()Lio/github/sufarook/kiln/runtime/KilnTransaction;
+}
+
 public final class io/github/sufarook/kiln/runtime/Order : java/lang/Enum {
 	public static final field ASC Lio/github/sufarook/kiln/runtime/Order;
 	public static final field DESC Lio/github/sufarook/kiln/runtime/Order;
@@ -75,7 +131,7 @@ public final class io/github/sufarook/kiln/runtime/Predicate {
 public final class io/github/sufarook/kiln/runtime/QueryDslKt {
 	public static final fun asc (Lio/github/sufarook/kiln/runtime/Column;)Lio/github/sufarook/kiln/runtime/OrderSpec;
 	public static final fun between (Lio/github/sufarook/kiln/runtime/Column;Ljava/lang/Object;Ljava/lang/Object;)Lio/github/sufarook/kiln/runtime/Predicate;
-	public static final fun bindArg (Lapp/cash/sqldelight/db/SqlPreparedStatement;ILio/github/sufarook/kiln/runtime/SqlArg;)V
+	public static final fun bindArg (Lio/github/sufarook/kiln/runtime/KilnPreparedStatement;ILio/github/sufarook/kiln/runtime/SqlArg;)V
 	public static final fun buildOrderSuffix (Ljava/util/List;Ljava/lang/Long;Ljava/lang/Long;)Ljava/lang/String;
 	public static final fun desc (Lio/github/sufarook/kiln/runtime/Column;)Lio/github/sufarook/kiln/runtime/OrderSpec;
 	public static final fun eq (Lio/github/sufarook/kiln/runtime/Column;Ljava/lang/Object;)Lio/github/sufarook/kiln/runtime/Predicate;
@@ -93,11 +149,11 @@ public final class io/github/sufarook/kiln/runtime/QueryDslKt {
 }
 
 public final class io/github/sufarook/kiln/runtime/QueryObservationKt {
-	public static final fun observeQuery (Lapp/cash/sqldelight/db/SqlDriver;Ljava/lang/String;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function0;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun observeQuery (Lio/github/sufarook/kiln/runtime/KilnDriver;Ljava/lang/String;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function0;)Lkotlinx/coroutines/flow/Flow;
 }
 
 public final class io/github/sufarook/kiln/runtime/SchemaMigrator {
-	public fun <init> (Lapp/cash/sqldelight/db/SqlDriver;)V
+	public fun <init> (Lio/github/sufarook/kiln/runtime/KilnDriver;)V
 	public final fun sync (Ljava/lang/String;Ljava/util/List;)V
 }
 
@@ -149,9 +205,9 @@ public final class io/github/sufarook/kiln/runtime/SqlArg$StringArg : io/github/
 }
 
 public final class io/github/sufarook/kiln/runtime/TransactionKt {
-	public static final fun notifyOrDefer (Lapp/cash/sqldelight/db/SqlDriver;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static final fun withTransaction (Lapp/cash/sqldelight/db/SqlDriver;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public static synthetic fun withTransaction$default (Lapp/cash/sqldelight/db/SqlDriver;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public static final fun withTransactionAwareContext (Lapp/cash/sqldelight/db/SqlDriver;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun notifyOrDefer (Lio/github/sufarook/kiln/runtime/KilnDriver;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun withTransaction (Lio/github/sufarook/kiln/runtime/KilnDriver;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun withTransaction$default (Lio/github/sufarook/kiln/runtime/KilnDriver;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun withTransactionAwareContext (Lio/github/sufarook/kiln/runtime/KilnDriver;Lkotlin/coroutines/CoroutineContext;Lkotlin/jvm/functions/Function2;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 

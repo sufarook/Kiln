@@ -1,7 +1,5 @@
 package io.github.sufarook.kiln.runtime
 
-import app.cash.sqldelight.Query
-import app.cash.sqldelight.db.SqlDriver
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -17,16 +15,16 @@ import kotlinx.coroutines.flow.map
  * Used by generated observeAll() — not intended to be called directly.
  */
 fun <T> observeQuery(
-    driver: SqlDriver,
+    driver: KilnDriver,
     tableName: String,
     context: CoroutineContext,
     query: () -> T
 ): Flow<T> = callbackFlow {
-    val listener = Query.Listener { trySend(Unit) }
+    val listener = KilnListener { trySend(Unit) }
     driver.addListener(tableName, listener = listener)
     trySend(Unit) // initial emission
     awaitClose { driver.removeListener(tableName, listener = listener) }
 }
-    .conflate() // collapse bursts of writes into one re-query
+    .conflate()
     .map { query() }
     .flowOn(context)

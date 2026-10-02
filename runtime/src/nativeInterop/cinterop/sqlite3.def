@@ -1,0 +1,3 @@
+headers = sqlite3.h
+linkerOpts = -lsqlite3
+noStringConversion = sqlite3_prepare_v2

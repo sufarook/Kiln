@@ -1,9 +1,5 @@
 package io.github.sufarook.kiln.runtime
 
-import app.cash.sqldelight.SuspendingTransacterImpl
-import app.cash.sqldelight.db.SqlDriver
-import kotlin.concurrent.atomics.AtomicReference
-import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
@@ -21,7 +17,7 @@ import kotlinx.coroutines.withContext
  * Executes [block] inside a single SQLite transaction.
  *
  * All INSERT / UPDATE / DELETE operations performed by Kiln repositories
- * inside [block] have their [SqlDriver.notifyListeners] calls deferred. After
+ * inside [block] have their [KilnDriver.notifyListeners] calls deferred. After
  * the outermost COMMIT, each dirty table is notified exactly once — reactive
  * flows therefore receive one emission per transaction rather than one per
  * operation. This holds whoever opened the outermost transaction: a block run
@@ -39,34 +35,18 @@ import kotlinx.coroutines.withContext
  * resumes on that thread, and repository calls inside the block run there too.
  * Pass `Dispatchers.IO` for a transaction that waits on I/O, so it doesn't hold
  * one of `Dispatchers.Default`'s few threads.
- *
- * ```kotlin
- * // Cascade delete with a single Flow emission per affected table:
- * driver.withTransaction {
- *     taskRepo.deleteByProject(projectId)
- *     projectRepo.delete(projectId)
- * }
- *
- * // Batch insert — observers see all rows appear at once:
- * driver.withTransaction {
- *     tasks.forEach { taskRepo.insert(it) }
- * }
- * ```
  */
-suspend fun SqlDriver.withTransaction(
+suspend fun KilnDriver.withTransaction(
     context: CoroutineContext = Dispatchers.Default,
     block: suspend () -> Unit
 ) {
     val enclosing = currentCoroutineContext()[TransactionThread]
     val joined = enclosing?.dispatcherFor(this)
     if (joined != null) {
-        // Nested inside a Kiln transaction on this driver: join it on its own thread.
         withContext(joined) { runTransaction(block) }
         return
     }
     withContext(context) {
-        // runBlocking pins every continuation of the block to this thread. The
-        // caller's Job is passed on so cancelling the caller still cancels the block.
         runBlocking(coroutineContext[Job] ?: EmptyCoroutineContext) {
             val pinned = coroutineContext[ContinuationInterceptor] as CoroutineDispatcher
             withContext(TransactionThread(this@withTransaction, pinned, enclosing)) {
@@ -84,7 +64,7 @@ suspend fun SqlDriver.withTransaction(
  *
  * Called by generated repository code — not intended for direct use.
  */
-suspend fun <T> SqlDriver.withTransactionAwareContext(
+suspend fun <T> KilnDriver.withTransactionAwareContext(
     context: CoroutineContext,
     block: suspend CoroutineScope.() -> T
 ): T {
@@ -99,75 +79,75 @@ suspend fun <T> SqlDriver.withTransactionAwareContext(
 /**
  * Inside a transaction, records [tableName] as dirty so its notification is sent
  * once, after the outermost commit — or not at all if the transaction rolls back.
- * Outside a transaction, calls [SqlDriver.notifyListeners] immediately
+ * Outside a transaction, calls [KilnDriver.notifyListeners] immediately
  * (preserving the existing per-operation behaviour).
  *
  * Called by generated repository code — not intended for direct use.
  */
-suspend fun SqlDriver.notifyOrDefer(tableName: String) {
-    KilnTransacter(this).notifyTable(tableName)
+suspend fun KilnDriver.notifyOrDefer(tableName: String) {
+    val txCtx = currentCoroutineContext()[TransactionThread]
+    if (txCtx != null && txCtx.ownsDriver(this)) {
+        txCtx.defer(tableName)
+    } else if (currentTransaction() != null) {
+        // Inside an external transaction — cannot defer, best effort notify.
+        notifyListeners(tableName)
+    } else {
+        notifyListeners(tableName)
+    }
 }
 
-private suspend fun SqlDriver.runTransaction(block: suspend () -> Unit) {
-    var blockFailure: Throwable? = null
+private suspend fun KilnDriver.runTransaction(block: suspend () -> Unit) {
+    val txCtx = currentCoroutineContext()[TransactionThread]!!
+    val tx = newTransaction()
     try {
-        KilnTransacter(this).transaction {
-            try {
-                block()
-            } catch (e: Throwable) {
-                blockFailure = e
-                throw e
-            }
-        }
+        block()
+        tx.endTransaction(successful = true)
+        if (tx.enclosingTransaction == null) txCtx.flushIfOutermost(this)
     } catch (e: Throwable) {
-        // SQLDelight ends the transaction in a finally block, so a failing ROLLBACK
-        // replaces the block's exception. Surface the block's — it is the cause.
-        val cause = blockFailure
-        if (cause != null && cause !== e) {
-            cause.addSuppressed(e)
-            throw cause
+        try {
+            tx.endTransaction(successful = false)
+        } catch (rollbackFailure: Throwable) {
+            e.addSuppressed(rollbackFailure)
         }
+        txCtx.clearDeferred()
         throw e
     }
 }
 
-/** SQLDelight's transacter over a borrowed driver — the one transaction authority. */
-private class KilnTransacter(driver: SqlDriver) : SuspendingTransacterImpl(driver) {
-    fun notifyTable(tableName: String) = notifyQueries(TableIdentifiers.of(tableName)) { emit -> emit(tableName) }
-}
-
-/**
- * The thread each active Kiln transaction is pinned to, per driver. Nested
- * transactions and generated repository calls look it up to run where their
- * driver's transaction can be used and ended.
- */
 private class TransactionThread(
-    private val driver: SqlDriver,
+    private val driver: KilnDriver,
     private val dispatcher: CoroutineDispatcher,
     private val enclosing: TransactionThread?
 ) : AbstractCoroutineContextElement(Key) {
     companion object Key : CoroutineContext.Key<TransactionThread>
 
-    fun dispatcherFor(driver: SqlDriver): CoroutineDispatcher? = if (driver === this.driver) dispatcher else enclosing?.dispatcherFor(driver)
-}
+    private val deferred = mutableSetOf<String>()
+    private var depth = 0
 
-/**
- * A stable identifier per table name, for SQLDelight's per-transaction
- * deduplication. `hashCode()` won't do: two table names can share one, and the
- * second table's notification would be silently dropped.
- */
-@OptIn(ExperimentalAtomicApi::class)
-private object TableIdentifiers {
-    // Arbitrary base, away from zero, where hand-written identifiers tend to sit.
-    private const val BASE = 0x4B494C4E // "KILN"
-    private val ids = AtomicReference(emptyMap<String, Int>())
+    init {
+        depth = (enclosing?.depth ?: 0) + 1
+    }
 
-    fun of(tableName: String): Int {
-        while (true) {
-            val current = ids.load()
-            current[tableName]?.let { return it }
-            val next = current + (tableName to BASE + current.size)
-            if (ids.compareAndSet(current, next)) return next.getValue(tableName)
+    fun dispatcherFor(driver: KilnDriver): CoroutineDispatcher? = if (driver === this.driver) dispatcher else enclosing?.dispatcherFor(driver)
+
+    fun ownsDriver(driver: KilnDriver): Boolean = driver === this.driver
+
+    fun defer(tableName: String) {
+        if (enclosing?.ownsDriver(driver) == true) {
+            enclosing.defer(tableName)
+        } else {
+            deferred.add(tableName)
         }
+    }
+
+    fun flushIfOutermost(driver: KilnDriver) {
+        if (enclosing?.ownsDriver(driver) == true) return
+        val tables = deferred.toSet()
+        deferred.clear()
+        tables.forEach { driver.notifyListeners(it) }
+    }
+
+    fun clearDeferred() {
+        deferred.clear()
     }
 }
