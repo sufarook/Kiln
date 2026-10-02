@@ -21,8 +21,7 @@ package io.github.sufarook.kiln.annotations
  * - `deleteByProject(projectId: Long)`
  *
  * @param cascade When `true`, a KDoc hint is added to `deleteByProject` noting that
- *   callers should invoke it before deleting the parent. Full automatic cascade
- *   (transactional) is provided in Phase 5b.
+ *   callers should invoke it before deleting the parent.
  */
 @Target(AnnotationTarget.PROPERTY)
 @Retention(AnnotationRetention.SOURCE)

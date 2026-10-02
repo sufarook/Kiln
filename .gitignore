@@ -33,6 +33,7 @@ DerivedData/
 
 # Internal planning — stays local, not published
 ROADMAP.md
+openspec/
 
 # Claude Code local settings (per-developer permissions, not shared)
 .claude/settings.local.json

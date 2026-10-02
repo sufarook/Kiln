@@ -9,7 +9,6 @@ versioned migration files.
 | For | Read |
 |---|---|
 | Module layout, build/test commands, sharp edges, PR conventions | [CONTRIBUTING.md](CONTRIBUTING.md) |
-| Project context and constraints, in the form planning tools consume | [openspec/config.yaml](openspec/config.yaml) |
 | What the library does, from a consumer's side | [README.md](README.md), [docs/src/](docs/src) |
 
 ## Before claiming a change is done
@@ -60,15 +59,6 @@ These have each produced an incorrect doc or assumption before:
   ([sufarook/kiln-samples](https://github.com/sufarook/kiln-samples)) and consume
   Kiln from Maven Central, so they can only demonstrate *published* features.
   Bump their pinned version after a release lands, not before.
-
-## Planning
-
-Non-trivial work is planned with [OpenSpec](https://openspec.dev/) before it is
-implemented — `/opsx:propose`, then `/opsx:apply`. Artifacts live in
-`openspec/changes/<name>/` and are reviewed as a PR before any code is written.
-`openspec list` shows what is active.
-
-Requires the CLI: `npm install -g @fission-ai/openspec@latest`.
 
 ## Releasing
 
