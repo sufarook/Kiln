@@ -9,7 +9,7 @@
 
 **Compile-time CRUD generation for Kotlin Multiplatform SQLite. No SQL. No mappers. No migrations.**
 
-Annotate a data class. Get a fully typed, coroutine-native repository — on Android **and** iOS, generated at compile time with zero reflection.
+Annotate a data class. Get a fully typed, coroutine-native repository — on Android, Desktop, **and** iOS, generated at compile time with zero reflection.
 
 ```kotlin
 @DbEntity(tableName = "todos")
@@ -44,7 +44,7 @@ repo.count()
 
 | | Room | Kiln |
 |---|---|---|
-| Platforms | Android (KMP support partial) | Android + iOS from one `commonMain` entity |
+| Platforms | Android (KMP support partial) | Android, Desktop, and iOS from one `commonMain` entity |
 | Migrations | Manual: bump version, write `Migration(1, 2)` | **Automatic** — no version numbers exist |
 | Rename a column | Hand-written SQL migration | `@Column(migrateFrom = "old_name")` |
 | Queries | `@Query("SELECT * FROM …")` — SQL strings | `findWhere { priority eq 1 }` — compile-checked |
@@ -108,6 +108,9 @@ class TodoStore(driver: KilnDriver) {
 
 // Android
 val driver = AndroidDatabaseDriverFactory(context).create("app.db")
+
+// Desktop (JVM)
+val driver = JvmDatabaseDriverFactory().create("app.db")
 
 // iOS
 val driver = IosDatabaseDriverFactory().create("app.db")
@@ -180,7 +183,9 @@ you would — from Maven Central, with no `project(":")` references:
 **[github.com/sufarook/kiln-samples](https://github.com/sufarook/kiln-samples)**
 
 - **`compose-multiplatform`** — one `@Composable` and one set of generated repositories
-  shared by Android and iOS, built around a many-to-many junction table
+  shared by Android, Desktop (JVM), and iOS, built around a many-to-many junction table
+- **`expense-tracker`** — a multi-table expense tracker with relations, junction tables,
+  transactions, and type-safe DSL queries
 - **`android-views`** — the same library in a traditional XML / RecyclerView app
 
 ## Status

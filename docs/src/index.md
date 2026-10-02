@@ -36,7 +36,7 @@ No SQL to write. No version numbers to track. No migration files to maintain.
 
     ---
 
-    Define entities in `commonMain`. Works on Android and iOS from a single source of truth.
+    Define entities in `commonMain`. Works on Android, Desktop, and iOS from a single source of truth.
 
 -   :material-puzzle-outline:{ .lg .middle } **One-line Gradle setup**
 
