@@ -26,12 +26,12 @@ dependencyResolutionManagement {
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android") version "2.3.20"
-    id("io.github.sufarook.kiln") version "1.0.0-alpha06"
+    id("io.github.sufarook.kiln") version "1.0.0-alpha07"
 }
 
 dependencies {
-    implementation("io.github.sufarook.kiln:annotations:1.0.0-alpha06")
-    implementation("io.github.sufarook.kiln:runtime:1.0.0-alpha06")
+    implementation("io.github.sufarook.kiln:annotations:1.0.0-alpha07")
+    implementation("io.github.sufarook.kiln:runtime:1.0.0-alpha07")
 }
 ```
 
@@ -48,7 +48,7 @@ For KMP projects the plugin configures `kspCommonMainMetadata` automatically —
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
-    id("io.github.sufarook.kiln") version "1.0.0-alpha06"
+    id("io.github.sufarook.kiln") version "1.0.0-alpha07"
 }
 
 kotlin {
@@ -59,8 +59,8 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation("io.github.sufarook.kiln:annotations:1.0.0-alpha06")
-            implementation("io.github.sufarook.kiln:runtime:1.0.0-alpha06")
+            implementation("io.github.sufarook.kiln:annotations:1.0.0-alpha07")
+            implementation("io.github.sufarook.kiln:runtime:1.0.0-alpha07")
         }
     }
 }
@@ -81,9 +81,9 @@ val noteRepo = NoteRepository(driver).also { it.createTable() }
 
 | Artifact | Coordinate |
 |----------|-----------|
-| Annotations | `io.github.sufarook.kiln:annotations:1.0.0-alpha06` |
-| Runtime | `io.github.sufarook.kiln:runtime:1.0.0-alpha06` |
+| Annotations | `io.github.sufarook.kiln:annotations:1.0.0-alpha07` |
+| Runtime | `io.github.sufarook.kiln:runtime:1.0.0-alpha07` |
 | Gradle plugin | `io.github.sufarook.kiln` (plugin id) |
 
 !!! warning "Alpha release"
-    Version `1.0.0-alpha06` is stable for Android production use. The public API is stable but minor breaking changes may occur before the `1.0.0` stable release. Watch the [GitHub releases](https://github.com/sufarook/Kiln/releases) page for updates.
+    Version `1.0.0-alpha07` is stable for Android production use. The public API is stable but minor breaking changes may occur before the `1.0.0` stable release. Watch the [GitHub releases](https://github.com/sufarook/Kiln/releases) page for updates.
