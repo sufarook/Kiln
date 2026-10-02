@@ -39,14 +39,25 @@ class KilnPlugin : Plugin<Project> {
      * KMP: run the processor once on common metadata so one generated repository is
      * shared by all targets. KSP filters its own output dirs out of Android
      * compilations, so generated sources are synced to a neutral directory first.
+     *
+     * KSP 2.x propagates processors from `kspCommonMainMetadata` to every target
+     * config, which would produce duplicate classes. The processor is excluded from
+     * target configs so it only runs on the metadata compilation.
+     *
+     * Requires at least two platform targets so KSP creates the metadata
+     * compilation. On hosts where some targets are unavailable (e.g. no K/N on
+     * Windows), add a lightweight substitute target such as `jvm("desktop")`.
      */
     private fun configureMultiplatform(project: Project) {
         project.dependencies.add("kspCommonMainMetadata", "$GROUP:processor:$VERSION")
 
         val syncTask = project.tasks.register("syncKilnGeneratedSources", Sync::class.java) { task ->
-            task.dependsOn("kspCommonMainKotlinMetadata")
             task.from(project.layout.buildDirectory.dir("generated/ksp/metadata/commonMain/kotlin"))
             task.into(project.layout.buildDirectory.dir(GENERATED_DIR))
+        }
+
+        project.tasks.matching { it.name == "kspCommonMainKotlinMetadata" }.all { kspTask ->
+            syncTask.configure { it.dependsOn(kspTask) }
         }
 
         val kmp = project.extensions.getByType(KotlinMultiplatformExtension::class.java)
@@ -61,6 +72,33 @@ class KilnPlugin : Plugin<Project> {
         project.tasks.withType(KotlinCompilationTask::class.java).configureEach { task ->
             if (task.name != "kspCommonMainKotlinMetadata") {
                 task.dependsOn(syncTask)
+            }
+        }
+
+        // KspAATask is not a KotlinCompilationTask, so wire it separately.
+        // In multi-target mode the synced sources are needed by target KSP tasks;
+        // in single-target mode the sync is NO-SOURCE (empty metadata dir) but
+        // the dependency satisfies Gradle's implicit-dependency validation since
+        // the sync output dir is part of the commonMain source set.
+        project.tasks.matching {
+            it.name.startsWith("ksp") && it.name != "kspCommonMainKotlinMetadata"
+        }.all { task ->
+            task.dependsOn(syncTask)
+        }
+
+        // KSP 2.x propagates kspCommonMainMetadata to every target config,
+        // so the processor would run for each target compilation too, producing
+        // duplicates. Exclude it from target configs so it only runs once on the
+        // metadata compilation.
+        project.afterEvaluate {
+            kmp.targets.forEach { target ->
+                val name = target.name
+                if (name != "metadata") {
+                    val kspConfig = "ksp${name.replaceFirstChar { it.uppercase() }}"
+                    project.configurations.findByName(kspConfig)?.exclude(
+                        mapOf("group" to GROUP, "module" to "processor")
+                    )
+                }
             }
         }
     }
