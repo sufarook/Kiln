@@ -6,7 +6,7 @@ context: |
   (@DbEntity/@PrimaryKey/@Column/@Relation/@Ignore) and get a full repository
   with no hand-written SQL, no mappers, and no versioned migration files.
 
-  Published to Maven Central as io.github.sufarook.kiln (currently 1.0.0-alpha07).
+  Published to Maven Central as io.github.sufarook.kiln (currently 1.0.0-alpha08).
 
   Modules:
     annotations/   The annotation set. Public API — consumers import these directly.
