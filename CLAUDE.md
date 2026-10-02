@@ -11,7 +11,6 @@ versioned migration files.
 | Module layout, build/test commands, sharp edges, PR conventions | [CONTRIBUTING.md](CONTRIBUTING.md) |
 | Project context and constraints, in the form planning tools consume | [openspec/config.yaml](openspec/config.yaml) |
 | What the library does, from a consumer's side | [README.md](README.md), [docs/src/](docs/src) |
-| Active and deferred work | [ROADMAP.md](ROADMAP.md) |
 
 ## Before claiming a change is done
 
