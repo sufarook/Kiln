@@ -1512,33 +1512,7 @@
 </tbody>
 </table>
 <h2 id="runtime-dependencies">Runtime dependencies</h2>
-<p>Kiln's runtime layer sits on top of <a href="https://cashapp.github.io/sqldelight/">SQLDelight</a> 2.x for the <code>SqlDriver</code> abstraction. You choose the driver for your platform — Kiln does not bundle one.</p>
-<table>
-<thead>
-<tr>
-<th>Platform</th>
-<th>Driver dependency</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Android</td>
-<td><code>app.cash.sqldelight:android-driver:2.3.2</code></td>
-</tr>
-<tr>
-<td>iOS (KMP)</td>
-<td><code>app.cash.sqldelight:native-driver:2.3.2</code></td>
-</tr>
-<tr>
-<td>JVM tests</td>
-<td><code>app.cash.sqldelight:sqlite-driver:2.3.2</code></td>
-</tr>
-</tbody>
-</table>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Kiln does not require you to write any SQLDelight <code>.sq</code> files or configure a SQLDelight schema. The driver is used purely as a transport layer for raw SQL execution.</p>
-</div>
+<p>Kiln ships its own platform-specific SQLite drivers. You do not need to add any separate driver dependency — the <code>runtime</code> artifact includes drivers for Android, iOS, and the JVM.</p>
 
 
 

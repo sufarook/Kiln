@@ -1919,7 +1919,7 @@
 <div class="language-kotlin highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nd">@Column</span><span class="p">(</span><span class="n">migrateFrom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"old_column_name"</span><span class="p">)</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kd">val</span><span class="w"> </span><span class="nv">newPropertyName</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">""</span>
 </span></code></pre></div></p>
-<p><strong>Recovering existing data:</strong> If the data is still on device and you haven't uninstalled, you can write a one-time migration using the raw <code>SqlDriver</code>:
+<p><strong>Recovering existing data:</strong> If the data is still on device and you haven't uninstalled, you can write a one-time migration using the raw <code>KilnDriver</code>:
 <div class="language-kotlin highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">driver</span><span class="p">.</span><span class="na">execute</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="s">"UPDATE tasks SET new_name = old_name"</span><span class="p">,</span><span class="w"> </span><span class="m">0</span><span class="p">)</span>
 </span></code></pre></div>
 Run this once before calling <code>createTable()</code>, then remove it.</p>
@@ -1933,7 +1933,7 @@ Run this once before calling <code>createTable()</code>, then remove it.</p>
 </span></code></pre></div></p>
 <hr />
 <h3 id="observeall-isnt-updating-after-insert"><code>observeAll()</code> isn't updating after insert</h3>
-<p>The flow won't re-emit if the write and the observer use different <code>SqlDriver</code> instances. All repositories that share the same driver instance share the same <code>Query.Listener</code> channel.</p>
+<p>The flow won't re-emit if the write and the observer use different <code>KilnDriver</code> instances. All repositories that share the same driver instance share the same <code>KilnListener</code> channel.</p>
 <p><strong>Make sure you pass the same driver to every repository:</strong>
 <div class="language-kotlin highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">// Correct — all repos share one driver</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kd">val</span><span class="w"> </span><span class="nv">driver</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">createDriver</span><span class="p">()</span>
@@ -1961,7 +1961,7 @@ Run this once before calling <code>createTable()</code>, then remove it.</p>
 <p><strong>Tables Kiln doesn't know about</strong> (no corresponding <code>@DbEntity</code>) are never touched.</p>
 <hr />
 <h3 id="can-kiln-work-alongside-raw-sql-or-room">Can Kiln work alongside raw SQL or Room?</h3>
-<p>Yes. Kiln uses the <code>SqlDriver</code> directly — it's the same driver you'd pass to SQLDelight. You can call raw SQL through <code>driver.execute(…)</code> at any point. Just be aware that raw writes won't trigger Kiln's <code>Query.Listener</code>, so reactive flows won't re-emit for those changes.</p>
+<p>Yes. Kiln uses the <code>KilnDriver</code> directly. You can call raw SQL through <code>driver.execute(…)</code> at any point. Just be aware that raw writes won't trigger Kiln's <code>KilnListener</code>, so reactive flows won't re-emit for those changes.</p>
 <p>Kiln's migrations are safe alongside tables it doesn't own, even when other code has turned on foreign-key enforcement (Room does). When an entity change forces Kiln to rebuild its table, it switches enforcement off for the rebuild and back to its previous setting afterwards — so rows in your own tables that reference the rebuilt one, including <code>ON DELETE CASCADE</code> references, are left untouched. Call <code>createTable()</code> / <code>KilnSchema.createAll()</code> outside any transaction: Kiln refuses to migrate inside one, because it can't change enforcement or control the commit there.</p>
 <hr />
 <h2 id="performance">Performance</h2>
@@ -1975,14 +1975,14 @@ Run this once before calling <code>createTable()</code>, then remove it.</p>
 <hr />
 <h2 id="general">General</h2>
 <h3 id="does-kiln-support-transactions">Does Kiln support transactions?</h3>
-<p>Yes. Wrap multiple writes in <code>SqlDriver.withTransaction { }</code> — everything inside commits atomically, and reactive flows receive a <strong>single</strong> notification after the commit (or none at all if it rolls back):</p>
+<p>Yes. Wrap multiple writes in <code>driver.withTransaction { }</code> — everything inside commits atomically, and reactive flows receive a <strong>single</strong> notification after the commit (or none at all if it rolls back):</p>
 <div class="language-kotlin highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">driver</span><span class="p">.</span><span class="na">withTransaction</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span><span class="n">taskRepo</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
 </span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="n">checklistRepo</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
 </span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>If the block throws, the transaction rolls back and no <code>observeAll()</code> / <code>observeWhere()</code> flow re-emits for those writes. Generated repositories also expose <code>insertAll(items)</code>, which wraps a bulk insert in a single transaction for you.</p>
-<p>Blocks nest — a <code>withTransaction</code> inside another joins it, and only the outermost one commits. Kiln also joins a transaction opened through SQLDelight's API on the same driver (a SQLDelight-generated <code>Database.transaction { }</code>, say), and notifies only once that commits. Don't open transactions with raw <code>driver.execute(null, "BEGIN TRANSACTION", 0)</code>: Kiln can't see a transaction opened that way, so it can't join it.</p>
+<p>Blocks nest — a <code>withTransaction</code> inside another joins it, and only the outermost one commits. Kiln also joins a transaction opened via <code>driver.newTransaction()</code> on the same driver, and notifies only once that commits. Don't open transactions with raw <code>driver.execute(null, "BEGIN TRANSACTION", 0)</code>: Kiln can't see a transaction opened that way, so it can't join it.</p>
 <hr />
 <h3 id="does-it-support-foreign-keys">Does it support foreign keys?</h3>
 <p>Two separate things, and the answer differs for each:</p>
@@ -1990,12 +1990,15 @@ Run this once before calling <code>createTable()</code>, then remove it.</p>
 <p><strong>FK constraint enforcement — no.</strong> SQLite foreign keys are off by default and Kiln does not emit <code>PRAGMA foreign_keys = ON</code>, so the database won't reject an orphaned row or cascade a delete on its own. Handle referential integrity in your code — call <code>deleteByParent(id)</code> before deleting a parent (annotate the relation <code>@Relation(cascade = true)</code> as a reminder that you're responsible for the cascade), and see <a href="../sample/cross-table/">Cross-table Loading</a> for the recommended pattern.</p>
 <hr />
 <h3 id="can-i-use-kiln-in-a-pure-jvm-project-no-android">Can I use Kiln in a pure JVM project (no Android)?</h3>
-<p>Yes. Pass a <code>JdbcSqliteDriver</code> from SQLDelight's <code>sqlite-driver</code> artifact:</p>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kd">val</span><span class="w"> </span><span class="nv">driver</span><span class="p">:</span><span class="w"> </span><span class="n">SqlDriver</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JdbcSqliteDriver</span><span class="p">(</span><span class="s">"jdbc:sqlite:myapp.db"</span><span class="p">)</span>
+<p>Yes. Use <code>JvmDatabaseDriverFactory</code> to create a driver:</p>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kd">val</span><span class="w"> </span><span class="nv">driver</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JvmDatabaseDriverFactory</span><span class="p">().</span><span class="na">create</span><span class="p">(</span><span class="s">"myapp.db"</span><span class="p">)</span>
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="kd">val</span><span class="w"> </span><span class="nv">repo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ProductRepository</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
 </span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">repo</span><span class="p">.</span><span class="na">createTable</span><span class="p">()</span>
 </span></code></pre></div>
-<p>The generated code only depends on <code>app.cash.sqldelight:runtime</code> — it has no Android dependency.</p>
+<p>For tests, use an in-memory database:</p>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kd">val</span><span class="w"> </span><span class="nv">driver</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JvmDatabaseDriverFactory</span><span class="p">().</span><span class="na">createInMemory</span><span class="p">()</span>
+</span></code></pre></div>
+<p>The generated code depends on <code>io.github.sufarook.kiln:runtime</code> — it has no Android dependency.</p>
 
 
 

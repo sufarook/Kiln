@@ -1,6 +1,8 @@
 $dokka.format:html-v1
 $dokka.linkExtension:html
-
+$dokka.location:io.github.sufarook.kiln.runtime/IosDatabaseDriverFactory///PointingToDeclaration/runtime/io.github.sufarook.kiln.runtime/[ios-x64]-ios-database-driver-factory/index.html
+$dokka.location:io.github.sufarook.kiln.runtime/IosDatabaseDriverFactory/IosDatabaseDriverFactory/#/PointingToDeclaration/runtime/io.github.sufarook.kiln.runtime/[ios-x64]-ios-database-driver-factory/-ios-database-driver-factory.html
+$dokka.location:io.github.sufarook.kiln.runtime/IosDatabaseDriverFactory/create/#kotlin.String/PointingToDeclaration/runtime/io.github.sufarook.kiln.runtime/[ios-x64]-ios-database-driver-factory/create.html
 module:annotations
 io.github.sufarook.kiln.annotations
 module:runtime

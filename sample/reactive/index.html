@@ -1496,7 +1496,7 @@
 
 <h1 id="reactive-queries">Reactive Queries</h1>
 <h2 id="how-it-works">How it works</h2>
-<p>Every generated repository exposes <code>observeAll()</code> returning <code>Flow&lt;List&lt;T&gt;&gt;</code>. Internally it wraps SQLDelight's <code>Query.Listener</code> — when any write operation (<code>insert</code>, <code>update</code>, <code>delete</code>, <code>deleteWhere</code>) completes, the listener is notified and the flow re-emits the updated list.</p>
+<p>Every generated repository exposes <code>observeAll()</code> returning <code>Flow&lt;List&lt;T&gt;&gt;</code>. Internally it uses <code>KilnListener</code> — when any write operation (<code>insert</code>, <code>update</code>, <code>delete</code>, <code>deleteWhere</code>) completes, the listener is notified and the flow re-emits the updated list.</p>
 <p>No polling. No manual <code>invalidate()</code> calls. No <code>postValue()</code>.</p>
 <h2 id="basic-observation">Basic observation</h2>
 <div class="language-kotlin highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">lifecycleScope</span><span class="p">.</span><span class="na">launch</span><span class="w"> </span><span class="p">{</span>
@@ -1585,7 +1585,7 @@
 </span><span id="__span-3-25"><a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="cross-table-reactivity">Cross-table reactivity</h2>
-<p>All repositories that share the same <code>SqlDriver</code> instance share the same listener channel. A write to <code>taskRepo</code> triggers re-emission on all active <code>taskRepo.observeAll()</code> and <code>taskRepo.observeWhere()</code> collectors — it does <strong>not</strong> trigger collectors on <code>projectRepo</code> or <code>checklistRepo</code>.</p>
+<p>All repositories that share the same <code>KilnDriver</code> instance share the same listener channel. A write to <code>taskRepo</code> triggers re-emission on all active <code>taskRepo.observeAll()</code> and <code>taskRepo.observeWhere()</code> collectors — it does <strong>not</strong> trigger collectors on <code>projectRepo</code> or <code>checklistRepo</code>.</p>
 <p>To react to changes across tables, combine flows:</p>
 <div class="language-kotlin highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">// React when either tasks or checklist items change</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">combine</span><span class="p">(</span>

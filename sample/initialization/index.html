@@ -1474,7 +1474,7 @@
 
 <h1 id="initialization">Initialization</h1>
 <h2 id="create-driver-and-repositories">Create driver and repositories</h2>
-<p>Create one <code>SqlDriver</code> and pass it to each repository. All repositories share the same driver — SQLite is a single-file database and a single <code>SqlDriver</code> instance manages the connection.</p>
+<p>Create one <code>KilnDriver</code> and pass it to each repository. All repositories share the same driver — SQLite is a single-file database and a single <code>KilnDriver</code> instance manages the connection.</p>
 <p>Kiln generates a <code>KilnSchema</code> object covering every <code>@DbEntity</code> in the module, so one call creates the whole schema:</p>
 <div class="language-kotlin highlight"><span class="filename">TaskTrackerApp.kt</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">TaskTrackerApp</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Application</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>

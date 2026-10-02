@@ -44,7 +44,9 @@
         <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
                 <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":runtime/androidMain">android</button>
                 <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":runtime/commonMain">common</button>
-                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":runtime/iosMain">ios</button>
+                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":runtime/iosArm64Main">iosArm64</button>
+                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":runtime/iosSimulatorArm64Main">iosSimulatorArm64</button>
+                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":runtime/iosX64Main">iosX64</button>
                 <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":runtime/jvmMain">jvm</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
@@ -70,9 +72,23 @@
                         </li>
                         <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
                             <label class="checkbox">
-                                <input type="checkbox" class="checkbox--input" id=":runtime/iosMain" data-filter=":runtime/iosMain">
+                                <input type="checkbox" class="checkbox--input" id=":runtime/iosArm64Main" data-filter=":runtime/iosArm64Main">
                                 <span class="checkbox--icon"></span>
-                                ios
+                                iosArm64
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":runtime/iosSimulatorArm64Main" data-filter=":runtime/iosSimulatorArm64Main">
+                                <span class="checkbox--icon"></span>
+                                iosSimulatorArm64
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":runtime/iosX64Main" data-filter=":runtime/iosX64Main">
+                                <span class="checkbox--icon"></span>
+                                iosX64
                             </label>
                         </li>
                         <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
@@ -113,7 +129,7 @@
         </nav>
         <div id="resizer" class="resizer" data-item-type="BAR"></div>
         <div id="main" data-item-type="SECTION" role="main">
-<div class="main-content" data-page-type="package" id="content" pageids="runtime::io.github.sufarook.kiln.runtime////PointingToDeclaration//814835134">
+<div class="main-content" data-page-type="package" id="content" pageids="runtime::io.github.sufarook.kiln.runtime////PointingToDeclaration//-1075706462">
   <div class="breadcrumbs"><a href="../index.html">runtime</a><span class="delimiter">/</span><span class="current">io.github.sufarook.kiln.runtime</span></div>
   <div class="cover ">
     <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
@@ -136,6 +152,21 @@
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
                     <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":runtime/androidMain" data-filterable-set=":runtime/androidMain" data-active="" data-toggle=":runtime/androidMain">android</button></div>
 <div class="content sourceset-dependent-content" data-active="" data-togglable=":runtime/androidMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-android-database-driver-factory/index.html">AndroidDatabaseDriverFactory</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/content/Context.html">Context</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-965456376%2FClasslikes%2F673331665" anchor-label="BaseKilnDriver" id="-965456376%2FClasslikes%2F673331665" data-filterable-set=":runtime/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":runtime/commonMain" data-filterable-set=":runtime/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-base-kiln-driver/index.html"><span>Base</span><wbr><span>Kiln</span><wbr><span><span>Driver</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-965456376%2FClasslikes%2F673331665"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":runtime/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-base-kiln-driver/index.html">BaseKilnDriver</a> : <a href="-kiln-driver/index.html">KilnDriver</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -185,19 +216,19 @@
               </div>
             </div>
           </div>
-<a data-name="1700152967%2FClasslikes%2F-1853970355" anchor-label="IosDatabaseDriverFactory" id="1700152967%2FClasslikes%2F-1853970355" data-filterable-set=":runtime/iosMain"></a>
-          <div class="table-row table-row_content" data-filterable-current=":runtime/iosMain" data-filterable-set=":runtime/iosMain">
+<a data-name="1700152967%2FClasslikes%2F324587313" anchor-label="IosDatabaseDriverFactory" id="1700152967%2FClasslikes%2F324587313" data-filterable-set=":runtime/iosArm64Main,:runtime/iosSimulatorArm64Main,:runtime/iosX64Main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":runtime/iosArm64Main,:runtime/iosSimulatorArm64Main,:runtime/iosX64Main" data-filterable-set=":runtime/iosArm64Main,:runtime/iosSimulatorArm64Main,:runtime/iosX64Main">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-ios-database-driver-factory/index.html"><span>Ios</span><wbr><span>Database</span><wbr><span>Driver</span><wbr><span><span>Factory</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1700152967%2FClasslikes%2F-1853970355"></span>
+                  <div><a href="../../runtime/io.github.sufarook.kiln.runtime/[ios-x64]-ios-database-driver-factory/index.html"><span>Ios</span><wbr><span>Database</span><wbr><span>Driver</span><wbr><span><span>Factory</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1700152967%2FClasslikes%2F324587313"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
-                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":runtime/iosMain" data-filterable-set=":runtime/iosMain" data-active="" data-toggle=":runtime/iosMain">ios</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":runtime/iosMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-ios-database-driver-factory/index.html">IosDatabaseDriverFactory</a></div></div>                  </div>
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":runtime/iosArm64Main" data-filterable-set=":runtime/iosArm64Main" data-active="" data-toggle=":runtime/iosArm64Main">iosArm64</button><button class="platform-bookmark" data-filterable-current=":runtime/iosSimulatorArm64Main" data-filterable-set=":runtime/iosSimulatorArm64Main" data-toggle=":runtime/iosSimulatorArm64Main">iosSimulatorArm64</button><button class="platform-bookmark" data-filterable-current=":runtime/iosX64Main" data-filterable-set=":runtime/iosX64Main" data-toggle=":runtime/iosX64Main">iosX64</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":runtime/iosArm64Main"><div class="symbol monospace"><span class="token keyword">class </span><a href="[ios-arm64]-ios-database-driver-factory/index.html">IosDatabaseDriverFactory</a></div></div><div class="content sourceset-dependent-content" data-togglable=":runtime/iosSimulatorArm64Main"><div class="symbol monospace"><span class="token keyword">class </span><a href="[ios-simulator-arm64]-ios-database-driver-factory/index.html">IosDatabaseDriverFactory</a></div></div><div class="content sourceset-dependent-content" data-togglable=":runtime/iosX64Main"><div class="symbol monospace"><span class="token keyword">class </span><a href="[ios-x64]-ios-database-driver-factory/index.html">IosDatabaseDriverFactory</a></div></div>                  </div>
                 </div>
               </div>
             </div>
@@ -214,7 +245,82 @@
                 <div class="title">
                   <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
                     <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":runtime/jvmMain" data-filterable-set=":runtime/jvmMain" data-active="" data-toggle=":runtime/jvmMain">jvm</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":runtime/jvmMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-jvm-database-driver-factory/index.html">JvmDatabaseDriverFactory</a></div><div class="brief "><p class="paragraph">Creates a SQLite driver for JVM (desktop / server) targets.</p></div></div>                  </div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":runtime/jvmMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-jvm-database-driver-factory/index.html">JvmDatabaseDriverFactory</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2114380587%2FClasslikes%2F673331665" anchor-label="KilnCursor" id="2114380587%2FClasslikes%2F673331665" data-filterable-set=":runtime/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":runtime/commonMain" data-filterable-set=":runtime/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-kiln-cursor/index.html"><span>Kiln</span><wbr><span><span>Cursor</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2114380587%2FClasslikes%2F673331665"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":runtime/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-kiln-cursor/index.html">KilnCursor</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1302131047%2FClasslikes%2F673331665" anchor-label="KilnDriver" id="-1302131047%2FClasslikes%2F673331665" data-filterable-set=":runtime/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":runtime/commonMain" data-filterable-set=":runtime/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-kiln-driver/index.html"><span>Kiln</span><wbr><span><span>Driver</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1302131047%2FClasslikes%2F673331665"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":runtime/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-kiln-driver/index.html">KilnDriver</a> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-auto-closeable/index.html">AutoCloseable</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="408892301%2FClasslikes%2F673331665" anchor-label="KilnListener" id="408892301%2FClasslikes%2F673331665" data-filterable-set=":runtime/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":runtime/commonMain" data-filterable-set=":runtime/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-kiln-listener/index.html"><span>Kiln</span><wbr><span><span>Listener</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="408892301%2FClasslikes%2F673331665"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":runtime/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token keyword">interface </span><a href="-kiln-listener/index.html">KilnListener</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="264760111%2FClasslikes%2F673331665" anchor-label="KilnPreparedStatement" id="264760111%2FClasslikes%2F673331665" data-filterable-set=":runtime/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":runtime/commonMain" data-filterable-set=":runtime/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-kiln-prepared-statement/index.html"><span>Kiln</span><wbr><span>Prepared</span><wbr><span><span>Statement</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="264760111%2FClasslikes%2F673331665"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":runtime/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-kiln-prepared-statement/index.html">KilnPreparedStatement</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-884981885%2FClasslikes%2F673331665" anchor-label="KilnTransaction" id="-884981885%2FClasslikes%2F673331665" data-filterable-set=":runtime/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":runtime/commonMain" data-filterable-set=":runtime/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-kiln-transaction/index.html"><span>Kiln</span><wbr><span><span>Transaction</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-884981885%2FClasslikes%2F673331665"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":runtime/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-kiln-transaction/index.html">KilnTransaction</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -274,7 +380,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":runtime/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-schema-migrator/index.html">SchemaMigrator</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">driver<span class="token operator">: </span><span data-unresolved-link="app.cash.sqldelight.db/SqlDriver///PointingToDeclaration/">SqlDriver</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Automatic schema migration — called inside every generated createTable().</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":runtime/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-schema-migrator/index.html">SchemaMigrator</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">driver<span class="token operator">: </span><a href="-kiln-driver/index.html">KilnDriver</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Automatic schema migration — called inside every generated createTable().</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -328,17 +434,17 @@
               </div>
             </div>
           </div>
-<a data-name="-314923594%2FFunctions%2F673331665" anchor-label="bindArg" id="-314923594%2FFunctions%2F673331665" data-filterable-set=":runtime/commonMain"></a>
+<a data-name="-1004493970%2FFunctions%2F673331665" anchor-label="bindArg" id="-1004493970%2FFunctions%2F673331665" data-filterable-set=":runtime/commonMain"></a>
           <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":runtime/commonMain" data-filterable-set=":runtime/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="bind-arg.html"><span>bind</span><wbr><span><span>Arg</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-314923594%2FFunctions%2F673331665"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1004493970%2FFunctions%2F673331665"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":runtime/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="app.cash.sqldelight.db/SqlPreparedStatement///PointingToDeclaration/">SqlPreparedStatement</span><span class="token punctuation">.</span><a href="bind-arg.html"><span class="token function">bindArg</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">index<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">arg<span class="token operator">: </span><a href="-sql-arg/index.html">SqlArg</a></span></span><span class="token punctuation">)</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":runtime/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="-kiln-prepared-statement/index.html">KilnPreparedStatement</a><span class="token punctuation">.</span><a href="bind-arg.html"><span class="token function">bindArg</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">index<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">arg<span class="token operator">: </span><a href="-sql-arg/index.html">SqlArg</a></span></span><span class="token punctuation">)</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -538,17 +644,17 @@
               </div>
             </div>
           </div>
-<a data-name="-904045201%2FFunctions%2F673331665" anchor-label="notifyOrDefer" id="-904045201%2FFunctions%2F673331665" data-filterable-set=":runtime/commonMain"></a>
+<a data-name="1229382263%2FFunctions%2F673331665" anchor-label="notifyOrDefer" id="1229382263%2FFunctions%2F673331665" data-filterable-set=":runtime/commonMain"></a>
           <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":runtime/commonMain" data-filterable-set=":runtime/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="notify-or-defer.html"><span>notify</span><wbr><span>Or</span><wbr><span><span>Defer</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-904045201%2FFunctions%2F673331665"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1229382263%2FFunctions%2F673331665"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":runtime/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><span data-unresolved-link="app.cash.sqldelight.db/SqlDriver///PointingToDeclaration/">SqlDriver</span><span class="token punctuation">.</span><a href="notify-or-defer.html"><span class="token function">notifyOrDefer</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">tableName<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Inside a transaction, records <a href="notify-or-defer.html">tableName</a> as dirty so its notification is sent once, after the outermost commit — or not at all if the transaction rolls back. Outside a transaction, calls <span data-unresolved-link="app.cash.sqldelight.db/SqlDriver/notifyListeners/#vararg(kotlin.String)/PointingToDeclaration/">SqlDriver.notifyListeners</span> immediately (preserving the existing per-operation behaviour).</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":runtime/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="-kiln-driver/index.html">KilnDriver</a><span class="token punctuation">.</span><a href="notify-or-defer.html"><span class="token function">notifyOrDefer</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">tableName<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Inside a transaction, records <a href="notify-or-defer.html">tableName</a> as dirty so its notification is sent once, after the outermost commit — or not at all if the transaction rolls back. Outside a transaction, calls <a href="-kiln-driver/notify-listeners.html">KilnDriver.notifyListeners</a> immediately (preserving the existing per-operation behaviour).</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -568,47 +674,47 @@
               </div>
             </div>
           </div>
-<a data-name="444150628%2FFunctions%2F673331665" anchor-label="observeQuery" id="444150628%2FFunctions%2F673331665" data-filterable-set=":runtime/commonMain"></a>
+<a data-name="-11822436%2FFunctions%2F673331665" anchor-label="observeQuery" id="-11822436%2FFunctions%2F673331665" data-filterable-set=":runtime/commonMain"></a>
           <div class="table-row table-row_content" data-filterable-current=":runtime/commonMain" data-filterable-set=":runtime/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="observe-query.html"><span>observe</span><wbr><span><span>Query</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="444150628%2FFunctions%2F673331665"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-11822436%2FFunctions%2F673331665"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":runtime/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="observe-query.html">T</a><span class="token operator">&gt; </span><a href="observe-query.html"><span class="token function">observeQuery</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">driver<span class="token operator">: </span><span data-unresolved-link="app.cash.sqldelight.db/SqlDriver///PointingToDeclaration/">SqlDriver</span><span class="token punctuation">, </span></span><span class="parameter ">tableName<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">context<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.coroutines/-coroutine-context/index.html">CoroutineContext</a><span class="token punctuation">, </span></span><span class="parameter ">query<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="observe-query.html">T</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines.flow/Flow///PointingToDeclaration/">Flow</span><span class="token operator">&lt;</span><a href="observe-query.html">T</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Runs <a href="observe-query.html">query</a> once immediately, then again every time the driver is notified that <a href="observe-query.html">tableName</a> changed (generated repositories call notifyListeners after each write).</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":runtime/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="observe-query.html">T</a><span class="token operator">&gt; </span><a href="observe-query.html"><span class="token function">observeQuery</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">driver<span class="token operator">: </span><a href="-kiln-driver/index.html">KilnDriver</a><span class="token punctuation">, </span></span><span class="parameter ">tableName<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">context<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.coroutines/-coroutine-context/index.html">CoroutineContext</a><span class="token punctuation">, </span></span><span class="parameter ">query<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="observe-query.html">T</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines.flow/Flow///PointingToDeclaration/">Flow</span><span class="token operator">&lt;</span><a href="observe-query.html">T</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Runs <a href="observe-query.html">query</a> once immediately, then again every time the driver is notified that <a href="observe-query.html">tableName</a> changed (generated repositories call notifyListeners after each write).</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-303233916%2FFunctions%2F673331665" anchor-label="withTransaction" id="-303233916%2FFunctions%2F673331665" data-filterable-set=":runtime/commonMain"></a>
+<a data-name="1974422268%2FFunctions%2F673331665" anchor-label="withTransaction" id="1974422268%2FFunctions%2F673331665" data-filterable-set=":runtime/commonMain"></a>
           <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":runtime/commonMain" data-filterable-set=":runtime/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="with-transaction.html"><span>with</span><wbr><span><span>Transaction</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-303233916%2FFunctions%2F673331665"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1974422268%2FFunctions%2F673331665"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":runtime/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><span data-unresolved-link="app.cash.sqldelight.db/SqlDriver///PointingToDeclaration/">SqlDriver</span><span class="token punctuation">.</span><a href="with-transaction.html"><span class="token function">withTransaction</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.coroutines/-coroutine-context/index.html">CoroutineContext</a><span class="token operator"> = </span>Dispatchers.Default<span class="token punctuation">, </span></span><span class="parameter ">block<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Executes <a href="with-transaction.html">block</a> inside a single SQLite transaction.</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":runtime/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="-kiln-driver/index.html">KilnDriver</a><span class="token punctuation">.</span><a href="with-transaction.html"><span class="token function">withTransaction</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.coroutines/-coroutine-context/index.html">CoroutineContext</a><span class="token operator"> = </span>Dispatchers.Default<span class="token punctuation">, </span></span><span class="parameter ">block<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Executes <a href="with-transaction.html">block</a> inside a single SQLite transaction.</p></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-985323181%2FFunctions%2F673331665" anchor-label="withTransactionAwareContext" id="-985323181%2FFunctions%2F673331665" data-filterable-set=":runtime/commonMain"></a>
+<a data-name="876470027%2FFunctions%2F673331665" anchor-label="withTransactionAwareContext" id="876470027%2FFunctions%2F673331665" data-filterable-set=":runtime/commonMain"></a>
           <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":runtime/commonMain" data-filterable-set=":runtime/commonMain">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="with-transaction-aware-context.html"><span>with</span><wbr><span>Transaction</span><wbr><span>Aware</span><wbr><span><span>Context</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-985323181%2FFunctions%2F673331665"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="876470027%2FFunctions%2F673331665"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":runtime/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="with-transaction-aware-context.html">T</a><span class="token operator">&gt; </span><span data-unresolved-link="app.cash.sqldelight.db/SqlDriver///PointingToDeclaration/">SqlDriver</span><span class="token punctuation">.</span><a href="with-transaction-aware-context.html"><span class="token function">withTransactionAwareContext</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.coroutines/-coroutine-context/index.html">CoroutineContext</a><span class="token punctuation">, </span></span><span class="parameter ">block<span class="token operator">: </span><span class="token keyword">suspend </span><span data-unresolved-link="kotlinx.coroutines/CoroutineScope///PointingToDeclaration/">CoroutineScope</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="with-transaction-aware-context.html">T</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="with-transaction-aware-context.html">T</a></div><div class="brief "><p class="paragraph">Runs <a href="with-transaction-aware-context.html">block</a> like <code class="lang-kotlin">withContext(context, block)</code>, unless a transaction is open:</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":runtime/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="with-transaction-aware-context.html">T</a><span class="token operator">&gt; </span><a href="-kiln-driver/index.html">KilnDriver</a><span class="token punctuation">.</span><a href="with-transaction-aware-context.html"><span class="token function">withTransactionAwareContext</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.coroutines/-coroutine-context/index.html">CoroutineContext</a><span class="token punctuation">, </span></span><span class="parameter ">block<span class="token operator">: </span><span class="token keyword">suspend </span><span data-unresolved-link="kotlinx.coroutines/CoroutineScope///PointingToDeclaration/">CoroutineScope</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="with-transaction-aware-context.html">T</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="with-transaction-aware-context.html">T</a></div><div class="brief "><p class="paragraph">Runs <a href="with-transaction-aware-context.html">block</a> like <code class="lang-kotlin">withContext(context, block)</code>, unless a transaction is open:</p></div></div></div>
                 </div>
               </div>
             </div>

@@ -44,7 +44,9 @@
         <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
                 <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":runtime/androidMain">android</button>
                 <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":runtime/commonMain">common</button>
-                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":runtime/iosMain">ios</button>
+                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":runtime/iosArm64Main">iosArm64</button>
+                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":runtime/iosSimulatorArm64Main">iosSimulatorArm64</button>
+                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":runtime/iosX64Main">iosX64</button>
                 <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":runtime/jvmMain">jvm</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
@@ -70,9 +72,23 @@
                         </li>
                         <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
                             <label class="checkbox">
-                                <input type="checkbox" class="checkbox--input" id=":runtime/iosMain" data-filter=":runtime/iosMain">
+                                <input type="checkbox" class="checkbox--input" id=":runtime/iosArm64Main" data-filter=":runtime/iosArm64Main">
                                 <span class="checkbox--icon"></span>
-                                ios
+                                iosArm64
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":runtime/iosSimulatorArm64Main" data-filter=":runtime/iosSimulatorArm64Main">
+                                <span class="checkbox--icon"></span>
+                                iosSimulatorArm64
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":runtime/iosX64Main" data-filter=":runtime/iosX64Main">
+                                <span class="checkbox--icon"></span>
+                                iosX64
                             </label>
                         </li>
                         <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
@@ -113,26 +129,28 @@
         </nav>
         <div id="resizer" class="resizer" data-item-type="BAR"></div>
         <div id="main" data-item-type="SECTION" role="main">
-<div class="main-content" id="content" pageids="runtime::////PointingToDeclaration//814835134">
+<div class="main-content" id="content" pageids="runtime::////PointingToDeclaration//-1075706462">
   <div class="breadcrumbs"></div>
   <div class="cover ">
     <h1 class="cover"><span><span>runtime</span></span></h1>
   </div>
   <h2 class="">Packages</h2>
-  <div class="table"><a data-name="-1611035295%2FPackages%2F814835134" anchor-label="io.github.sufarook.kiln.runtime" id="-1611035295%2FPackages%2F814835134" data-filterable-set=":runtime/androidMain,:runtime/commonMain,:runtime/iosMain,:runtime/jvmMain"></a>
-    <div class="table-row table-row_platform-tagged" data-filterable-current=":runtime/androidMain,:runtime/commonMain,:runtime/iosMain,:runtime/jvmMain" data-filterable-set=":runtime/androidMain,:runtime/commonMain,:runtime/iosMain,:runtime/jvmMain">
+  <div class="table"><a data-name="-1611035295%2FPackages%2F-1075706462" anchor-label="io.github.sufarook.kiln.runtime" id="-1611035295%2FPackages%2F-1075706462" data-filterable-set=":runtime/androidMain,:runtime/commonMain,:runtime/iosArm64Main,:runtime/iosSimulatorArm64Main,:runtime/iosX64Main,:runtime/jvmMain"></a>
+    <div class="table-row table-row_platform-tagged" data-filterable-current=":runtime/androidMain,:runtime/commonMain,:runtime/iosArm64Main,:runtime/iosSimulatorArm64Main,:runtime/iosX64Main,:runtime/jvmMain" data-filterable-set=":runtime/androidMain,:runtime/commonMain,:runtime/iosArm64Main,:runtime/iosSimulatorArm64Main,:runtime/iosX64Main,:runtime/jvmMain">
       <div>
         <div class="main-subrow ">
           <div class=""><span class="inline-flex">
               <div><a href="io.github.sufarook.kiln.runtime/index.html">io.github.sufarook.kiln.runtime</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1611035295%2FPackages%2F814835134"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1611035295%2FPackages%2F-1075706462"></span>
                 <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
               </span></span></div>
           <div class="pull-right platform-tags--wrapper">
             <div class="platform-tags no-gutters">
               <div class="platform-tag jvm-like">android</div>
               <div class="platform-tag common-like">common</div>
-              <div class="platform-tag native-like">ios</div>
+              <div class="platform-tag native-like">iosArm64</div>
+              <div class="platform-tag native-like">iosSimulatorArm64</div>
+              <div class="platform-tag native-like">iosX64</div>
               <div class="platform-tag jvm-like">jvm</div>
             </div>
           </div>
