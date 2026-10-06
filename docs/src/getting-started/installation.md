@@ -77,6 +77,38 @@ val noteRepo = NoteRepository(driver).also { it.createTable() }
 
 ---
 
+## Desktop / JVM
+
+For pure JVM or Compose Desktop projects, use `JvmDatabaseDriverFactory`:
+
+```kotlin title="build.gradle.kts"
+plugins {
+    kotlin("jvm")
+    id("io.github.sufarook.kiln") version "1.0.0-alpha08"
+}
+
+dependencies {
+    implementation("io.github.sufarook.kiln:annotations:1.0.0-alpha08")
+    implementation("io.github.sufarook.kiln:runtime:1.0.0-alpha08")
+}
+```
+
+```kotlin title="main.kt"
+val driver = JvmDatabaseDriverFactory().create("myapp.db")
+val repo = ProductRepository(driver).also { it.createTable() }
+```
+
+For tests or ephemeral use, create an in-memory database:
+
+```kotlin
+val driver = JvmDatabaseDriverFactory().createInMemory()
+```
+
+!!! tip
+    The generated code has no Android dependency — the `runtime` module is pure Kotlin.
+
+---
+
 ## Maven coordinates
 
 | Artifact | Coordinate |

@@ -83,6 +83,28 @@ See [`driver.withTransaction`](../reference/api.md#transactions) for the transac
 
 ---
 
+## Nullable relations
+
+A `@Relation` property can be nullable to model optional parent references — for example, an order that may or may not belong to a registered customer:
+
+```kotlin
+@DbEntity(tableName = "orders")
+data class Order(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @Column(name = "customer_id") @Relation val customerId: Long? = null,
+    val total: Double
+)
+```
+
+The generated `findByCustomer(id)` and `observeByCustomer(id)` still work — they match rows where `customer_id` equals the given id. Rows where `customer_id` is `NULL` (walk-in orders, in this case) are excluded from those results. Use `isNull()` / `isNotNull()` in a DSL query to find them:
+
+```kotlin
+val walkIns = orderRepo.findWhere { OrderColumns.customerId.isNull() }
+val registered = orderRepo.findWhere { OrderColumns.customerId.isNotNull() }
+```
+
+---
+
 ## Reactive join
 
 Combine `observeBy<Parent>` with `observeAll()` on the parent to build a live `Pair<Project?, List<Task>>` stream:

@@ -102,6 +102,8 @@ class TaskStore(
 ```kotlin title="ProjectDetailViewModel.kt"
 class ProjectDetailViewModel(
     private val store: TaskStore,
+    private val taskRepo: TaskRepository,
+    private val driver: KilnDriver,
     private val projectId: Long
 ) : ViewModel() {
 
@@ -117,11 +119,11 @@ class ProjectDetailViewModel(
     }
 
     fun completeTask(task: Task) {
-        viewModelScope.launch { store.completeTask(task) }
+        viewModelScope.launch { store.completeTask(driver, task) }
     }
 
     fun archiveProject(project: Project) {
-        viewModelScope.launch { store.archiveProject(project) }
+        viewModelScope.launch { store.archiveProject(driver, project) }
     }
 }
 ```

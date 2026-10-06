@@ -56,6 +56,37 @@ val results = taskRepo.findWhere { TaskColumns.title like "%$query%" }
 !!! note
     SQLite `LIKE` is case-insensitive for ASCII characters by default. For full Unicode case-insensitive search you'll need a custom collation, which is beyond the scope of the DSL.
 
+## `between`
+
+```kotlin
+// Tasks due this week
+val thisWeek = taskRepo.findWhere {
+    TaskColumns.dueDate.between("2026-10-05", "2026-10-11")
+}
+```
+
+## Ordering and pagination
+
+`findWhere` and `observeWhere` accept `orderBy`, `limit`, and `offset` parameters for sorting and pagination:
+
+```kotlin
+import io.github.sufarook.kiln.runtime.asc
+import io.github.sufarook.kiln.runtime.desc
+
+// Sorted by priority (highest first), limited to 20 results
+val topTasks = taskRepo.findWhere(
+    orderBy = listOf(TaskColumns.priority.desc()),
+    limit = 20
+) { TaskColumns.isCompleted eq false }
+
+// Page 3 (0-indexed), 10 items per page, alphabetical
+val page = taskRepo.findWhere(
+    orderBy = listOf(TaskColumns.title.asc()),
+    limit = 10,
+    offset = 30
+) { TaskColumns.isCompleted eq false }
+```
+
 ## `observeWhere` — reactive filter
 
 ```kotlin

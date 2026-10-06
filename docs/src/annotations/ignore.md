@@ -43,5 +43,5 @@ val tasks = taskRepo.findAll().map { task ->
 }
 ```
 
-!!! note
-    `@Ignore` works with Kotlin's default parameter values. As long as the ignored property has a default, the data class remains constructable from cursor data without providing that value.
+!!! warning "Ignored properties must have a default value"
+    `@Ignore` properties **must** have a Kotlin default value. Kiln constructs instances from cursor data without providing ignored properties — if one has no default, the data class is not constructable and compilation fails.

@@ -57,5 +57,19 @@ lifecycleScope.launch {
 }
 ```
 
+## Bulk insert
+
+```kotlin
+lifecycleScope.launch {
+    taskRepo.insertAll(listOf(
+        Task(projectId = 1L, title = "Design mockups"),
+        Task(projectId = 1L, title = "Write copy"),
+        Task(projectId = 1L, title = "Build prototype")
+    ))
+}
+```
+
+`insertAll` wraps all inserts in a single transaction — reactive observers receive one emission after all rows are committed, not one per row.
+
 !!! note "No return value from insert"
     `insert` does not return the generated id. If you need the id immediately after insert, use `findAll().last().id` or query by a unique field. This limitation will be addressed in a future release.

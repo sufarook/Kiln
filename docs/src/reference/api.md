@@ -141,7 +141,10 @@ val product: Product? = productRepo.findById("abc")
 suspend fun findAll(): List<T>
 ```
 
-Returns all rows in insertion order. Returns an empty list (not null) when the table is empty.
+Returns all rows. Returns an empty list (not null) when the table is empty.
+
+!!! note
+    SQLite does not guarantee row order without an `ORDER BY` clause. Use `findWhere` with `orderBy` if you need deterministic ordering.
 
 ```kotlin
 val products: List<Product> = productRepo.findAll()
@@ -152,14 +155,40 @@ val products: List<Product> = productRepo.findAll()
 ## `findWhere { predicate }: List<T>`
 
 ```kotlin
-suspend fun findWhere(predicate: ProductColumns.() -> Predicate): List<T>
+suspend fun findWhere(
+    orderBy: List<OrderSpec> = emptyList(),
+    limit: Long = 0,
+    offset: Long = 0,
+    predicate: ProductColumns.() -> Predicate
+): List<T>
 ```
 
 Returns all rows matching the DSL predicate. Returns an empty list when no rows match.
 
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `orderBy` | `emptyList()` | Sort columns — use `Column.asc()` or `Column.desc()` |
+| `limit` | `0` (no limit) | Maximum rows to return |
+| `offset` | `0` | Rows to skip before returning |
+| `predicate` | *(required)* | DSL filter — see [DSL Operators](dsl-operators.md) |
+
 ```kotlin
+// Basic filter
 val inStock = productRepo.findWhere { ProductColumns.inStock eq true }
+
+// Sorted and paginated
+val page = productRepo.findWhere(
+    orderBy = listOf(ProductColumns.price.desc()),
+    limit = 20,
+    offset = 40
+) { ProductColumns.inStock eq true }
 ```
+
+!!! tip "Imports for ordering"
+    ```kotlin
+    import io.github.sufarook.kiln.runtime.asc
+    import io.github.sufarook.kiln.runtime.desc
+    ```
 
 ---
 
@@ -183,15 +212,27 @@ productRepo.observeAll()
 ## `observeWhere { predicate }: Flow<List<T>>`
 
 ```kotlin
-fun observeWhere(predicate: ProductColumns.() -> Predicate): Flow<List<T>>
+fun observeWhere(
+    orderBy: List<OrderSpec> = emptyList(),
+    limit: Long = 0,
+    offset: Long = 0,
+    predicate: ProductColumns.() -> Predicate
+): Flow<List<T>>
 ```
 
-Like `observeAll()`, but filters by the DSL predicate on every emission.
+Like `observeAll()`, but filters by the DSL predicate on every emission. Accepts the same `orderBy` / `limit` / `offset` parameters as `findWhere`.
 
 ```kotlin
+// Basic reactive filter
 val activeTasks: Flow<List<Task>> = taskRepo.observeWhere {
     TaskColumns.status inList listOf("TODO", "IN_PROGRESS")
 }
+
+// Reactive paginated feed
+val topProducts: Flow<List<Product>> = productRepo.observeWhere(
+    orderBy = listOf(ProductColumns.price.desc()),
+    limit = 10
+) { ProductColumns.inStock eq true }
 ```
 
 !!! note
@@ -330,6 +371,72 @@ suspend fun <T> KilnDriver.withTransactionAwareContext(
 ```
 
 Called automatically by generated repository code in place of `withContext(context)`. Inside a transaction it runs `block` on the transaction's thread instead of switching to `context`; otherwise it behaves exactly like `withContext`. Not intended for direct use.
+
+---
+
+## Raw SQL (`KilnDriver`)
+
+When you need operations Kiln doesn't generate — aggregates, JOINs, GROUP BY, or one-off DDL — use the driver directly:
+
+### `driver.execute()`
+
+Executes a write statement (INSERT, UPDATE, DELETE, DDL):
+
+```kotlin
+driver.execute(null, "UPDATE products SET price = price * 1.1 WHERE category_id = ?", 1) {
+    bindLong(0, categoryId)
+}
+```
+
+### `driver.executeQuery()`
+
+Executes a read statement and maps results from the cursor:
+
+```kotlin
+val totalRevenue = driver.executeQuery(
+    null,
+    "SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE status = ?",
+    mapper = { cursor ->
+        cursor.next()
+        cursor.getDouble(0) ?: 0.0
+    },
+    parameters = 1
+) {
+    bindString(0, "COMPLETED")
+}
+```
+
+A multi-row example with JOIN and GROUP BY:
+
+```kotlin
+data class CategorySales(val name: String, val total: Double)
+
+val sales = driver.executeQuery(
+    null,
+    """
+    SELECT c.name, SUM(oi.quantity * oi.unit_price) AS total
+    FROM order_items oi
+    INNER JOIN products p ON oi.product_id = p.id
+    INNER JOIN categories c ON p.category_id = c.id
+    GROUP BY c.name
+    ORDER BY total DESC
+    """.trimIndent(),
+    mapper = { cursor ->
+        buildList {
+            while (cursor.next().value) {
+                add(CategorySales(
+                    name = cursor.getString(0) ?: "",
+                    total = cursor.getDouble(1) ?: 0.0
+                ))
+            }
+        }
+    },
+    parameters = 0
+)
+```
+
+!!! warning
+    Raw writes (`driver.execute`) do not trigger Kiln's `KilnListener`. Reactive flows (`observeAll`, `observeWhere`) won't re-emit for those changes. If you need reactivity after a raw write, call `driver.notifyListeners("<table_name>")`.
 
 ---
 
