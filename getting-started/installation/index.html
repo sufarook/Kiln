@@ -346,6 +346,25 @@
   
   
     <li class="md-tabs__item">
+      <a href="../../versioning/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Versioning
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
       <a href="../../faq/" class="md-tabs__link">
         
   
@@ -645,6 +664,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#desktop-jvm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Desktop / JVM
+      
+    </span>
+  </a>
   
 </li>
       
@@ -1396,6 +1426,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../../versioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Versioning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../faq/" class="md-nav__link">
         
   
@@ -1510,6 +1567,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#desktop-jvm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Desktop / JVM
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#maven-coordinates" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1601,6 +1669,29 @@
 <div class="language-kotlin highlight"><span class="filename">iosMain</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">val</span><span class="w"> </span><span class="nv">driver</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IosDatabaseDriverFactory</span><span class="p">().</span><span class="na">create</span><span class="p">(</span><span class="s">"myapp.db"</span><span class="p">)</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kd">val</span><span class="w"> </span><span class="nv">noteRepo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NoteRepository</span><span class="p">(</span><span class="n">driver</span><span class="p">).</span><span class="na">also</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">it</span><span class="p">.</span><span class="na">createTable</span><span class="p">()</span><span class="w"> </span><span class="p">}</span>
 </span></code></pre></div>
+<hr />
+<h2 id="desktop-jvm">Desktop / JVM</h2>
+<p>For pure JVM or Compose Desktop projects, use <code>JvmDatabaseDriverFactory</code>:</p>
+<div class="language-kotlin highlight"><span class="filename">build.gradle.kts</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">plugins</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="n">kotlin</span><span class="p">(</span><span class="s">"jvm"</span><span class="p">)</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="n">id</span><span class="p">(</span><span class="s">"io.github.sufarook.kiln"</span><span class="p">)</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="s">"1.0.0-alpha08"</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="p">}</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="n">dependencies</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="n">implementation</span><span class="p">(</span><span class="s">"io.github.sufarook.kiln:annotations:1.0.0-alpha08"</span><span class="p">)</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="n">implementation</span><span class="p">(</span><span class="s">"io.github.sufarook.kiln:runtime:1.0.0-alpha08"</span><span class="p">)</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="p">}</span>
+</span></code></pre></div>
+<div class="language-kotlin highlight"><span class="filename">main.kt</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">val</span><span class="w"> </span><span class="nv">driver</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JvmDatabaseDriverFactory</span><span class="p">().</span><span class="na">create</span><span class="p">(</span><span class="s">"myapp.db"</span><span class="p">)</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kd">val</span><span class="w"> </span><span class="nv">repo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ProductRepository</span><span class="p">(</span><span class="n">driver</span><span class="p">).</span><span class="na">also</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">it</span><span class="p">.</span><span class="na">createTable</span><span class="p">()</span><span class="w"> </span><span class="p">}</span>
+</span></code></pre></div>
+<p>For tests or ephemeral use, create an in-memory database:</p>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">val</span><span class="w"> </span><span class="nv">driver</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JvmDatabaseDriverFactory</span><span class="p">().</span><span class="na">createInMemory</span><span class="p">()</span>
+</span></code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The generated code has no Android dependency — the <code>runtime</code> module is pure Kotlin.</p>
+</div>
 <hr />
 <h2 id="maven-coordinates">Maven coordinates</h2>
 <table>

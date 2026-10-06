@@ -346,6 +346,25 @@
   
   
     <li class="md-tabs__item">
+      <a href="../../versioning/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Versioning
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
       <a href="../../faq/" class="md-tabs__link">
         
   
@@ -1151,6 +1170,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#between" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        between
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ordering-and-pagination" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ordering and pagination
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#observewhere-reactive-filter" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1417,6 +1458,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../../versioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Versioning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../faq/" class="md-nav__link">
         
   
@@ -1512,6 +1580,28 @@
     <span class="md-ellipsis">
       
         Text search
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#between" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        between
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ordering-and-pagination" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ordering and pagination
       
     </span>
   </a>
@@ -1624,72 +1714,96 @@
 <p class="admonition-title">Note</p>
 <p>SQLite <code>LIKE</code> is case-insensitive for ASCII characters by default. For full Unicode case-insensitive search you'll need a custom collation, which is beyond the scope of the DSL.</p>
 </div>
+<h2 id="between"><code>between</code></h2>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1">// Tasks due this week</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kd">val</span><span class="w"> </span><span class="nv">thisWeek</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">taskRepo</span><span class="p">.</span><span class="na">findWhere</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="n">TaskColumns</span><span class="p">.</span><span class="na">dueDate</span><span class="p">.</span><span class="na">between</span><span class="p">(</span><span class="s">"2026-10-05"</span><span class="p">,</span><span class="w"> </span><span class="s">"2026-10-11"</span><span class="p">)</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="p">}</span>
+</span></code></pre></div>
+<h2 id="ordering-and-pagination">Ordering and pagination</h2>
+<p><code>findWhere</code> and <code>observeWhere</code> accept <code>orderBy</code>, <code>limit</code>, and <code>offset</code> parameters for sorting and pagination:</p>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">import</span><span class="w"> </span><span class="nn">io.github.sufarook.kiln.runtime.asc</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">import</span><span class="w"> </span><span class="nn">io.github.sufarook.kiln.runtime.desc</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1">// Sorted by priority (highest first), limited to 20 results</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="kd">val</span><span class="w"> </span><span class="nv">topTasks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">taskRepo</span><span class="p">.</span><span class="na">findWhere</span><span class="p">(</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="n">orderBy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">listOf</span><span class="p">(</span><span class="n">TaskColumns</span><span class="p">.</span><span class="na">priority</span><span class="p">.</span><span class="na">desc</span><span class="p">()),</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="n">limit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">20</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">TaskColumns</span><span class="p">.</span><span class="na">isCompleted</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="c1">// Page 3 (0-indexed), 10 items per page, alphabetical</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="kd">val</span><span class="w"> </span><span class="nv">page</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">taskRepo</span><span class="p">.</span><span class="na">findWhere</span><span class="p">(</span>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">    </span><span class="n">orderBy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">listOf</span><span class="p">(</span><span class="n">TaskColumns</span><span class="p">.</span><span class="na">title</span><span class="p">.</span><span class="na">asc</span><span class="p">()),</span>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">    </span><span class="n">limit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">10</span><span class="p">,</span>
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">    </span><span class="n">offset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">30</span>
+</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">TaskColumns</span><span class="p">.</span><span class="na">isCompleted</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">}</span>
+</span></code></pre></div>
 <h2 id="observewhere-reactive-filter"><code>observeWhere</code> — reactive filter</h2>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1">// Reactive incomplete checklist items for a task — re-emits on every write</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kd">val</span><span class="w"> </span><span class="nv">pendingItems</span><span class="p">:</span><span class="w"> </span><span class="n">Flow</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">ChecklistItem</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">checklistRepo</span><span class="p">.</span><span class="na">observeWhere</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="p">(</span><span class="n">ChecklistItemColumns</span><span class="p">.</span><span class="na">taskId</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="n">taskId</span><span class="p">)</span><span class="w"> </span><span class="n">and</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="p">(</span><span class="n">ChecklistItemColumns</span><span class="p">.</span><span class="na">isDone</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="p">}</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">// Reactive incomplete checklist items for a task — re-emits on every write</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kd">val</span><span class="w"> </span><span class="nv">pendingItems</span><span class="p">:</span><span class="w"> </span><span class="n">Flow</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">ChecklistItem</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">checklistRepo</span><span class="p">.</span><span class="na">observeWhere</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="p">(</span><span class="n">ChecklistItemColumns</span><span class="p">.</span><span class="na">taskId</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="n">taskId</span><span class="p">)</span><span class="w"> </span><span class="n">and</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="p">(</span><span class="n">ChecklistItemColumns</span><span class="p">.</span><span class="na">isDone</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="count"><code>count</code></h2>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">// Count incomplete tasks in a project (e.g. for a badge)</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kd">val</span><span class="w"> </span><span class="nv">openCount</span><span class="p">:</span><span class="w"> </span><span class="kt">Long</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">taskRepo</span><span class="p">.</span><span class="na">count</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="p">(</span><span class="n">TaskColumns</span><span class="p">.</span><span class="na">projectId</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="n">projectId</span><span class="p">)</span><span class="w"> </span><span class="n">and</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="p">(</span><span class="n">TaskColumns</span><span class="p">.</span><span class="na">isCompleted</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="p">}</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="c1">// Total row count (no predicate)</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="kd">val</span><span class="w"> </span><span class="nv">totalProjects</span><span class="p">:</span><span class="w"> </span><span class="kt">Long</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">projectRepo</span><span class="p">.</span><span class="na">count</span><span class="p">()</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1">// Count incomplete tasks in a project (e.g. for a badge)</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kd">val</span><span class="w"> </span><span class="nv">openCount</span><span class="p">:</span><span class="w"> </span><span class="kt">Long</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">taskRepo</span><span class="p">.</span><span class="na">count</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="p">(</span><span class="n">TaskColumns</span><span class="p">.</span><span class="na">projectId</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="n">projectId</span><span class="p">)</span><span class="w"> </span><span class="n">and</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="p">(</span><span class="n">TaskColumns</span><span class="p">.</span><span class="na">isCompleted</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="p">}</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="c1">// Total row count (no predicate)</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="kd">val</span><span class="w"> </span><span class="nv">totalProjects</span><span class="p">:</span><span class="w"> </span><span class="kt">Long</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">projectRepo</span><span class="p">.</span><span class="na">count</span><span class="p">()</span>
 </span></code></pre></div>
 <h2 id="deletewhere"><code>deleteWhere</code></h2>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">// Bulk delete all done checklist items for a task</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">checklistRepo</span><span class="p">.</span><span class="na">deleteWhere</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="p">(</span><span class="n">ChecklistItemColumns</span><span class="p">.</span><span class="na">taskId</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="n">taskId</span><span class="p">)</span><span class="w"> </span><span class="n">and</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="p">(</span><span class="n">ChecklistItemColumns</span><span class="p">.</span><span class="na">isDone</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="p">}</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="c1">// Delete all tasks for a project</span>
-</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="n">taskRepo</span><span class="p">.</span><span class="na">deleteWhere</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">TaskColumns</span><span class="p">.</span><span class="na">projectId</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="n">projectId</span><span class="w"> </span><span class="p">}</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1">// Bulk delete all done checklist items for a task</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">checklistRepo</span><span class="p">.</span><span class="na">deleteWhere</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="p">(</span><span class="n">ChecklistItemColumns</span><span class="p">.</span><span class="na">taskId</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="n">taskId</span><span class="p">)</span><span class="w"> </span><span class="n">and</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="p">(</span><span class="n">ChecklistItemColumns</span><span class="p">.</span><span class="na">isDone</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="p">}</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="c1">// Delete all tasks for a project</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="n">taskRepo</span><span class="p">.</span><span class="na">deleteWhere</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">TaskColumns</span><span class="p">.</span><span class="na">projectId</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="n">projectId</span><span class="w"> </span><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="full-viewmodel-example">Full ViewModel example</h2>
-<div class="language-kotlin highlight"><span class="filename">TaskDetailViewModel.kt</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">TaskDetailViewModel</span><span class="p">(</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">taskRepo</span><span class="p">:</span><span class="w"> </span><span class="n">TaskRepository</span><span class="p">,</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">checklistRepo</span><span class="p">:</span><span class="w"> </span><span class="n">ChecklistItemRepository</span><span class="p">,</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">taskId</span><span class="p">:</span><span class="w"> </span><span class="kt">Long</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="p">)</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">ViewModel</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">checklist</span><span class="p">:</span><span class="w"> </span><span class="n">StateFlow</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">ChecklistItem</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">checklistRepo</span>
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">        </span><span class="p">.</span><span class="na">observeWhere</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">ChecklistItemColumns</span><span class="p">.</span><span class="na">taskId</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="n">taskId</span><span class="w"> </span><span class="p">}</span>
-</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">        </span><span class="p">.</span><span class="na">stateIn</span><span class="p">(</span><span class="n">viewModelScope</span><span class="p">,</span><span class="w"> </span><span class="n">SharingStarted</span><span class="p">.</span><span class="na">WhileSubscribed</span><span class="p">(</span><span class="m">5</span><span class="n">_000</span><span class="p">),</span><span class="w"> </span><span class="n">emptyList</span><span class="p">())</span>
-</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>
-</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">progress</span><span class="p">:</span><span class="w"> </span><span class="n">StateFlow</span><span class="o">&lt;</span><span class="kt">Float</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">checklist</span>
-</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">        </span><span class="p">.</span><span class="na">map</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">items</span><span class="w"> </span><span class="o">-&gt;</span>
-</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">items</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">())</span><span class="w"> </span><span class="m">0f</span>
-</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">            </span><span class="k">else</span><span class="w"> </span><span class="n">items</span><span class="p">.</span><span class="na">count</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">it</span><span class="p">.</span><span class="na">isDone</span><span class="w"> </span><span class="p">}.</span><span class="na">toFloat</span><span class="p">()</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">items</span><span class="p">.</span><span class="na">size</span>
-</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="w">        </span><span class="p">}</span>
-</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="w">        </span><span class="p">.</span><span class="na">stateIn</span><span class="p">(</span><span class="n">viewModelScope</span><span class="p">,</span><span class="w"> </span><span class="n">SharingStarted</span><span class="p">.</span><span class="na">WhileSubscribed</span><span class="p">(</span><span class="m">5</span><span class="n">_000</span><span class="p">),</span><span class="w"> </span><span class="m">0f</span><span class="p">)</span>
-</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>
-</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="w">    </span><span class="kd">fun</span><span class="w"> </span><span class="nf">toggleItem</span><span class="p">(</span><span class="n">item</span><span class="p">:</span><span class="w"> </span><span class="n">ChecklistItem</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="w">        </span><span class="n">viewModelScope</span><span class="p">.</span><span class="na">launch</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-8-20"><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="w">            </span><span class="n">checklistRepo</span><span class="p">.</span><span class="na">update</span><span class="p">(</span><span class="n">item</span><span class="p">.</span><span class="na">copy</span><span class="p">(</span><span class="n">isDone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">!</span><span class="n">item</span><span class="p">.</span><span class="na">isDone</span><span class="p">))</span>
-</span><span id="__span-8-21"><a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="w">        </span><span class="p">}</span>
-</span><span id="__span-8-22"><a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-8-23"><a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a>
-</span><span id="__span-8-24"><a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a><span class="w">    </span><span class="kd">fun</span><span class="w"> </span><span class="nf">addItem</span><span class="p">(</span><span class="n">text</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-8-25"><a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a><span class="w">        </span><span class="n">viewModelScope</span><span class="p">.</span><span class="na">launch</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-8-26"><a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a><span class="w">            </span><span class="n">checklistRepo</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="n">ChecklistItem</span><span class="p">(</span><span class="n">taskId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">taskId</span><span class="p">,</span><span class="w"> </span><span class="n">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">text</span><span class="p">))</span>
-</span><span id="__span-8-27"><a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a><span class="w">        </span><span class="p">}</span>
-</span><span id="__span-8-28"><a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-8-29"><a id="__codelineno-8-29" name="__codelineno-8-29" href="#__codelineno-8-29"></a>
-</span><span id="__span-8-30"><a id="__codelineno-8-30" name="__codelineno-8-30" href="#__codelineno-8-30"></a><span class="w">    </span><span class="kd">fun</span><span class="w"> </span><span class="nf">clearCompleted</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-8-31"><a id="__codelineno-8-31" name="__codelineno-8-31" href="#__codelineno-8-31"></a><span class="w">        </span><span class="n">viewModelScope</span><span class="p">.</span><span class="na">launch</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-8-32"><a id="__codelineno-8-32" name="__codelineno-8-32" href="#__codelineno-8-32"></a><span class="w">            </span><span class="n">checklistRepo</span><span class="p">.</span><span class="na">deleteWhere</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-8-33"><a id="__codelineno-8-33" name="__codelineno-8-33" href="#__codelineno-8-33"></a><span class="w">                </span><span class="p">(</span><span class="n">ChecklistItemColumns</span><span class="p">.</span><span class="na">taskId</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="n">taskId</span><span class="p">)</span><span class="w"> </span><span class="n">and</span>
-</span><span id="__span-8-34"><a id="__codelineno-8-34" name="__codelineno-8-34" href="#__codelineno-8-34"></a><span class="w">                </span><span class="p">(</span><span class="n">ChecklistItemColumns</span><span class="p">.</span><span class="na">isDone</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
-</span><span id="__span-8-35"><a id="__codelineno-8-35" name="__codelineno-8-35" href="#__codelineno-8-35"></a><span class="w">            </span><span class="p">}</span>
-</span><span id="__span-8-36"><a id="__codelineno-8-36" name="__codelineno-8-36" href="#__codelineno-8-36"></a><span class="w">        </span><span class="p">}</span>
-</span><span id="__span-8-37"><a id="__codelineno-8-37" name="__codelineno-8-37" href="#__codelineno-8-37"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-8-38"><a id="__codelineno-8-38" name="__codelineno-8-38" href="#__codelineno-8-38"></a><span class="p">}</span>
+<div class="language-kotlin highlight"><span class="filename">TaskDetailViewModel.kt</span><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">TaskDetailViewModel</span><span class="p">(</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">taskRepo</span><span class="p">:</span><span class="w"> </span><span class="n">TaskRepository</span><span class="p">,</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">checklistRepo</span><span class="p">:</span><span class="w"> </span><span class="n">ChecklistItemRepository</span><span class="p">,</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">taskId</span><span class="p">:</span><span class="w"> </span><span class="kt">Long</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="p">)</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">ViewModel</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">checklist</span><span class="p">:</span><span class="w"> </span><span class="n">StateFlow</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">ChecklistItem</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">checklistRepo</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">        </span><span class="p">.</span><span class="na">observeWhere</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">ChecklistItemColumns</span><span class="p">.</span><span class="na">taskId</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="n">taskId</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="w">        </span><span class="p">.</span><span class="na">stateIn</span><span class="p">(</span><span class="n">viewModelScope</span><span class="p">,</span><span class="w"> </span><span class="n">SharingStarted</span><span class="p">.</span><span class="na">WhileSubscribed</span><span class="p">(</span><span class="m">5</span><span class="n">_000</span><span class="p">),</span><span class="w"> </span><span class="n">emptyList</span><span class="p">())</span>
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">progress</span><span class="p">:</span><span class="w"> </span><span class="n">StateFlow</span><span class="o">&lt;</span><span class="kt">Float</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">checklist</span>
+</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="w">        </span><span class="p">.</span><span class="na">map</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">items</span><span class="w"> </span><span class="o">-&gt;</span>
+</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">items</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">())</span><span class="w"> </span><span class="m">0f</span>
+</span><span id="__span-10-14"><a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="w">            </span><span class="k">else</span><span class="w"> </span><span class="n">items</span><span class="p">.</span><span class="na">count</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">it</span><span class="p">.</span><span class="na">isDone</span><span class="w"> </span><span class="p">}.</span><span class="na">toFloat</span><span class="p">()</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">items</span><span class="p">.</span><span class="na">size</span>
+</span><span id="__span-10-15"><a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="w">        </span><span class="p">}</span>
+</span><span id="__span-10-16"><a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="w">        </span><span class="p">.</span><span class="na">stateIn</span><span class="p">(</span><span class="n">viewModelScope</span><span class="p">,</span><span class="w"> </span><span class="n">SharingStarted</span><span class="p">.</span><span class="na">WhileSubscribed</span><span class="p">(</span><span class="m">5</span><span class="n">_000</span><span class="p">),</span><span class="w"> </span><span class="m">0f</span><span class="p">)</span>
+</span><span id="__span-10-17"><a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a>
+</span><span id="__span-10-18"><a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a><span class="w">    </span><span class="kd">fun</span><span class="w"> </span><span class="nf">toggleItem</span><span class="p">(</span><span class="n">item</span><span class="p">:</span><span class="w"> </span><span class="n">ChecklistItem</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-19"><a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a><span class="w">        </span><span class="n">viewModelScope</span><span class="p">.</span><span class="na">launch</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-20"><a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a><span class="w">            </span><span class="n">checklistRepo</span><span class="p">.</span><span class="na">update</span><span class="p">(</span><span class="n">item</span><span class="p">.</span><span class="na">copy</span><span class="p">(</span><span class="n">isDone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">!</span><span class="n">item</span><span class="p">.</span><span class="na">isDone</span><span class="p">))</span>
+</span><span id="__span-10-21"><a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a><span class="w">        </span><span class="p">}</span>
+</span><span id="__span-10-22"><a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-10-23"><a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a>
+</span><span id="__span-10-24"><a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a><span class="w">    </span><span class="kd">fun</span><span class="w"> </span><span class="nf">addItem</span><span class="p">(</span><span class="n">text</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-25"><a id="__codelineno-10-25" name="__codelineno-10-25" href="#__codelineno-10-25"></a><span class="w">        </span><span class="n">viewModelScope</span><span class="p">.</span><span class="na">launch</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-26"><a id="__codelineno-10-26" name="__codelineno-10-26" href="#__codelineno-10-26"></a><span class="w">            </span><span class="n">checklistRepo</span><span class="p">.</span><span class="na">insert</span><span class="p">(</span><span class="n">ChecklistItem</span><span class="p">(</span><span class="n">taskId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">taskId</span><span class="p">,</span><span class="w"> </span><span class="n">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">text</span><span class="p">))</span>
+</span><span id="__span-10-27"><a id="__codelineno-10-27" name="__codelineno-10-27" href="#__codelineno-10-27"></a><span class="w">        </span><span class="p">}</span>
+</span><span id="__span-10-28"><a id="__codelineno-10-28" name="__codelineno-10-28" href="#__codelineno-10-28"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-10-29"><a id="__codelineno-10-29" name="__codelineno-10-29" href="#__codelineno-10-29"></a>
+</span><span id="__span-10-30"><a id="__codelineno-10-30" name="__codelineno-10-30" href="#__codelineno-10-30"></a><span class="w">    </span><span class="kd">fun</span><span class="w"> </span><span class="nf">clearCompleted</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-31"><a id="__codelineno-10-31" name="__codelineno-10-31" href="#__codelineno-10-31"></a><span class="w">        </span><span class="n">viewModelScope</span><span class="p">.</span><span class="na">launch</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-32"><a id="__codelineno-10-32" name="__codelineno-10-32" href="#__codelineno-10-32"></a><span class="w">            </span><span class="n">checklistRepo</span><span class="p">.</span><span class="na">deleteWhere</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-33"><a id="__codelineno-10-33" name="__codelineno-10-33" href="#__codelineno-10-33"></a><span class="w">                </span><span class="p">(</span><span class="n">ChecklistItemColumns</span><span class="p">.</span><span class="na">taskId</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="n">taskId</span><span class="p">)</span><span class="w"> </span><span class="n">and</span>
+</span><span id="__span-10-34"><a id="__codelineno-10-34" name="__codelineno-10-34" href="#__codelineno-10-34"></a><span class="w">                </span><span class="p">(</span><span class="n">ChecklistItemColumns</span><span class="p">.</span><span class="na">isDone</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+</span><span id="__span-10-35"><a id="__codelineno-10-35" name="__codelineno-10-35" href="#__codelineno-10-35"></a><span class="w">            </span><span class="p">}</span>
+</span><span id="__span-10-36"><a id="__codelineno-10-36" name="__codelineno-10-36" href="#__codelineno-10-36"></a><span class="w">        </span><span class="p">}</span>
+</span><span id="__span-10-37"><a id="__codelineno-10-37" name="__codelineno-10-37" href="#__codelineno-10-37"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-10-38"><a id="__codelineno-10-38" name="__codelineno-10-38" href="#__codelineno-10-38"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>See <a href="../../reference/dsl-operators/">DSL Operators</a> for the complete operator reference.</p>
 

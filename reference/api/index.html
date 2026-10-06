@@ -346,6 +346,25 @@
   
   
     <li class="md-tabs__item">
+      <a href="../../versioning/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Versioning
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
       <a href="../../faq/" class="md-tabs__link">
         
   
@@ -1460,6 +1479,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#raw-sql-kilndriver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Raw SQL (KilnDriver)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Raw SQL (KilnDriver)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#driverexecute" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        driver.execute()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#driverexecutequery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        driver.executeQuery()
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#companion-entitycolumns" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1566,6 +1624,33 @@
           </ul>
         </nav>
       
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../versioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Versioning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1872,6 +1957,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#raw-sql-kilndriver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Raw SQL (KilnDriver)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Raw SQL (KilnDriver)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#driverexecute" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        driver.execute()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#driverexecutequery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        driver.executeQuery()
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#companion-entitycolumns" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1986,33 +2110,99 @@
 <h2 id="findall-listt"><code>findAll(): List&lt;T&gt;</code></h2>
 <div class="language-kotlin highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">findAll</span><span class="p">():</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span>
 </span></code></pre></div>
-<p>Returns all rows in insertion order. Returns an empty list (not null) when the table is empty.</p>
+<p>Returns all rows. Returns an empty list (not null) when the table is empty.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>SQLite does not guarantee row order without an <code>ORDER BY</code> clause. Use <code>findWhere</code> with <code>orderBy</code> if you need deterministic ordering.</p>
+</div>
 <div class="language-kotlin highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kd">val</span><span class="w"> </span><span class="nv">products</span><span class="p">:</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Product</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">productRepo</span><span class="p">.</span><span class="na">findAll</span><span class="p">()</span>
 </span></code></pre></div>
 <hr />
 <h2 id="findwhere-predicate-listt"><code>findWhere { predicate }: List&lt;T&gt;</code></h2>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">findWhere</span><span class="p">(</span><span class="n">predicate</span><span class="p">:</span><span class="w"> </span><span class="n">ProductColumns</span><span class="p">.()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">Predicate</span><span class="p">):</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">findWhere</span><span class="p">(</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">    </span><span class="n">orderBy</span><span class="p">:</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">OrderSpec</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">emptyList</span><span class="p">(),</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">    </span><span class="n">limit</span><span class="p">:</span><span class="w"> </span><span class="kt">Long</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">,</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">    </span><span class="n">offset</span><span class="p">:</span><span class="w"> </span><span class="kt">Long</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">,</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">    </span><span class="n">predicate</span><span class="p">:</span><span class="w"> </span><span class="n">ProductColumns</span><span class="p">.()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">Predicate</span>
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="p">):</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span>
 </span></code></pre></div>
 <p>Returns all rows matching the DSL predicate. Returns an empty list when no rows match.</p>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kd">val</span><span class="w"> </span><span class="nv">inStock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">productRepo</span><span class="p">.</span><span class="na">findWhere</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">ProductColumns</span><span class="p">.</span><span class="na">inStock</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">}</span>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>orderBy</code></td>
+<td><code>emptyList()</code></td>
+<td>Sort columns — use <code>Column.asc()</code> or <code>Column.desc()</code></td>
+</tr>
+<tr>
+<td><code>limit</code></td>
+<td><code>0</code> (no limit)</td>
+<td>Maximum rows to return</td>
+</tr>
+<tr>
+<td><code>offset</code></td>
+<td><code>0</code></td>
+<td>Rows to skip before returning</td>
+</tr>
+<tr>
+<td><code>predicate</code></td>
+<td><em>(required)</em></td>
+<td>DSL filter — see <a href="../dsl-operators/">DSL Operators</a></td>
+</tr>
+</tbody>
+</table>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1">// Basic filter</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="kd">val</span><span class="w"> </span><span class="nv">inStock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">productRepo</span><span class="p">.</span><span class="na">findWhere</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">ProductColumns</span><span class="p">.</span><span class="na">inStock</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="c1">// Sorted and paginated</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="kd">val</span><span class="w"> </span><span class="nv">page</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">productRepo</span><span class="p">.</span><span class="na">findWhere</span><span class="p">(</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="w">    </span><span class="n">orderBy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">listOf</span><span class="p">(</span><span class="n">ProductColumns</span><span class="p">.</span><span class="na">price</span><span class="p">.</span><span class="na">desc</span><span class="p">()),</span>
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="w">    </span><span class="n">limit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">20</span><span class="p">,</span>
+</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="w">    </span><span class="n">offset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">40</span>
+</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">ProductColumns</span><span class="p">.</span><span class="na">inStock</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">}</span>
 </span></code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Imports for ordering</p>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">import</span><span class="w"> </span><span class="nn">io.github.sufarook.kiln.runtime.asc</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="k">import</span><span class="w"> </span><span class="nn">io.github.sufarook.kiln.runtime.desc</span>
+</span></code></pre></div>
+</div>
 <hr />
 <h2 id="observeall-flowlistt"><code>observeAll(): Flow&lt;List&lt;T&gt;&gt;</code></h2>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kd">fun</span><span class="w"> </span><span class="nf">observeAll</span><span class="p">():</span><span class="w"> </span><span class="n">Flow</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&gt;</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kd">fun</span><span class="w"> </span><span class="nf">observeAll</span><span class="p">():</span><span class="w"> </span><span class="n">Flow</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&gt;</span>
 </span></code></pre></div>
 <p>Returns a cold <code>Flow</code> that emits the full table on collection and re-emits on every subsequent write (<code>insert</code>, <code>update</code>, <code>delete</code>, <code>deleteWhere</code>) to the same table.</p>
 <p>Uses <code>KilnListener</code> internally — no polling.</p>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">productRepo</span><span class="p">.</span><span class="na">observeAll</span><span class="p">()</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">    </span><span class="p">.</span><span class="na">collect</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">products</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">adapter</span><span class="p">.</span><span class="na">submitList</span><span class="p">(</span><span class="n">products</span><span class="p">)</span><span class="w"> </span><span class="p">}</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="n">productRepo</span><span class="p">.</span><span class="na">observeAll</span><span class="p">()</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">    </span><span class="p">.</span><span class="na">collect</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">products</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">adapter</span><span class="p">.</span><span class="na">submitList</span><span class="p">(</span><span class="n">products</span><span class="p">)</span><span class="w"> </span><span class="p">}</span>
 </span></code></pre></div>
 <hr />
 <h2 id="observewhere-predicate-flowlistt"><code>observeWhere { predicate }: Flow&lt;List&lt;T&gt;&gt;</code></h2>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="kd">fun</span><span class="w"> </span><span class="nf">observeWhere</span><span class="p">(</span><span class="n">predicate</span><span class="p">:</span><span class="w"> </span><span class="n">ProductColumns</span><span class="p">.()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">Predicate</span><span class="p">):</span><span class="w"> </span><span class="n">Flow</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&gt;</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="kd">fun</span><span class="w"> </span><span class="nf">observeWhere</span><span class="p">(</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">    </span><span class="n">orderBy</span><span class="p">:</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">OrderSpec</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">emptyList</span><span class="p">(),</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">    </span><span class="n">limit</span><span class="p">:</span><span class="w"> </span><span class="kt">Long</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">,</span>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="w">    </span><span class="n">offset</span><span class="p">:</span><span class="w"> </span><span class="kt">Long</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">,</span>
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="w">    </span><span class="n">predicate</span><span class="p">:</span><span class="w"> </span><span class="n">ProductColumns</span><span class="p">.()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">Predicate</span>
+</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="p">):</span><span class="w"> </span><span class="n">Flow</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&gt;</span>
 </span></code></pre></div>
-<p>Like <code>observeAll()</code>, but filters by the DSL predicate on every emission.</p>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="kd">val</span><span class="w"> </span><span class="nv">activeTasks</span><span class="p">:</span><span class="w"> </span><span class="n">Flow</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Task</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">taskRepo</span><span class="p">.</span><span class="na">observeWhere</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">    </span><span class="n">TaskColumns</span><span class="p">.</span><span class="na">status</span><span class="w"> </span><span class="n">inList</span><span class="w"> </span><span class="n">listOf</span><span class="p">(</span><span class="s">"TODO"</span><span class="p">,</span><span class="w"> </span><span class="s">"IN_PROGRESS"</span><span class="p">)</span>
-</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="p">}</span>
+<p>Like <code>observeAll()</code>, but filters by the DSL predicate on every emission. Accepts the same <code>orderBy</code> / <code>limit</code> / <code>offset</code> parameters as <code>findWhere</code>.</p>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1">// Basic reactive filter</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="kd">val</span><span class="w"> </span><span class="nv">activeTasks</span><span class="p">:</span><span class="w"> </span><span class="n">Flow</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Task</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">taskRepo</span><span class="p">.</span><span class="na">observeWhere</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">    </span><span class="n">TaskColumns</span><span class="p">.</span><span class="na">status</span><span class="w"> </span><span class="n">inList</span><span class="w"> </span><span class="n">listOf</span><span class="p">(</span><span class="s">"TODO"</span><span class="p">,</span><span class="w"> </span><span class="s">"IN_PROGRESS"</span><span class="p">)</span>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="p">}</span>
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>
+</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a><span class="c1">// Reactive paginated feed</span>
+</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="kd">val</span><span class="w"> </span><span class="nv">topProducts</span><span class="p">:</span><span class="w"> </span><span class="n">Flow</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Product</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">productRepo</span><span class="p">.</span><span class="na">observeWhere</span><span class="p">(</span>
+</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a><span class="w">    </span><span class="n">orderBy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">listOf</span><span class="p">(</span><span class="n">ProductColumns</span><span class="p">.</span><span class="na">price</span><span class="p">.</span><span class="na">desc</span><span class="p">()),</span>
+</span><span id="__span-22-9"><a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="w">    </span><span class="n">limit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">10</span>
+</span><span id="__span-22-10"><a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">ProductColumns</span><span class="p">.</span><span class="na">inStock</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">}</span>
 </span></code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -2020,91 +2210,144 @@
 </div>
 <hr />
 <h2 id="count-long"><code>count(): Long</code></h2>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">count</span><span class="p">():</span><span class="w"> </span><span class="kt">Long</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">count</span><span class="p">():</span><span class="w"> </span><span class="kt">Long</span>
 </span></code></pre></div>
 <p>Returns the total number of rows in the table.</p>
 <hr />
 <h2 id="count-predicate-long"><code>count { predicate }: Long</code></h2>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">count</span><span class="p">(</span><span class="n">predicate</span><span class="p">:</span><span class="w"> </span><span class="n">ProductColumns</span><span class="p">.()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">Predicate</span><span class="p">):</span><span class="w"> </span><span class="kt">Long</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">count</span><span class="p">(</span><span class="n">predicate</span><span class="p">:</span><span class="w"> </span><span class="n">ProductColumns</span><span class="p">.()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">Predicate</span><span class="p">):</span><span class="w"> </span><span class="kt">Long</span>
 </span></code></pre></div>
 <p>Returns the number of rows matching the predicate.</p>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="kd">val</span><span class="w"> </span><span class="nv">openCount</span><span class="p">:</span><span class="w"> </span><span class="kt">Long</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">taskRepo</span><span class="p">.</span><span class="na">count</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">    </span><span class="p">(</span><span class="n">TaskColumns</span><span class="p">.</span><span class="na">projectId</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="n">projectId</span><span class="p">)</span><span class="w"> </span><span class="n">and</span>
-</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">    </span><span class="p">(</span><span class="n">TaskColumns</span><span class="p">.</span><span class="na">isCompleted</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
-</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="p">}</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="kd">val</span><span class="w"> </span><span class="nv">openCount</span><span class="p">:</span><span class="w"> </span><span class="kt">Long</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">taskRepo</span><span class="p">.</span><span class="na">count</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="w">    </span><span class="p">(</span><span class="n">TaskColumns</span><span class="p">.</span><span class="na">projectId</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="n">projectId</span><span class="p">)</span><span class="w"> </span><span class="n">and</span>
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="w">    </span><span class="p">(</span><span class="n">TaskColumns</span><span class="p">.</span><span class="na">isCompleted</span><span class="w"> </span><span class="n">eq</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
+</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="p">}</span>
 </span></code></pre></div>
 <hr />
 <h2 id="insertallentities-listt"><code>insertAll(entities: List&lt;T&gt;)</code></h2>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">insertAll</span><span class="p">(</span><span class="n">entities</span><span class="p">:</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">)</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">insertAll</span><span class="p">(</span><span class="n">entities</span><span class="p">:</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">)</span>
 </span></code></pre></div>
 <p>Batch-inserts a list of entities inside a single transaction. Reactive observers receive one <code>Flow</code> emission after all rows are committed rather than one per <code>insert</code> call.</p>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="n">taskRepo</span><span class="p">.</span><span class="na">insertAll</span><span class="p">(</span><span class="n">importedTasks</span><span class="p">)</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="n">taskRepo</span><span class="p">.</span><span class="na">insertAll</span><span class="p">(</span><span class="n">importedTasks</span><span class="p">)</span>
 </span></code></pre></div>
 <p>Internally calls <code>driver.withTransaction { entities.forEach { insert(it) } }</code>. If any insert fails, the entire batch is rolled back.</p>
 <hr />
 <h2 id="findbyparentparentid-pk-listt"><code>findBy&lt;Parent&gt;(parentId: PK): List&lt;T&gt;</code></h2>
 <p>Generated for each <code>@Relation</code>-annotated foreign-key property. Returns all child rows whose FK column equals <code>parentId</code>.</p>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="c1">// Task has: @Relation val projectId: Long</span>
-</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="kd">val</span><span class="w"> </span><span class="nv">tasks</span><span class="p">:</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Task</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">taskRepo</span><span class="p">.</span><span class="na">findByProject</span><span class="p">(</span><span class="n">projectId</span><span class="p">)</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="c1">// Task has: @Relation val projectId: Long</span>
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="kd">val</span><span class="w"> </span><span class="nv">tasks</span><span class="p">:</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Task</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">taskRepo</span><span class="p">.</span><span class="na">findByProject</span><span class="p">(</span><span class="n">projectId</span><span class="p">)</span>
 </span></code></pre></div>
 <hr />
 <h2 id="observebyparentparentid-pk-flowlistt"><code>observeBy&lt;Parent&gt;(parentId: PK): Flow&lt;List&lt;T&gt;&gt;</code></h2>
 <p>Reactive variant of <code>findBy&lt;Parent&gt;</code>. Re-emits whenever the child table changes.</p>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="kd">val</span><span class="w"> </span><span class="nv">liveTasksFlow</span><span class="p">:</span><span class="w"> </span><span class="n">Flow</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Task</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">taskRepo</span><span class="p">.</span><span class="na">observeByProject</span><span class="p">(</span><span class="n">projectId</span><span class="p">)</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="kd">val</span><span class="w"> </span><span class="nv">liveTasksFlow</span><span class="p">:</span><span class="w"> </span><span class="n">Flow</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Task</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">taskRepo</span><span class="p">.</span><span class="na">observeByProject</span><span class="p">(</span><span class="n">projectId</span><span class="p">)</span>
 </span></code></pre></div>
 <hr />
 <h2 id="deletebyparentparentid-pk"><code>deleteBy&lt;Parent&gt;(parentId: PK)</code></h2>
 <p>Deletes all child rows whose FK column equals <code>parentId</code>. Used for cascade deletes.</p>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="c1">// Remove all tasks before deleting the parent project</span>
-</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="n">taskRepo</span><span class="p">.</span><span class="na">deleteByProject</span><span class="p">(</span><span class="n">projectId</span><span class="p">)</span>
-</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="n">projectRepo</span><span class="p">.</span><span class="na">delete</span><span class="p">(</span><span class="n">projectId</span><span class="p">)</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="c1">// Remove all tasks before deleting the parent project</span>
+</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="n">taskRepo</span><span class="p">.</span><span class="na">deleteByProject</span><span class="p">(</span><span class="n">projectId</span><span class="p">)</span>
+</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="n">projectRepo</span><span class="p">.</span><span class="na">delete</span><span class="p">(</span><span class="n">projectId</span><span class="p">)</span>
 </span></code></pre></div>
 <p>For cleaner cascade semantics, wrap both calls in <code>driver.withTransaction { … }</code> so both tables are notified in a single <code>Flow</code> emission.</p>
 <hr />
 <h2 id="transactions">Transactions</h2>
 <h3 id="driverwithtransaction"><code>driver.withTransaction { }</code></h3>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="n">KilnDriver</span><span class="p">.</span><span class="nf">withTransaction</span><span class="p">(</span>
-</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="w">    </span><span class="n">context</span><span class="p">:</span><span class="w"> </span><span class="n">CoroutineContext</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dispatchers</span><span class="p">.</span><span class="na">Default</span><span class="p">,</span>
-</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="w">    </span><span class="n">block</span><span class="p">:</span><span class="w"> </span><span class="n">suspend</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span>
-</span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="p">)</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="n">KilnDriver</span><span class="p">.</span><span class="nf">withTransaction</span><span class="p">(</span>
+</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="w">    </span><span class="n">context</span><span class="p">:</span><span class="w"> </span><span class="n">CoroutineContext</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dispatchers</span><span class="p">.</span><span class="na">Default</span><span class="p">,</span>
+</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="w">    </span><span class="n">block</span><span class="p">:</span><span class="w"> </span><span class="n">suspend</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kt">Unit</span>
+</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="p">)</span>
 </span></code></pre></div>
 <p>Executes <code>block</code> inside a single SQLite transaction. On any exception the transaction is rolled back and the exception re-thrown.</p>
 <p>Blocks nest: a <code>withTransaction</code> inside another joins it, and only the outermost one commits. A block run while a transaction is already open via <code>driver.newTransaction()</code> joins that transaction too. A transaction opened with raw <code>BEGIN</code> SQL is invisible to Kiln and can't be joined.</p>
 <p>All Kiln repository write methods (<code>insert</code>, <code>update</code>, <code>delete</code>, <code>deleteWhere</code>, <code>insertAll</code>) defer their <code>Flow</code> listener notifications while a transaction is open. After the outermost commit each affected table is notified <strong>exactly once</strong>: reactive <code>Flow</code>s receive one emission for the whole transaction rather than one per operation.</p>
 <p>No notifications are sent when a transaction is rolled back.</p>
 <p><strong>Threading.</strong> A transaction holds one thread of <code>context</code> until it completes. SQLite transactions belong to the thread that opened them, so the block — including after any suspension — runs on that thread, and repository calls inside it run there too, whatever dispatcher the repository was constructed with. For a transaction that waits on I/O, pass <code>Dispatchers.IO</code> so it doesn't occupy one of <code>Dispatchers.Default</code>'s few threads.</p>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="c1">// Cascade delete — observers see one emission each, not four</span>
-</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="n">driver</span><span class="p">.</span><span class="na">withTransaction</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="w">    </span><span class="n">taskRepo</span><span class="p">.</span><span class="na">deleteByProject</span><span class="p">(</span><span class="n">projectId</span><span class="p">)</span><span class="w">   </span><span class="c1">// deferred</span>
-</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="w">    </span><span class="n">projectRepo</span><span class="p">.</span><span class="na">delete</span><span class="p">(</span><span class="n">projectId</span><span class="p">)</span><span class="w">         </span><span class="c1">// deferred</span>
-</span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="p">}</span>
-</span><span id="__span-31-6"><a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a><span class="c1">// notifyListeners fires here, once per table</span>
-</span><span id="__span-31-7"><a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a>
-</span><span id="__span-31-8"><a id="__codelineno-31-8" name="__codelineno-31-8" href="#__codelineno-31-8"></a><span class="c1">// Batch import — observers see all rows appear atomically</span>
-</span><span id="__span-31-9"><a id="__codelineno-31-9" name="__codelineno-31-9" href="#__codelineno-31-9"></a><span class="n">driver</span><span class="p">.</span><span class="na">withTransaction</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-31-10"><a id="__codelineno-31-10" name="__codelineno-31-10" href="#__codelineno-31-10"></a><span class="w">    </span><span class="n">taskRepo</span><span class="p">.</span><span class="na">insertAll</span><span class="p">(</span><span class="n">newTasks</span><span class="p">)</span>
-</span><span id="__span-31-11"><a id="__codelineno-31-11" name="__codelineno-31-11" href="#__codelineno-31-11"></a><span class="p">}</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="c1">// Cascade delete — observers see one emission each, not four</span>
+</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="n">driver</span><span class="p">.</span><span class="na">withTransaction</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="w">    </span><span class="n">taskRepo</span><span class="p">.</span><span class="na">deleteByProject</span><span class="p">(</span><span class="n">projectId</span><span class="p">)</span><span class="w">   </span><span class="c1">// deferred</span>
+</span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="w">    </span><span class="n">projectRepo</span><span class="p">.</span><span class="na">delete</span><span class="p">(</span><span class="n">projectId</span><span class="p">)</span><span class="w">         </span><span class="c1">// deferred</span>
+</span><span id="__span-32-5"><a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a><span class="p">}</span>
+</span><span id="__span-32-6"><a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a><span class="c1">// notifyListeners fires here, once per table</span>
+</span><span id="__span-32-7"><a id="__codelineno-32-7" name="__codelineno-32-7" href="#__codelineno-32-7"></a>
+</span><span id="__span-32-8"><a id="__codelineno-32-8" name="__codelineno-32-8" href="#__codelineno-32-8"></a><span class="c1">// Batch import — observers see all rows appear atomically</span>
+</span><span id="__span-32-9"><a id="__codelineno-32-9" name="__codelineno-32-9" href="#__codelineno-32-9"></a><span class="n">driver</span><span class="p">.</span><span class="na">withTransaction</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-32-10"><a id="__codelineno-32-10" name="__codelineno-32-10" href="#__codelineno-32-10"></a><span class="w">    </span><span class="n">taskRepo</span><span class="p">.</span><span class="na">insertAll</span><span class="p">(</span><span class="n">newTasks</span><span class="p">)</span>
+</span><span id="__span-32-11"><a id="__codelineno-32-11" name="__codelineno-32-11" href="#__codelineno-32-11"></a><span class="p">}</span>
 </span></code></pre></div>
 <h3 id="drivernotifyordefertablename"><code>driver.notifyOrDefer(tableName)</code></h3>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="n">KilnDriver</span><span class="p">.</span><span class="nf">notifyOrDefer</span><span class="p">(</span><span class="n">tableName</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="n">KilnDriver</span><span class="p">.</span><span class="nf">notifyOrDefer</span><span class="p">(</span><span class="n">tableName</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span>
 </span></code></pre></div>
 <p>Called automatically by generated repository code. Outside a transaction it calls <code>KilnDriver.notifyListeners</code> immediately. Inside one it adds the table name to the open transaction's pending tables, deferring the notification to after the outermost commit. Not intended for direct use.</p>
 <h3 id="driverwithtransactionawarecontextcontext"><code>driver.withTransactionAwareContext(context) { }</code></h3>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">KilnDriver</span><span class="p">.</span><span class="nf">withTransactionAwareContext</span><span class="p">(</span>
-</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="w">    </span><span class="n">context</span><span class="p">:</span><span class="w"> </span><span class="n">CoroutineContext</span><span class="p">,</span>
-</span><span id="__span-33-3"><a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="w">    </span><span class="n">block</span><span class="p">:</span><span class="w"> </span><span class="n">suspend</span><span class="w"> </span><span class="n">CoroutineScope</span><span class="p">.()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">T</span>
-</span><span id="__span-33-4"><a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="p">):</span><span class="w"> </span><span class="n">T</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">KilnDriver</span><span class="p">.</span><span class="nf">withTransactionAwareContext</span><span class="p">(</span>
+</span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="w">    </span><span class="n">context</span><span class="p">:</span><span class="w"> </span><span class="n">CoroutineContext</span><span class="p">,</span>
+</span><span id="__span-34-3"><a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="w">    </span><span class="n">block</span><span class="p">:</span><span class="w"> </span><span class="n">suspend</span><span class="w"> </span><span class="n">CoroutineScope</span><span class="p">.()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">T</span>
+</span><span id="__span-34-4"><a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="p">):</span><span class="w"> </span><span class="n">T</span>
 </span></code></pre></div>
 <p>Called automatically by generated repository code in place of <code>withContext(context)</code>. Inside a transaction it runs <code>block</code> on the transaction's thread instead of switching to <code>context</code>; otherwise it behaves exactly like <code>withContext</code>. Not intended for direct use.</p>
 <hr />
+<h2 id="raw-sql-kilndriver">Raw SQL (<code>KilnDriver</code>)</h2>
+<p>When you need operations Kiln doesn't generate — aggregates, JOINs, GROUP BY, or one-off DDL — use the driver directly:</p>
+<h3 id="driverexecute"><code>driver.execute()</code></h3>
+<p>Executes a write statement (INSERT, UPDATE, DELETE, DDL):</p>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-35-1"><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="n">driver</span><span class="p">.</span><span class="na">execute</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="s">"UPDATE products SET price = price * 1.1 WHERE category_id = ?"</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-35-2"><a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="w">    </span><span class="n">bindLong</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="n">categoryId</span><span class="p">)</span>
+</span><span id="__span-35-3"><a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="driverexecutequery"><code>driver.executeQuery()</code></h3>
+<p>Executes a read statement and maps results from the cursor:</p>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-36-1"><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="kd">val</span><span class="w"> </span><span class="nv">totalRevenue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">driver</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span>
+</span><span id="__span-36-2"><a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="w">    </span><span class="kc">null</span><span class="p">,</span>
+</span><span id="__span-36-3"><a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a><span class="w">    </span><span class="s">"SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE status = ?"</span><span class="p">,</span>
+</span><span id="__span-36-4"><a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a><span class="w">    </span><span class="n">mapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">cursor</span><span class="w"> </span><span class="o">-&gt;</span>
+</span><span id="__span-36-5"><a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a><span class="w">        </span><span class="n">cursor</span><span class="p">.</span><span class="na">next</span><span class="p">()</span>
+</span><span id="__span-36-6"><a id="__codelineno-36-6" name="__codelineno-36-6" href="#__codelineno-36-6"></a><span class="w">        </span><span class="n">cursor</span><span class="p">.</span><span class="na">getDouble</span><span class="p">(</span><span class="m">0</span><span class="p">)</span><span class="w"> </span><span class="o">?:</span><span class="w"> </span><span class="m">0.0</span>
+</span><span id="__span-36-7"><a id="__codelineno-36-7" name="__codelineno-36-7" href="#__codelineno-36-7"></a><span class="w">    </span><span class="p">},</span>
+</span><span id="__span-36-8"><a id="__codelineno-36-8" name="__codelineno-36-8" href="#__codelineno-36-8"></a><span class="w">    </span><span class="n">parameters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span>
+</span><span id="__span-36-9"><a id="__codelineno-36-9" name="__codelineno-36-9" href="#__codelineno-36-9"></a><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-36-10"><a id="__codelineno-36-10" name="__codelineno-36-10" href="#__codelineno-36-10"></a><span class="w">    </span><span class="n">bindString</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="s">"COMPLETED"</span><span class="p">)</span>
+</span><span id="__span-36-11"><a id="__codelineno-36-11" name="__codelineno-36-11" href="#__codelineno-36-11"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>A multi-row example with JOIN and GROUP BY:</p>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-37-1"><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="kd">data</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">CategorySales</span><span class="p">(</span><span class="kd">val</span><span class="w"> </span><span class="nv">name</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kd">val</span><span class="w"> </span><span class="nv">total</span><span class="p">:</span><span class="w"> </span><span class="kt">Double</span><span class="p">)</span>
+</span><span id="__span-37-2"><a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a>
+</span><span id="__span-37-3"><a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a><span class="kd">val</span><span class="w"> </span><span class="nv">sales</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">driver</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span>
+</span><span id="__span-37-4"><a id="__codelineno-37-4" name="__codelineno-37-4" href="#__codelineno-37-4"></a><span class="w">    </span><span class="kc">null</span><span class="p">,</span>
+</span><span id="__span-37-5"><a id="__codelineno-37-5" name="__codelineno-37-5" href="#__codelineno-37-5"></a><span class="w">    </span><span class="s">"""</span>
+</span><span id="__span-37-6"><a id="__codelineno-37-6" name="__codelineno-37-6" href="#__codelineno-37-6"></a><span class="s">    SELECT c.name, SUM(oi.quantity * oi.unit_price) AS total</span>
+</span><span id="__span-37-7"><a id="__codelineno-37-7" name="__codelineno-37-7" href="#__codelineno-37-7"></a><span class="s">    FROM order_items oi</span>
+</span><span id="__span-37-8"><a id="__codelineno-37-8" name="__codelineno-37-8" href="#__codelineno-37-8"></a><span class="s">    INNER JOIN products p ON oi.product_id = p.id</span>
+</span><span id="__span-37-9"><a id="__codelineno-37-9" name="__codelineno-37-9" href="#__codelineno-37-9"></a><span class="s">    INNER JOIN categories c ON p.category_id = c.id</span>
+</span><span id="__span-37-10"><a id="__codelineno-37-10" name="__codelineno-37-10" href="#__codelineno-37-10"></a><span class="s">    GROUP BY c.name</span>
+</span><span id="__span-37-11"><a id="__codelineno-37-11" name="__codelineno-37-11" href="#__codelineno-37-11"></a><span class="s">    ORDER BY total DESC</span>
+</span><span id="__span-37-12"><a id="__codelineno-37-12" name="__codelineno-37-12" href="#__codelineno-37-12"></a><span class="s">    """</span><span class="p">.</span><span class="na">trimIndent</span><span class="p">(),</span>
+</span><span id="__span-37-13"><a id="__codelineno-37-13" name="__codelineno-37-13" href="#__codelineno-37-13"></a><span class="w">    </span><span class="n">mapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">cursor</span><span class="w"> </span><span class="o">-&gt;</span>
+</span><span id="__span-37-14"><a id="__codelineno-37-14" name="__codelineno-37-14" href="#__codelineno-37-14"></a><span class="w">        </span><span class="n">buildList</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-37-15"><a id="__codelineno-37-15" name="__codelineno-37-15" href="#__codelineno-37-15"></a><span class="w">            </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">cursor</span><span class="p">.</span><span class="na">next</span><span class="p">().</span><span class="na">value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-37-16"><a id="__codelineno-37-16" name="__codelineno-37-16" href="#__codelineno-37-16"></a><span class="w">                </span><span class="n">add</span><span class="p">(</span><span class="n">CategorySales</span><span class="p">(</span>
+</span><span id="__span-37-17"><a id="__codelineno-37-17" name="__codelineno-37-17" href="#__codelineno-37-17"></a><span class="w">                    </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cursor</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="m">0</span><span class="p">)</span><span class="w"> </span><span class="o">?:</span><span class="w"> </span><span class="s">""</span><span class="p">,</span>
+</span><span id="__span-37-18"><a id="__codelineno-37-18" name="__codelineno-37-18" href="#__codelineno-37-18"></a><span class="w">                    </span><span class="n">total</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cursor</span><span class="p">.</span><span class="na">getDouble</span><span class="p">(</span><span class="m">1</span><span class="p">)</span><span class="w"> </span><span class="o">?:</span><span class="w"> </span><span class="m">0.0</span>
+</span><span id="__span-37-19"><a id="__codelineno-37-19" name="__codelineno-37-19" href="#__codelineno-37-19"></a><span class="w">                </span><span class="p">))</span>
+</span><span id="__span-37-20"><a id="__codelineno-37-20" name="__codelineno-37-20" href="#__codelineno-37-20"></a><span class="w">            </span><span class="p">}</span>
+</span><span id="__span-37-21"><a id="__codelineno-37-21" name="__codelineno-37-21" href="#__codelineno-37-21"></a><span class="w">        </span><span class="p">}</span>
+</span><span id="__span-37-22"><a id="__codelineno-37-22" name="__codelineno-37-22" href="#__codelineno-37-22"></a><span class="w">    </span><span class="p">},</span>
+</span><span id="__span-37-23"><a id="__codelineno-37-23" name="__codelineno-37-23" href="#__codelineno-37-23"></a><span class="w">    </span><span class="n">parameters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span>
+</span><span id="__span-37-24"><a id="__codelineno-37-24" name="__codelineno-37-24" href="#__codelineno-37-24"></a><span class="p">)</span>
+</span></code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Raw writes (<code>driver.execute</code>) do not trigger Kiln's <code>KilnListener</code>. Reactive flows (<code>observeAll</code>, <code>observeWhere</code>) won't re-emit for those changes. If you need reactivity after a raw write, call <code>driver.notifyListeners("&lt;table_name&gt;")</code>.</p>
+</div>
+<hr />
 <h2 id="companion-entitycolumns">Companion: <code>&lt;Entity&gt;Columns</code></h2>
 <p>Each entity also generates a companion <code>&lt;Entity&gt;Columns</code> object used inside DSL lambdas:</p>
-<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="kd">object</span><span class="w"> </span><span class="nc">ProductColumns</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">id</span><span class="p">:</span><span class="w"> </span><span class="n">Column</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span>
-</span><span id="__span-34-3"><a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">name</span><span class="p">:</span><span class="w"> </span><span class="n">Column</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span>
-</span><span id="__span-34-4"><a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">price</span><span class="p">:</span><span class="w"> </span><span class="n">Column</span><span class="o">&lt;</span><span class="kt">Double</span><span class="o">&gt;</span>
-</span><span id="__span-34-5"><a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a><span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">inStock</span><span class="p">:</span><span class="w"> </span><span class="n">Column</span><span class="o">&lt;</span><span class="kt">Boolean</span><span class="o">&gt;</span>
-</span><span id="__span-34-6"><a id="__codelineno-34-6" name="__codelineno-34-6" href="#__codelineno-34-6"></a><span class="p">}</span>
+<div class="language-kotlin highlight"><pre><span></span><code><span id="__span-38-1"><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="kd">object</span><span class="w"> </span><span class="nc">ProductColumns</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-38-2"><a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">id</span><span class="p">:</span><span class="w"> </span><span class="n">Column</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span>
+</span><span id="__span-38-3"><a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a><span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">name</span><span class="p">:</span><span class="w"> </span><span class="n">Column</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span>
+</span><span id="__span-38-4"><a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a><span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">price</span><span class="p">:</span><span class="w"> </span><span class="n">Column</span><span class="o">&lt;</span><span class="kt">Double</span><span class="o">&gt;</span>
+</span><span id="__span-38-5"><a id="__codelineno-38-5" name="__codelineno-38-5" href="#__codelineno-38-5"></a><span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">inStock</span><span class="p">:</span><span class="w"> </span><span class="n">Column</span><span class="o">&lt;</span><span class="kt">Boolean</span><span class="o">&gt;</span>
+</span><span id="__span-38-6"><a id="__codelineno-38-6" name="__codelineno-38-6" href="#__codelineno-38-6"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Column names reflect the actual SQL column names (accounting for <code>@Column(name = …)</code> overrides). Use these inside <code>findWhere</code>, <code>observeWhere</code>, <code>deleteWhere</code>, and <code>count</code> lambdas.</p>
 

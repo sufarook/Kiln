@@ -346,6 +346,25 @@
   
   
     <li class="md-tabs__item">
+      <a href="../../versioning/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Versioning
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
       <a href="../../faq/" class="md-tabs__link">
         
   
@@ -1351,6 +1370,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../../versioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Versioning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../faq/" class="md-nav__link">
         
   
@@ -1484,9 +1530,9 @@
 </span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="p">)</span>
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="p">}</span>
 </span></code></pre></div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p><code>@Ignore</code> works with Kotlin's default parameter values. As long as the ignored property has a default, the data class remains constructable from cursor data without providing that value.</p>
+<div class="admonition warning">
+<p class="admonition-title">Ignored properties must have a default value</p>
+<p><code>@Ignore</code> properties <strong>must</strong> have a Kotlin default value. Kiln constructs instances from cursor data without providing ignored properties — if one has no default, the data class is not constructable and compilation fails.</p>
 </div>
 
 
