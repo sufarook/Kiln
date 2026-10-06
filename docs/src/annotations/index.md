@@ -1,6 +1,6 @@
 # Annotations
 
-Kiln provides four annotations. All have `SOURCE` retention — they are consumed entirely at compile time and produce no runtime overhead.
+Kiln provides five annotations. All have `SOURCE` retention — they are consumed entirely at compile time and produce no runtime overhead.
 
 | Annotation | Target | Purpose |
 |-----------|--------|---------|

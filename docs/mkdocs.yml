@@ -93,4 +93,5 @@ nav:
     - DSL Operators: reference/dsl-operators.md
     - Supported Types: reference/supported-types.md
     - "KDoc (annotations + runtime)": https://sufarook.github.io/Kiln/api/
+  - Versioning: versioning.md
   - FAQ: faq.md
