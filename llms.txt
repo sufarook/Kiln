@@ -1,0 +1,228 @@
+# Kiln
+
+> Compile-time CRUD generation for Kotlin Multiplatform SQLite via KSP.
+> Annotate a data class, rebuild, get a full type-safe repository.
+> No SQL to write, no cursor mapping, no versioned migration files.
+
+Docs: https://sufarook.github.io/Kiln/
+Source: https://github.com/sufarook/Kiln
+Version: 1.0.0-alpha08
+
+## Setup (one line)
+
+```kotlin
+plugins {
+    id("io.github.sufarook.kiln") version "1.0.0-alpha08"
+}
+```
+
+The plugin applies KSP, wires the processor, and adds annotations + runtime
+dependencies automatically.
+
+## Annotations
+
+### @DbEntity(tableName: String = "")
+Marks a data class as a database table. Must be a data class with a primary
+constructor. All constructor properties become columns unless annotated @Ignore.
+
+### @PrimaryKey(autoGenerate: Boolean = false)
+Designates a primary-key column. autoGenerate requires Long or Int type and
+the property must default to 0. Two or more @PrimaryKey properties form a
+composite primary key (autoGenerate not allowed on composites).
+
+### @Column(name: String = "", unique: Boolean = false, index: Boolean = false, migrateFrom: String = "")
+Overrides column name, adds constraints, or hints migration.
+- name: SQL column name (default: property name)
+- unique: UNIQUE constraint
+- index: CREATE INDEX on this column
+- migrateFrom: old column name for data-preserving rename
+
+### @Ignore
+Excludes a property from the schema. The property MUST have a Kotlin default
+value. Not stored, not read from cursor.
+
+### @Relation(cascade: Boolean = false)
+Marks a foreign-key property. Generates findBy<Parent>, observeBy<Parent>,
+deleteBy<Parent> on the child repository. Parent name is inferred by stripping
+trailing "Id" from property name (projectId -> Project). cascade is
+documentation only — no runtime FK enforcement.
+
+## Generated Repository Methods
+
+For each @DbEntity class, Kiln generates <Entity>Repository(driver: KilnDriver):
+
+### Schema
+- createTable() — CREATE TABLE IF NOT EXISTS + auto-migration
+- KilnSchema.createAll(driver) — creates all tables in the module
+
+### CRUD
+- suspend insert(entity: T) — does NOT return generated id
+- suspend insertAll(entities: List<T>) — batch insert in single transaction
+- suspend update(entity: T) — updates by primary key
+- suspend delete(id: ID) — deletes by primary key
+
+### Queries
+- suspend findById(id: ID): T? — null if not found
+- suspend findAll(): List<T> — all rows (no guaranteed order)
+- suspend findWhere(orderBy, limit, offset) { predicate }: List<T>
+- suspend count(): Long
+- suspend count { predicate }: Long
+- suspend deleteWhere { predicate }: Int — returns deleted count
+
+### Reactive (Flow)
+- fun observeAll(): Flow<List<T>> — re-emits on every write
+- fun observeWhere(orderBy, limit, offset) { predicate }: Flow<List<T>>
+
+### @Relation Helpers (per FK property)
+- suspend findBy<Parent>(parentId): List<T>
+- fun observeBy<Parent>(parentId): Flow<List<T>>
+- suspend deleteBy<Parent>(parentId)
+
+### Ordering and Pagination
+findWhere and observeWhere accept these optional parameters:
+- orderBy: List<OrderSpec> — use Column.asc() or Column.desc()
+- limit: Long = 0 — max rows (0 = no limit)
+- offset: Long = 0 — rows to skip
+
+```kotlin
+import io.github.sufarook.kiln.runtime.asc
+import io.github.sufarook.kiln.runtime.desc
+
+repo.findWhere(
+    orderBy = listOf(ProductColumns.price.desc()),
+    limit = 20, offset = 40
+) { ProductColumns.isActive eq true }
+```
+
+## DSL Operators
+
+Used inside findWhere, observeWhere, deleteWhere, count lambdas.
+All values are bound as ? parameters (SQL injection impossible).
+
+| Operator         | SQL                    | Import needed |
+|------------------|------------------------|---------------|
+| col eq value     | col = ?                | eq            |
+| col neq value    | col != ?               | neq           |
+| col lt value     | col < ?                | lt            |
+| col lte value    | col <= ?               | lte           |
+| col gt value     | col > ?                | gt            |
+| col gte value    | col >= ?               | gte           |
+| col.between(a,b) | col BETWEEN ? AND ?    | between       |
+| col inList list  | col IN (?,?...)        | inList        |
+| col notInList l  | col NOT IN (?,?...)    | notInList     |
+| col.isNull()     | col IS NULL            | (none)        |
+| col.isNotNull()  | col IS NOT NULL        | (none)        |
+| col like pat     | col LIKE ?             | like          |
+| col notLike pat  | col NOT LIKE ?         | notLike       |
+| pred1 and pred2  | (p1) AND (p2)          | (none)*       |
+| pred1 or pred2   | (p1) OR (p2)           | (none)*       |
+| not(pred)        | NOT (pred)             | not           |
+
+*IMPORTANT: `and` and `or` are MEMBER FUNCTIONS on Predicate, not top-level
+imports. They work as infix calls without import. Only `not` needs an import.
+
+Import pattern:
+```kotlin
+import io.github.sufarook.kiln.runtime.eq
+import io.github.sufarook.kiln.runtime.like
+import io.github.sufarook.kiln.runtime.not  // only `not` needs import
+// `and` / `or` are members — do NOT import them
+```
+
+## Supported Types
+
+| Kotlin type                      | SQLite type |
+|----------------------------------|-------------|
+| String                           | TEXT        |
+| Int, Long, Short                 | INTEGER     |
+| Double, Float                    | REAL        |
+| Boolean                          | INTEGER     |
+| ByteArray                        | BLOB        |
+| kotlinx.datetime.LocalDate       | TEXT        |
+| kotlinx.datetime.LocalDateTime   | TEXT        |
+| kotlinx.datetime.Instant         | TEXT        |
+| Any enum class                   | TEXT        |
+| Any of the above as nullable (?) | same + NULL |
+
+## Transactions
+
+```kotlin
+import io.github.sufarook.kiln.runtime.withTransaction
+
+driver.withTransaction {
+    repo1.insert(entity1)
+    repo2.update(entity2)
+}
+```
+
+- Atomic commit/rollback
+- Reactive flows get ONE emission after commit (not per operation)
+- Blocks nest (inner joins outer; only outermost commits)
+- Pass Dispatchers.IO for I/O-heavy transactions
+
+## Auto-migration
+
+Migration is VERSION-LESS. No migration files, no version numbers.
+createTable() calls SchemaMigrator.sync() which diffs PRAGMA table_info
+against the entity definition.
+
+| Change          | Path   | What happens                              |
+|-----------------|--------|-------------------------------------------|
+| Add column      | Fast   | ALTER TABLE ADD COLUMN ... DEFAULT ...    |
+| Rename column   | Slow   | Table recreated; use @Column(migrateFrom) |
+| Remove column   | Slow   | Table recreated without the column        |
+| Type change     | Slow   | Table recreated with CAST                 |
+| No change       | No-op  | Only a PRAGMA read                        |
+
+IMPORTANT: New non-nullable columns MUST have a Kotlin default value.
+Without migrateFrom, a rename looks like drop + add (data lost).
+Table renames are NOT supported (no migrateFrom on @DbEntity).
+
+## Raw SQL Escape Hatch
+
+For aggregates, JOINs, GROUP BY — use the driver directly:
+
+```kotlin
+val total = driver.executeQuery(
+    null,
+    "SELECT COALESCE(SUM(amount), 0) FROM payments WHERE status = ?",
+    mapper = { cursor -> cursor.next(); cursor.getDouble(0) ?: 0.0 },
+    parameters = 1
+) { bindString(0, "COMPLETED") }
+```
+
+WARNING: Raw writes (driver.execute) do NOT trigger KilnListener.
+Call driver.notifyListeners("table_name") after raw writes if you
+need reactive flows to re-emit.
+
+## Driver Factories
+
+| Platform | Factory                    | Usage                        |
+|----------|----------------------------|------------------------------|
+| Android  | AndroidDatabaseDriverFactory | .create(context, "app.db")  |
+| iOS      | IosDatabaseDriverFactory    | .create("app.db")           |
+| JVM      | JvmDatabaseDriverFactory    | .create("app.db")           |
+| Tests    | JvmDatabaseDriverFactory    | .createInMemory()           |
+
+## Critical Invariants
+
+1. Kiln emits NO FOREIGN KEY constraints. @Relation generates helper methods
+   only. SQLite has no idea the tables relate. Referential integrity is your
+   responsibility.
+
+2. createTable() order does not matter — no FK dependencies between tables.
+
+3. KilnSchema.createAll(driver) covers every @DbEntity in a module.
+   Prefer it over per-repository createTable() calls.
+
+4. All repositories sharing the same KilnDriver share the same KilnListener.
+   Use ONE driver instance. Separate drivers = broken reactive observation.
+
+5. createTable() MUST be called outside any transaction — it throws
+   IllegalStateException if called inside one.
+
+6. insert() does not return the generated id. Query by a unique field
+   after insert if you need the id.
+
+7. Empty list to inList/notInList throws IllegalArgumentException.
+   Guard with if (list.isNotEmpty()).
