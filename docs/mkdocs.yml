@@ -94,4 +94,5 @@ nav:
     - Supported Types: reference/supported-types.md
     - "KDoc (annotations + runtime)": https://sufarook.github.io/Kiln/api/
   - Versioning: versioning.md
+  - AI Context File: ai-context.md
   - FAQ: faq.md
